@@ -1,0 +1,58 @@
+.container{
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginForm{
+    background: #e6e6e6;
+    border: 5px solid #c8c8c8;
+    border-radius: 5px;
+    width: 400px;
+    height: min-content;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.loginForm>div{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+.labelloginform{
+    margin-bottom: 5px;
+    font-size: 1.5em;
+    text-align: inherit;
+}
+
+.loginForm>div>input{
+    font-size: 1.2em;
+    border: 5px solid #c8c8c8;
+    border-radius: 3px;
+}
+
+.loginForm>div>input:focus-visible {
+    outline: black solid 1px;
+    font-size: 1.2em;
+    border: 5px solid #c8c8c8;
+}
+
+#loginError{
+    display: none;
+    border: 2px solid red;
+    text-align: center;
+    padding: 10px;
+    color: red;
+    margin-top: 15px;
+}
+
+.logo{
+    position: absolute;
+    top: 50px;
+    width: 150px;
+    height: auto;
+}

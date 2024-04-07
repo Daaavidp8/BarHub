@@ -1,0 +1,12 @@
+.containerFoodCards{
+    width: 90vw;
+    height: max-content;
+    background-color: white;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px 0;
+    border-radius: 5px;
+    justify-content: center;
+    margin: 20px 0;
+    gap: 10px;
+}

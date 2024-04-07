@@ -1,0 +1,15 @@
+.loginbutton{
+    align-self: center;
+    width: 150px;
+    border: none;
+    background-color: #c8c8c8;
+    font-size: 1em;
+    font-weight: normal;
+    margin-top: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.loginbutton:active{
+    background-color: #b8b8b8;
+}

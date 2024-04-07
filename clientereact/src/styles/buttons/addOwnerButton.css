@@ -1,0 +1,17 @@
+.openOwnerButton{
+    background-image: linear-gradient(to bottom, white, #00AF00) !important;
+}
+
+.crossAddOwnerButton{
+    position: absolute;
+    width: 150px !important;
+    height: auto !important;
+    transform: rotate(45deg);
+}
+
+
+.crossAddOwnerButton::before {
+    content: "Pulsa para añadir un nuevo propietario";
+    position: relative;
+    font-size: 2em;
+}

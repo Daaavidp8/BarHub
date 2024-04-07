@@ -1,0 +1,33 @@
+.button-59 {
+   align-items: center;
+   background-color: #fff;
+   border: 2px solid #000;
+   box-sizing: border-box;
+   color: black;
+   cursor: pointer;
+   display: inline-flex;
+   fill: #000;
+   font-family: Inter,sans-serif;
+   font-size: 14px;
+   font-weight: bold;
+   height: 35px;
+   justify-content: center;
+   letter-spacing: -.8px;
+   line-height: 24px;
+   min-width: 140px;
+   outline: 0;
+   padding: 0 10px;
+   text-align: center;
+   text-decoration: none;
+   transition: all .3s;
+   user-select: none;
+   -webkit-user-select: none;
+   touch-action: manipulation;
+}
+
+
+@media (min-width: 768px) {
+    .button-59 {
+        min-width: 170px;
+    }
+}
