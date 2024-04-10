@@ -6,6 +6,14 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Models\DB;
 
+$app->add(function ($request, $handler) {
+    $response = $handler->handle($request);
+    return $response
+        ->withHeader('Access-Control-Allow-Origin', '*')
+        ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'POST,GET,DELETE,PUT');
+});
+
 $app->get('/get_owners', function (Request $request, Response $response) {
     $sql = "SELECT * FROM Restaurants";
 
@@ -59,33 +67,20 @@ $app->get('/get_owner/{id}', function (Request $request, Response $response) {
     }
 });
 
-
-
 $app->post('/create_owner', function (Request $request, Response $response) {
     try {
         $data = $request->getParsedBody();
         $uploadedFiles = $request->getUploadedFiles();
 
-        // Verificamos si se ha enviado un archivo
-        if (!isset($uploadedFiles['owner_logo']) || !$uploadedFiles['owner_logo']->getError() === UPLOAD_ERR_OK) {
-            throw new Exception("No se ha recibido el archivo o ha ocurrido un error en la subida.");
-        }
+
 
         $name = $data["owner_name"];
         $cif = $data["owner_CIF"];
         $email = $data["owner_contact_email"];
         $phone = $data["owner_contact_phone"];
-        $uploadedFile = $uploadedFiles['owner_logo'];
 
+        $ruta = "../../clientereact/src/images/owners/" . $name;
 
-        // Verificamos si el archivo es una imagen PNG
-        if ($uploadedFile->getClientMediaType() !== 'image/png') {
-            throw new Exception("El archivo subido no tiene extensión PNG.");
-        }
-
-        $ruta = "../../owners/" . $name;
-
-        // Verificamos si el directorio ya existe
         if (!is_dir($ruta)) {
             mkdir($ruta, 0777, true);
             mkdir($ruta . "/img/sections", 0777, true);
@@ -94,17 +89,26 @@ $app->post('/create_owner', function (Request $request, Response $response) {
             throw new Exception("El directorio ya existe.");
         }
 
-        // Directorio donde se guardará el archivo
-        $directorio = $ruta . "/img/";
+        $uploadedFile = isset($uploadedFiles['owner_logo']) ? $uploadedFiles['owner_logo'] : null;
 
-        // Movemos el archivo al directorio deseado
-        $nombreArchivo = 'logo.png'; // Nombre que se le dará al archivo
-        $rutaArchivo = $directorio . $nombreArchivo;
+        if ($uploadedFile !== null && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+            // Subimos el logo a la carpeta creada del correspondiente del restaurante
+            if ($uploadedFile->getClientMediaType() !== 'image/png') {
+                throw new Exception("El archivo subido no tiene extensión PNG.");
+            }
 
-        // Intentamos mover el archivo
-        if (!$uploadedFile->moveTo($rutaArchivo)) {
-            throw new Exception("Error al mover el archivo.");
+            $directorio = $ruta . "/img/";
+
+            $nombreArchivo = 'logo.png';
+            $rutaArchivo = $directorio . $nombreArchivo;
+
+            $uploadedFile->moveTo($rutaArchivo);
         }
+
+
+
+
+
 
         // Insertamos los datos en la base de datos
         $sql = "INSERT INTO Restaurants (name, cif, contactEmail, contactPhone) VALUES (:name, :cif, :email, :phone)";
@@ -121,67 +125,113 @@ $app->post('/create_owner', function (Request $request, Response $response) {
         // Retornamos una respuesta exitosa
         return $response
             ->withHeader('content-type', 'application/json')
-            ->withJson(["message" => "Propietario creado exitosamente."], 200);
+            ->withStatus(200);
     } catch (Exception $e) {
         // En caso de errores, retornamos un mensaje de error
         return $response
             ->withHeader('content-type', 'application/json')
-            ->withJson(["error" => $e->getMessage()], 500);
+            ->withStatus(500);
     }
 });
 
 
-
-$app->put('/update_owner/{id}',function (Request $request, Response $response, array $args)
-{
+$app->put('/update_owner/{id}', function (Request $request, Response $response) {
     $id = $request->getAttribute('id');
     $data = $request->getParsedBody();
+
     $name = $data["owner_name"];
     $cif = $data["owner_CIF"];
     $email = $data["owner_contact_email"];
     $phone = $data["owner_contact_phone"];
-    $rutaOwners = "../../owners/";
+    $rutaOwners = "../../clientereact/src/images/owners/";
+
 
     try {
-        $sql = "SELECT name FROM Restaurants WHERE id_restaurant = $id";
-
-        $db = new Db();
+        $db = new DB();
         $conn = $db->connect();
 
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $lastFolderName = $stmt->fetchColumn();
-        $lastFolderName = $rutaOwners . $lastFolderName;
-        $newFolderName = $rutaOwners . $name;
+        // Verificar si el nuevo nombre de propietario ya existe en la base de datos
+        $sql_check = "SELECT COUNT(*) FROM Restaurants WHERE name = :name AND id_restaurant != :id";
+        $stmt_check = $conn->prepare($sql_check);
+        $stmt_check->bindParam(':name', $name);
+        $stmt_check->bindParam(':id', $id);
+        $stmt_check->execute();
+        $count = $stmt_check->fetchColumn();
 
 
-        if (file_exists($lastFolderName)){
-            if (!file_exists($newFolderName)){
-                    rename($lastFolderName,$newFolderName);
-            }else{
-                throw new Exception("New Directory name already exists");
-            }
-        }else{
-            throw new Exception("Last Directory name not found");
+        if ($count > 0) {
+            throw new Exception("El nuevo nombre de propietario ya está en uso.");
         }
 
-        $sql = "UPDATE Restaurants SET name = :name, cif = :cif,contactEmail = :email,contactPhone = :phone WHERE id_restaurant = $id";
+        // Verificar si el nombre de la carpeta debe actualizarse
+        $sql_get_old_name = "SELECT name FROM Restaurants WHERE id_restaurant = :id";
+        $stmt_get_old_name = $conn->prepare($sql_get_old_name);
+        $stmt_get_old_name->bindParam(':id', $id);
+        $stmt_get_old_name->execute();
+        $old_name = $stmt_get_old_name->fetchColumn();
 
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':cif', $cif);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':phone', $phone);
 
-        $result = $stmt->execute();
 
-        $db = null;
+        // Actualizar la información del propietario en la base de datos
+        $sql_update = "UPDATE Restaurants SET name = :name, cif = :cif, contactEmail = :email, contactPhone = :phone WHERE id_restaurant = :id";
+        $stmt_update = $conn->prepare($sql_update);
+        $stmt_update->bindParam(':name', $name);
+        $stmt_update->bindParam(':cif', $cif);
+        $stmt_update->bindParam(':email', $email);
+        $stmt_update->bindParam(':phone', $phone);
+        $stmt_update->bindParam(':id', $id);
+        $stmt_update->execute();
 
-        $response->getBody()->write(json_encode($result));
+        // Manejar la subida del archivo si existe
+        $uploadedFiles = $request->getUploadedFiles();
+        $uploadedFile = isset($uploadedFiles['owner_logo']) ? $uploadedFiles['owner_logo'] : null;
+
+        if ($uploadedFile !== null && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+            // Verificar el tipo de archivo
+            if ($uploadedFile->getClientMediaType() !== 'image/png') {
+                throw new Exception("El archivo subido no tiene extensión PNG.");
+            }
+
+            // Mover el archivo al directorio de imágenes del propietario
+            $directorio = $rutaOwners . $old_name . "/img/";
+            $nombreArchivo = 'logo.png';
+            $rutaArchivo = $directorio . $nombreArchivo;
+
+            $uploadedFile->moveTo($rutaArchivo);
+        }
+
+        if ($name !== $old_name) {
+            // Renombrar el directorio del propietario solo si el nombre es diferente
+            $old_folder_path = $rutaOwners . $old_name;
+            $new_folder_path = $rutaOwners . $name;
+
+            if (file_exists($old_folder_path)) {
+                rename($old_folder_path, $new_folder_path);
+            } else {
+                throw new Exception("El directorio original no existe.");
+            }
+        }
+
+
+
+
+
+        // Retornar una respuesta exitosa
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (PDOException $e) {
+        // Manejar errores de la base de datos
+        $error = array(
+            "message" => $e->getMessage()
+        );
+
+        $response->getBody()->write(json_encode($error));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(500);
+    } catch (Exception $e) {
+        // Manejar otros tipos de errores
         $error = array(
             "message" => $e->getMessage()
         );
@@ -192,6 +242,7 @@ $app->put('/update_owner/{id}',function (Request $request, Response $response, a
             ->withStatus(500);
     }
 });
+
 
 
 function borrar_directorio($directorio)
@@ -217,15 +268,11 @@ function borrar_directorio($directorio)
 }
 
 $app->delete('/delete_owner/{id}', function (Request $request, Response $response, array $args) {
-
     $id = $args["id"];
-    $rutaOwners = "../../owners/";
-
-
+    $rutaOwners = "../../clientereact/src/images/owners/";
 
     try {
-        // Delete from owners directory
-
+        // Borrar Carpeta
         $db = new Db();
         $conn = $db->connect();
 
@@ -234,13 +281,32 @@ $app->delete('/delete_owner/{id}', function (Request $request, Response $respons
         $stmt->execute();
         $folderName = $stmt->fetchColumn();
         $folderName = $rutaOwners . $folderName;
-        var_dump($folderName);
 
         borrar_directorio($folderName);
-         // Delete from database
+
+        // Borrar de la base de datos todo lo relacionado con ese restaurante
+
+        $sql = "DELETE FROM Articles WHERE id_section IN (SELECT id_section FROM Sections WHERE id_restaurant = $id)";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        $sql = "DELETE FROM UsersRoles WHERE id_user IN (SELECT id_user FROM Users WHERE id_restaurant = $id)";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        $sql = "DELETE FROM DinnerTables WHERE id_restaurant = $id";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        $sql = "DELETE FROM Sections WHERE id_restaurant = $id";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        $sql = "DELETE FROM Users WHERE id_restaurant = $id";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
 
         $sql = "DELETE FROM Restaurants WHERE id_restaurant = $id";
-
         $stmt = $conn->prepare($sql);
         $result = $stmt->execute();
 

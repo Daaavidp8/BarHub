@@ -9,6 +9,9 @@
     width: 100px;
     height: auto;
 }
+.flechaBack:hover{
+    cursor: pointer;
+}
 .contenedorFormOwners{
     display: flex;
     flex-direction: column;
@@ -46,11 +49,20 @@
     border-color: black;
 }
 
-.addOwner{
+.actionOwnerbutton{
     border: 1px solid black;
     padding: 10px 20px;
     font-size: 1.3em;
     margin-top: 10px;
+}
+
+.actionOwnerbutton:hover{
+    cursor: pointer;
+}
+
+.saveChangesButton{
+    background-image: linear-gradient(to bottom, white, #0033FF) !important;
+
 }
 
 .boximage{
@@ -69,4 +81,9 @@
     display: flex;
     align-items: center;
     font-size: 1.2em;
+}
+
+.restaurantName{
+    width: 75%;
+    text-align: center;
 }

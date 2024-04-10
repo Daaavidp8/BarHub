@@ -1,0 +1,66 @@
+.actionButton{
+    color: black;
+    border-radius: 5px;
+    border: 1px solid black;
+    transition: .3s;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.actionButton>*{
+    font-size: 1.5em;
+}
+
+.actionButton:hover{
+    cursor: pointer;
+}
+
+.modifyButton{
+    background-color: #0033FF;
+}
+
+.modifyButton:hover{
+    background-color: #0022CC;
+
+}
+
+.deleteButton{
+    background-color: #FF3300;
+}
+
+.deleteButton:hover{
+    background-color: #CC2200;
+}
+
+
+.confirmButtons{
+    width: 100px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 2px;
+    font-size: 1.5em ;
+}
+
+.confirmButtons:hover{
+    cursor: pointer;
+}
+
+.containerConfirmButtons{
+    justify-content: center;;
+}
+
+.deleteConfirmButton{
+    background-image: linear-gradient(to bottom, white, red) !important;
+}
+
+.messageConfirmDelete{
+    font-size: 2em;
+}
+
+

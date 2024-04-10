@@ -1,31 +1,45 @@
 import { useEffect, useState } from 'react';
-import {BrowserRouter as Router, Route, Routes, Navigate} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Login } from './components/main/Login';
 import { SecondScreen } from './components/main/SecondScreen';
 import { Admin } from "./components/main/Admin/Admin";
-import { AddOwner } from "./components/main/Admin/AddOwner";
+import { ActionOwner } from "./components/main/Admin/ActionOwner";
 import axios from "axios";
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+
+library.add(fas);
 
 function App() {
-    const [loggedIn, setLoggedIn] = useState(false);
+    const [loggedIn, setLoggedIn] = useState(() => {
+        // Al cargar la aplicación, comprobamos si hay un estado de inicio de sesión almacenado en localStorage
+        const storedLoggedIn = localStorage.getItem('loggedIn');
+        return storedLoggedIn === 'true';
+    });
     const [owners, setOwners] = useState([]);
 
     useEffect(() => {
-        const fetchOwners = async () => {
-            if (loggedIn) {
+        if (loggedIn) {
+            const fetchOwners = async () => {
                 try {
                     const response = await axios.get('http://172.17.0.2:8888/get_owners');
                     setOwners(response.data);
                 } catch (error) {
                     console.error('Error al obtener propietarios:', error);
                 }
-            }
-        };
-        fetchOwners();
+            };
+            fetchOwners();
+        }
     }, [loggedIn]);
 
     const handleLogin = () => {
+        localStorage.setItem('loggedIn', 'true');
         setLoggedIn(true);
+    };
+
+    const handleLogout = () => {
+        localStorage.setItem('loggedIn', 'false');
+        setLoggedIn(false);
     };
 
     return (
@@ -33,9 +47,17 @@ function App() {
             <Routes>
                 <Route path="/login" element={<Login onLogin={handleLogin} />} />
                 <Route path="/" element={<Navigate to="/login" />} />
-                <Route path="/admin" element={loggedIn ? <Admin/> : <Navigate to="/login" />} />
-                <Route path="/admin/add_owner" element={loggedIn ? <AddOwner /> : <Navigate to="/login" />} />
+                <Route path="/admin" element={loggedIn ? <Admin logout={handleLogout}/> : <Navigate to="/login" />} />
+                <Route path="/admin/add_owner" element={loggedIn ? <ActionOwner action={true}/> : <Navigate to="/login" />} />
                 <Route path="/pedido/:id" element={loggedIn ? <SecondScreen /> : <Navigate to="/login" />} />
+                {owners.map((owner) => (
+                    <Route
+                        key={owner.id_restaurant}
+                        path={`/admin/modify_owner/${owner.id_restaurant}`}
+                        element={loggedIn ? <ActionOwner action={false} data={owner}/> : <Navigate to="/login" />}
+                    />
+                ))}
+
                 {owners.map((owner) => (
                     <Route
                         key={owner.id_restaurant}

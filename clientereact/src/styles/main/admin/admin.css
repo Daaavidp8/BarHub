@@ -22,17 +22,75 @@
     flex-wrap: wrap;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+    gap: 20px;
     justify-content: start;
 }
 
 .ownersContainer>*{
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 100px;
-    height: 100px;
-    padding: 80px;
-    margin-bottom: 30px;
+    width: auto;
+    height: 300px;
     border: 5px solid black;
 }
+.boximageowner{
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    border: 3px solid black;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.logoOwners{
+    font-size: 1.5em;
+}
+
+.owner{
+    justify-content: space-evenly;
+}
+
+.restaurantName
+{
+    font-size: 1.2em;
+    font-weight: bold;
+    word-wrap: break-word;
+}
+
+.containerActionButtons{
+    display: flex;
+    gap: 10px;
+}
+
+.containerConfirmDelete{
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.confirmDelete{
+    background-color: #e6e6e6;
+    padding: 50px;
+    border-radius: 5px;
+    border: 3px solid black;
+}
+
+.errorCard{
+    display: none;
+    border: 3px red solid;
+    border-radius: 3px;
+    color: red;
+    padding: 20px;
+}
+
+
+
+
+

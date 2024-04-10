@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/forms/formOwners.css";
@@ -16,54 +16,69 @@ export function FormOwners(props) {
     const inputFileRef = useRef(null);
 
     const addOwner = async () => {
-        console.log(name)
-        console.log(cif)
-        console.log(email)
-        console.log(phone)
+        if (validarCampos()){
 
-
-        const formData = new FormData();
-        if (inputFileRef.current.files && inputFileRef.current.files.length > 0) {
+            const formData = new FormData();
             formData.append('owner_logo', inputFileRef.current.files[0]);
-        }
-        formData.append('owner_name', name);
-        formData.append('owner_CIF', cif);
-        formData.append('owner_contact_email', email);
-        formData.append('owner_contact_phone', phone);
+            formData.append('owner_name', name);
+            formData.append('owner_CIF', cif);
+            formData.append('owner_contact_email', email);
+            formData.append('owner_contact_phone', phone);
 
-        try {
+            try {
+                await axios.post('http://172.17.0.2:8888/create_owner', formData);
 
-            const response1 = await axios.post('http://172.17.0.2:8888/create_owner', formData);
 
-            console.log(response1.data);
 
-            const response = await axios.get('http://172.17.0.2:8888/get_owners');
+                const response = await axios.get('http://172.17.0.2:8888/get_owners');
 
-            const promises = response.data
-                .filter(owner => owner.name === name)
-                .map(async owner => {
-                    await axios.post('http://172.17.0.2:8888/create_worker/' + owner.id_restaurant, {
-                        worker_name: owner.name + "_admin",
-                        worker_username: username,
-                        worker_password: password,
-                        worker_roles: "2"
+                const promises = response.data
+                    .filter(owner => owner.name === name)
+                    .map(async owner => {
+                        await axios.post('http://172.17.0.2:8888/create_worker/' + owner.id_restaurant, {
+                            worker_name: owner.name + "_admin",
+                            worker_username: username,
+                            worker_password: password,
+                            worker_roles: "2"
+                        });
                     });
-                });
 
-            await Promise.all(promises);
+                await Promise.all(promises);
 
-            navigate("/admin");
-        } catch (error) {
-            console.error('Error al añadir propietario:', error);
+
+                navigate("/admin");
+
+                window.location.reload();
+            } catch (error) {
+                console.error('Error al añadir propietario:', error);
+            }
         }
     };
 
     const modifyOwner = async () => {
-        try {
-            // Implementar la lógica para modificar el propietario
-        } catch (error) {
-            console.error('Error al modificar propietario:', error);
+        if (validarCampos()){
+
+            const formData = new FormData();
+            formData.append('owner_logo', inputFileRef.current.files[0]);
+            formData.append('owner_name', name);
+            formData.append('owner_CIF', cif);
+            formData.append('owner_contact_email', email);
+            formData.append('owner_contact_phone', phone);
+            console.log(formData)
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json' // Indica el tipo de contenido de la solicitud
+                }
+            };
+
+            try {
+                await axios.put(`http://172.17.0.2:8888/update_owner/${props.data.id_restaurant}`, formData, config);
+                navigate("/admin");
+            } catch (error) {
+                console.error('Error al modificar propietario:', error);
+            }
         }
+
     };
 
     const handleChange = (e) => {
@@ -101,6 +116,64 @@ export function FormOwners(props) {
         }
     };
 
+    useEffect(() => {
+        if (!props.action) {
+            setName(props.data.name);
+            setCif(props.data.cif);
+            setEmail(props.data.contactEmail);
+            setPhone(props.data.contactPhone);
+
+            // Vista Previa Logo
+            axios.get("/src/images/owners/" + props.data.name + "/img/logo.png", {
+                responseType: 'blob'
+            }).then(response => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    setLogoPreview(reader.result);
+                };
+                reader.readAsDataURL(response.data);
+            }).catch(error => {
+                if (error.response && error.response.status === 404) {
+                    setLogoPreview(null);
+                } else {
+                    console.error('Error al cargar el logo:', error);
+                }
+            });
+
+
+        }
+    }, [props.action, props.data]);
+
+
+    const validarCampos = () => {
+        const regexTelefono = /^\d{9}$/;
+        const regexCIF = /^[ABCDEFGHJKLMNPQRSUVWabcdefghjklmnpqrsuvw]\d{7}[0-9A-J]$/;
+        const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        let errorMessage = "";
+
+        if (!regexTelefono.test(phone)) {
+            errorMessage += "- El número de teléfono debe tener 9 dígitos. <br>";
+        }
+
+        if (!regexCIF.test(cif)) {
+            errorMessage += "- El CIF no es válido. <br>";
+        }
+
+        if (!regexEmail.test(email)) {
+            errorMessage += "- El email no es válido. ";
+        }
+
+        if (errorMessage !== "") {
+            document.getElementsByClassName("errorCard")[0].style.display = "block";
+            document.getElementsByClassName("errorCard")[0].innerHTML = errorMessage;
+            return false;
+        }
+
+        return true;
+
+
+    }
+
     return (
         <div id="contenedorAllOwners" className="contenedorAllOwners">
             <div className="contenedorFormOwners">
@@ -127,26 +200,44 @@ export function FormOwners(props) {
                             onChange={handleChange}
                             required
                         /><br/>
-                        <label htmlFor="username">Nombre de Usuario:</label><br/>
-                        <input
-                            type="text"
-                            id="username"
-                            name="username"
-                            placeholder="Introduce el nombre de usuario..."
-                            value={username}
-                            onChange={handleChange}
-                            required
-                        />
-                        <label htmlFor="password">Contraseña:</label><br/>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Introduce la contraseña del usuario..."
-                            value={password}
-                            onChange={handleChange}
-                            required
-                        />
+                        {props.action ? (
+                            <>
+                                <label htmlFor="username">Nombre de Usuario:</label><br/>
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    placeholder="Introduce el nombre de usuario..."
+                                    value={username}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <label htmlFor="password">Contraseña:</label><br/>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    placeholder="Introduce la contraseña del usuario..."
+                                    value={password}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <label htmlFor="cif">CIF:</label><br/>
+                                <input
+                                    type="text"
+                                    id="cif"
+                                    name="cif"
+                                    placeholder="Introduce el cif de la empresa..."
+                                    value={cif}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </>
+                        )}
+
                     </div>
 
                     <div>
@@ -159,44 +250,51 @@ export function FormOwners(props) {
                             )}
                         </div>
                         <br/>
-                        <label htmlFor="cif">CIF:</label><br/>
-                        <input
-                            type="text"
-                            id="cif"
-                            name="cif"
-                            placeholder="Introduce el cif de la empresa..."
-                            value={cif}
-                            onChange={handleChange}
-                            required
-                        />
+                        {props.action && (
+                            <>
+                                <label htmlFor="cif">CIF:</label><br/>
+                                <input
+                                    type="text"
+                                    id="cif"
+                                    name="cif"
+                                    placeholder="Introduce el cif de la empresa..."
+                                    value={cif}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </>
 
-                        <label htmlFor="email">Email de Contacto:</label><br/>
+                        )}
+
+                        <label htmlFor="contactEmail">Email de Contacto:</label><br/>
                         <input
                             type="email"
-                            id="email"
-                            name="email"
+                            id="contactEmail"
+                            name="contactEmail"
                             placeholder="Ej: correodecontacto@ayuda.com"
                             value={email}
                             onChange={handleChange}
                             required
                         /><br/>
-                        <label htmlFor="phone">Teléfono de Contacto:</label><br/>
+                        <label htmlFor="contactPhone">Teléfono de Contacto:</label><br/>
                         <input
                             type="tel"
-                            id="phone"
-                            name="phone"
+                            id="contactPhone"
+                            name="contactPhone"
                             placeholder="Introduce el telefono de la persona de contacto..."
                             value={phone}
                             onChange={handleChange}
                             required
                         />
                     </div>
+
                 </form>
+                <div className="errorCard"></div>
 
                 {props.action ? (
-                    <button type="button" className="openOwnerButton addOwner" onClick={addOwner}>Añadir</button>
+                    <button type="button" className="openOwnerButton actionOwnerbutton" onClick={addOwner}>Añadir</button>
                 ) : (
-                    <button type="button" onClick={modifyOwner}>Modificar Restaurante</button>
+                    <button type="button" onClick={modifyOwner} className="actionOwnerbutton saveChangesButton">Guardar Cambios</button>
                 )}
             </div>
         </div>

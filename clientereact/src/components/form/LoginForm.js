@@ -4,7 +4,7 @@ import { Loginbutton } from "../buttons/LoginButton";
 import '../../styles/forms/loginForm.css';
 import axios from 'axios';
 
-export function LoginForm({ onLogin, prevPath }) {
+export function LoginForm({ onLogin }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();

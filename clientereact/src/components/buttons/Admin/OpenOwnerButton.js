@@ -6,6 +6,7 @@ export function OpenOwnerButton() {
     const navigate = useNavigate();
 
     const goPath = () => {
+        window.scrollTo(0, 0);
         navigate("/admin/add_owner")
     }
 
