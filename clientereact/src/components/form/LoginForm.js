@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Route, Routes, useNavigate} from 'react-router-dom';
 import { Loginbutton } from "../buttons/LoginButton";
 import '../../styles/forms/loginForm.css';
 import axios from 'axios';
@@ -26,6 +26,11 @@ export function LoginForm({ onLogin }) {
                     let restaurantName = responseowner.data[0].name;
                     navigate("/" + restaurantName + '/admin');
                 }
+                await new Promise(resolve => {
+                    localStorage.setItem('roles', response.data.roles);
+                    localStorage.setItem('restaurant', response.data.restaurant);
+                    resolve();
+                });
             } else {
                 document.getElementById('loginError').innerHTML = "Usuario o Contraseña incorrecto";
                 document.getElementById('loginError').style.display = "block";

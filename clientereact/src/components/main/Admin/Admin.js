@@ -5,10 +5,10 @@ import { ReactComponent as Logo } from '../../../images/logosvg.svg';
 import { OpenOwnerButton } from '../../buttons/Admin/OpenOwnerButton';
 import { ModifyButton } from '../../buttons/ModifyButton';
 import { DeleteButton } from '../../buttons/DeleteButton';
-import {Navigate, Route, Routes, useNavigate} from "react-router-dom";
-import {ActionOwner} from "./ActionOwner";
+import {useNavigate} from "react-router-dom";
 
 export function Admin({logout}) {
+    const navigate = useNavigate();
     const [owners, setOwners] = useState([]);
 
     useEffect(() => {
@@ -88,7 +88,7 @@ export function Admin({logout}) {
 
     return (
         <>
-            <DefaultTitle logo={<Logo className="logoAdmin" />} text="Administración de Propietarios" />
+            <DefaultTitle logo={<Logo className="logoAdmin"/>} text="Administración de Propietarios" />
             <div className="ownersContainer">
                 <OpenOwnerButton />
                 {owners.map((owner) => (
@@ -109,6 +109,12 @@ export function Admin({logout}) {
 
                 </div>
             </div>
+            <div onClick={() => {
+                logout();
+                navigate("/");
+            }}>Cerrar Sesión
+            </div>
+
         </>
     );
 }
