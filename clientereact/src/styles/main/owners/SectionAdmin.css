@@ -1,0 +1,32 @@
+.defaultTitle{
+    font-size: 1.3em;
+    padding-left: 5px;
+}
+
+.defaultTitle>div{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.containerSections{
+    margin: 50px auto 0;
+    display: flex;
+    flex-direction: column;
+    width: 75vw;
+    height: auto;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+}
+
+.containerSections>div{
+    background-color: #e6e6e6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 300px;
+    height: 300px;
+    border-radius: 3px;
+}

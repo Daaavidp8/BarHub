@@ -16,68 +16,86 @@ export function FormOwners(props) {
     const inputFileRef = useRef(null);
 
     const addOwner = async () => {
-        if (validarCampos()){
+        const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
+            username: localStorage.getItem('username'),
+            password: localStorage.getItem('password'),
+        });
 
-            const formData = new FormData();
-            formData.append('owner_logo', inputFileRef.current.files[0]);
-            formData.append('owner_name', name);
-            formData.append('owner_CIF', cif);
-            formData.append('owner_contact_email', email);
-            formData.append('owner_contact_phone', phone);
+        if (response.data.roles == 1){
+            if (validarCampos()){
 
-            try {
-                await axios.post('http://172.17.0.2:8888/create_owner', formData);
+                const formData = new FormData();
+                formData.append('owner_logo', inputFileRef.current.files[0]);
+                formData.append('owner_name', name);
+                formData.append('owner_CIF', cif);
+                formData.append('owner_contact_email', email);
+                formData.append('owner_contact_phone', phone);
+
+                try {
+                    await axios.post('http://172.17.0.2:8888/create_owner', formData);
 
 
 
-                const response = await axios.get('http://172.17.0.2:8888/get_owners');
+                    const response = await axios.get('http://172.17.0.2:8888/get_owners');
 
-                const promises = response.data
-                    .filter(owner => owner.name === name)
-                    .map(async owner => {
-                        await axios.post('http://172.17.0.2:8888/create_worker/' + owner.id_restaurant, {
-                            worker_name: owner.name + "_admin",
-                            worker_username: username,
-                            worker_password: password,
-                            worker_roles: "2"
+                    const promises = response.data
+                        .filter(owner => owner.name === name)
+                        .map(async owner => {
+                            await axios.post('http://172.17.0.2:8888/create_worker/' + owner.id_restaurant, {
+                                worker_name: owner.name + "_admin",
+                                worker_username: username,
+                                worker_password: password,
+                                worker_roles: "2"
+                            });
                         });
-                    });
 
-                await Promise.all(promises);
+                    await Promise.all(promises);
 
 
-                navigate("/admin");
+                    navigate("/admin");
 
-                window.location.reload();
-            } catch (error) {
-                console.error('Error al añadir propietario:', error);
+                    window.location.reload();
+                } catch (error) {
+                    console.error('Error al añadir propietario:', error);
+                }
             }
         }
+
     };
 
     const modifyOwner = async () => {
-        if (validarCampos()){
+        const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
+            username: localStorage.getItem('username'),
+            password: localStorage.getItem('password'),
+        });
 
-            const formData = new FormData();
-            formData.append('owner_logo', inputFileRef.current.files[0]);
-            formData.append('owner_name', name);
-            formData.append('owner_CIF', cif);
-            formData.append('owner_contact_email', email);
-            formData.append('owner_contact_phone', phone);
-            console.log(formData)
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json' // Indica el tipo de contenido de la solicitud
+        if (response.data.roles == 1){
+            if (validarCampos()){
+
+                const formData = new FormData();
+                formData.append('owner_logo', inputFileRef.current.files[0]);
+                formData.append('owner_name', name);
+                formData.append('owner_CIF', cif);
+                formData.append('owner_contact_email', email);
+                formData.append('owner_contact_phone', phone);
+                console.log(formData)
+                const config = {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                };
+
+                try {
+                    await axios.put(`http://172.17.0.2:8888/update_owner/${props.data.id_restaurant}`, formData, config);
+                    navigate("/admin");
+                    window.location.reload();
+                } catch (error) {
+                    console.error('Error al modificar propietario:', error);
                 }
-            };
-
-            try {
-                await axios.put(`http://172.17.0.2:8888/update_owner/${props.data.id_restaurant}`, formData, config);
-                navigate("/admin");
-            } catch (error) {
-                console.error('Error al modificar propietario:', error);
             }
+
         }
+
 
     };
 
@@ -124,7 +142,7 @@ export function FormOwners(props) {
             setPhone(props.data.contactPhone);
 
             // Vista Previa Logo
-            axios.get("/src/images/owners/" + props.data.name + "/img/logo.png", {
+            axios.get("/images/owners/" + props.data.name + "/img/logo.png", {
                 responseType: 'blob'
             }).then(response => {
                 const reader = new FileReader();

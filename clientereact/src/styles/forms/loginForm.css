@@ -56,3 +56,43 @@
     width: 150px;
     height: auto;
 }
+
+@media screen and (max-width: 450px) {
+
+    .loginForm {
+        width: 300px;
+        padding: 10px;
+    }
+
+    .loginForm > div {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+    }
+
+    .labelloginform {
+        margin-bottom: 3px;
+        font-size: 1.2em;
+    }
+
+    .loginForm > div > input {
+        font-size: 1em;
+    }
+
+    .loginForm > div > input:focus-visible {
+        font-size: 1em;
+    }
+
+    #loginError {
+        padding: 5px;
+        margin-top: 10px;
+    }
+
+    .logo {
+        top: 20%;
+        width: 100px;
+    }
+
+}
+
+

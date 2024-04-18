@@ -17,20 +17,20 @@ export function LoginForm({ onLogin }) {
                 password: password,
             });
 
+            console.log(response.data)
+
             if (response.data.status) {
                 onLogin();
+                localStorage.setItem('username', username);
+                localStorage.setItem('password', password);
                 if (response.data.roles == 1){
                     navigate("/admin");
+                    window.location.reload();
                 }else {
                     const responseowner = await axios.get('http://172.17.0.2:8888/get_owner/' + response.data.restaurant);
                     let restaurantName = responseowner.data[0].name;
                     navigate("/" + restaurantName + '/admin');
                 }
-                await new Promise(resolve => {
-                    localStorage.setItem('roles', response.data.roles);
-                    localStorage.setItem('restaurant', response.data.restaurant);
-                    resolve();
-                });
             } else {
                 document.getElementById('loginError').innerHTML = "Usuario o Contraseña incorrecto";
                 document.getElementById('loginError').style.display = "block";

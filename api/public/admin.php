@@ -79,7 +79,7 @@ $app->post('/create_owner', function (Request $request, Response $response) {
         $email = $data["owner_contact_email"];
         $phone = $data["owner_contact_phone"];
 
-        $ruta = "../../clientereact/src/images/owners/" . $name;
+        $ruta = "../../clientereact/public/images/owners/" . $name;
 
         if (!is_dir($ruta)) {
             mkdir($ruta, 0777, true);
@@ -89,7 +89,7 @@ $app->post('/create_owner', function (Request $request, Response $response) {
             throw new Exception("El directorio ya existe.");
         }
 
-        $uploadedFile = isset($uploadedFiles['owner_logo']) ? $uploadedFiles['owner_logo'] : null;
+        $uploadedFile = $uploadedFiles['owner_logo'] ?? null;
 
         if ($uploadedFile !== null && $uploadedFile->getError() === UPLOAD_ERR_OK) {
             // Subimos el logo a la carpeta creada del correspondiente del restaurante
@@ -119,7 +119,7 @@ $app->post('/create_owner', function (Request $request, Response $response) {
         $stmt->bindParam(':cif', $cif);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':phone', $phone);
-        $result = $stmt->execute();
+        $stmt->execute();
         $db = null;
 
         // Retornamos una respuesta exitosa
@@ -138,12 +138,23 @@ $app->post('/create_owner', function (Request $request, Response $response) {
 $app->put('/update_owner/{id}', function (Request $request, Response $response) {
     $id = $request->getAttribute('id');
     $data = $request->getParsedBody();
+    $uploadedFiles = $request->getUploadedFiles();
+
+    $error = array(
+        "message" => $uploadedFiles
+    );
+
+    $response->getBody()->write(json_encode($error));
+    return $response
+        ->withHeader('content-type', 'application/json')
+        ->withStatus(500);
+
 
     $name = $data["owner_name"];
     $cif = $data["owner_CIF"];
     $email = $data["owner_contact_email"];
     $phone = $data["owner_contact_phone"];
-    $rutaOwners = "../../clientereact/src/images/owners/";
+    $rutaOwners = "../../clientereact/public/images/owners/" . $name;
 
 
     try {
@@ -182,26 +193,10 @@ $app->put('/update_owner/{id}', function (Request $request, Response $response) 
         $stmt_update->bindParam(':id', $id);
         $stmt_update->execute();
 
-        // Manejar la subida del archivo si existe
-        $uploadedFiles = $request->getUploadedFiles();
-        $uploadedFile = isset($uploadedFiles['owner_logo']) ? $uploadedFiles['owner_logo'] : null;
 
-        if ($uploadedFile !== null && $uploadedFile->getError() === UPLOAD_ERR_OK) {
-            // Verificar el tipo de archivo
-            if ($uploadedFile->getClientMediaType() !== 'image/png') {
-                throw new Exception("El archivo subido no tiene extensión PNG.");
-            }
 
-            // Mover el archivo al directorio de imágenes del propietario
-            $directorio = $rutaOwners . $old_name . "/img/";
-            $nombreArchivo = 'logo.png';
-            $rutaArchivo = $directorio . $nombreArchivo;
-
-            $uploadedFile->moveTo($rutaArchivo);
-        }
 
         if ($name !== $old_name) {
-            // Renombrar el directorio del propietario solo si el nombre es diferente
             $old_folder_path = $rutaOwners . $old_name;
             $new_folder_path = $rutaOwners . $name;
 
@@ -213,10 +208,25 @@ $app->put('/update_owner/{id}', function (Request $request, Response $response) 
         }
 
 
+        $uploadedFile = $uploadedFiles['owner_logo'] ?? null;
+
+        if ($uploadedFile !== null && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+            if ($uploadedFile->getClientMediaType() !== 'image/png') {
+                throw new Exception("El archivo subido no tiene extensión PNG.");
+            }
+
+            $directorio = $rutaOwners . "/img/";
+
+            $nombreArchivo = 'logo.png';
+            $rutaArchivo = $directorio . $nombreArchivo;
+
+            $uploadedFile->moveTo($rutaArchivo);
+        }
 
 
 
-        // Retornar una respuesta exitosa
+
+
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
@@ -269,7 +279,7 @@ function borrar_directorio($directorio)
 
 $app->delete('/delete_owner/{id}', function (Request $request, Response $response, array $args) {
     $id = $args["id"];
-    $rutaOwners = "../../clientereact/src/images/owners/";
+    $rutaOwners = "../../clientereact/public/images/owners/";
 
     try {
         // Borrar Carpeta

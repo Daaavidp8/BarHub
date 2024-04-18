@@ -8,7 +8,8 @@ import { ActionOwner } from "./components/main/Admin/ActionOwner";
 import axios from "axios";
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
-import {AdminOwner} from "./components/main/Owner/AdminOwner";
+import {SelectOption} from "./components/main/SelectOption";
+import {SectionAdminOwner} from "./components/main/Owner/SectionAdminOwner";
 
 library.add(fas);
 
@@ -22,13 +23,25 @@ function App() {
     const [owners, setOwners] = useState([]);
 
     useEffect(() => {
-        if (loggedIn) {
+        if (loggedIn && localStorage.getItem('username') !== '') {
             const fetchData = async () => {
                 try {
-                    setUserRole( localStorage.getItem('roles'));
-                    setuserRestaurant( localStorage.getItem('restaurant'));
+                    const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
+                        username: localStorage.getItem('username'),
+                        password: localStorage.getItem('password'),
+                    });
+                    let roles = [];
+
+                    response.data.roles.forEach((role) => {
+                        roles.push(role)
+                    })
+
+                    setUserRole(roles);
+
+                    setuserRestaurant( response.data.restaurant);
                     const ownersResponse = await axios.get('http://172.17.0.2:8888/get_owners');
                     setOwners(ownersResponse.data);
+
                 } catch (error) {
                     console.error('Error al obtener datos:', error);
                 }
@@ -44,8 +57,8 @@ function App() {
 
     const handleLogout = () => {
         localStorage.setItem('loggedIn', 'false');
-        localStorage.setItem('roles', '');
-        localStorage.setItem('restaurant', '');
+        localStorage.setItem('password', '');
+        localStorage.setItem('username', '');
         setLoggedIn(false);
     };
 
@@ -54,29 +67,57 @@ function App() {
             <Routes>
                 <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
-                {loggedIn && userRole === "1" ? (
+                { !loggedIn || localStorage.getItem('username') === '' ? (
+                <Route path="/" element={<Navigate to="/login" />} />
+                ) : null}
+
+                {loggedIn && userRole == "1" ? (
                     <>
                         <Route path="/admin" element={<Admin logout={handleLogout} />} />
                         <Route path="/" element={<Navigate to="/admin" />} />
                     </>
-                ) : loggedIn && userRole !== "1" ? (
+                ) : loggedIn && userRole != "1" ? (
                     <>
                         {owners.map((owner) => (
                             <React.Fragment key={owner.id_restaurant}>
-                                <Route
-                                    path={`/${owner.name}/admin`}
-                                    element={owner.id_restaurant == userRestaurant ? <AdminOwner logout={handleLogout}/> : console.log("Id->" + owner.id_restaurant + "\nUserREst->" + userRestaurant)}
-                                />
-                                <Route path="/" element={<Navigate to={`/${owner.name}/admin`} />} />
+                                {owner.id_restaurant === userRestaurant && (
+                                    <>
+                                        <Route
+                                            path={`/${owner.name}/admin`}
+                                            element={<SelectOption logout={handleLogout} name={owner.name} restaurant={owner.id_restaurant}/>}
+                                        />
+                                        {userRole.includes(2) && (
+                                            <><Route
+                                                path={`/${owner.name}/admin/sections`}
+                                                element={<SectionAdminOwner/>}
+                                            />
+                                                <Route
+                                                    path={`/${owner.name}/admin/workers`}
+                                                    element={<SelectOption logout={handleLogout} name={owner.name} restaurant={owner.id_restaurant}/>}
+                                                />
+
+
+                                            </>
+
+                                        )}
+                                        {userRole.includes(3) && (
+                                            <Route
+                                                path={`/${owner.name}/admin/tables`}
+                                                element={<SelectOption logout={handleLogout} name={owner.name} restaurant={owner.id_restaurant}/>}
+                                            />
+                                        )}
+                                        <Route path="/" element={<Navigate to={`/${owner.name}/admin`} />} />
+                                    </>
+                                )}
+
                             </React.Fragment>
                         ))}
+
                     </>
-                ) : !loggedIn ? (
-                    <Route path="/" element={<Navigate to="/login" />} />
                 ) : null}
 
 
-
+                {console.log(localStorage.getItem('username') === '')}
 
                 <Route path="/admin/add_owner" element={loggedIn ? <ActionOwner action={true}/> : <Navigate to="/login" />} />
                 <Route path="/pedido/:id" element={loggedIn ? <SecondScreen /> : <Navigate to="/login" />} />

@@ -7,17 +7,28 @@ import { ModifyButton } from '../../buttons/ModifyButton';
 import { DeleteButton } from '../../buttons/DeleteButton';
 import {useNavigate} from "react-router-dom";
 
+
+
+
 export function Admin({logout}) {
     const navigate = useNavigate();
     const [owners, setOwners] = useState([]);
 
     useEffect(() => {
         const getOwners = async () => {
-            try {
-                const response = await axios.get('http://172.17.0.2:8888/get_owners');
-                setOwners(response.data);
-            } catch (error) {
-                console.error('Error al obtener propietarios:', error);
+            const responsesesion = await axios.post('http://172.17.0.2:8888/get_sesion', {
+                username: localStorage.getItem('username'),
+                password: localStorage.getItem('password'),
+            });
+
+            if (responsesesion.data.roles == "1"){
+                try {
+                    const response = await axios.get('http://172.17.0.2:8888/get_owners');
+                    setOwners(response.data);
+
+                } catch (error) {
+                    console.error('Error al obtener propietarios:', error);
+                }
             }
         };
         getOwners();
@@ -86,35 +97,38 @@ export function Admin({logout}) {
         }
     };
 
+
+
     return (
         <>
-            <DefaultTitle logo={<Logo className="logoAdmin"/>} text="Administración de Propietarios" />
+            <DefaultTitle logo={<Logo className="logoAdmin" />} text="Administración de Propietarios" />
             <div className="ownersContainer">
                 <OpenOwnerButton />
                 {owners.map((owner) => (
                     <div key={owner.id_restaurant} className="owner">
                         <div className="boximageowner">
-                            <img className="logoOwners" src={`../../../images/owners/${owner.name}/img/logo.png`} alt="Imagen No Subida" style={{ width: '80px', height: '84px' }} />
+                            <img
+                                src={`/images/owners/${owner.name}/img/logo.png`}
+                                alt={`Imagen no subida`}
+                                style={{ width: '100%', height: '100%' }}
+                            />
                         </div>
                         <p className="restaurantName">{owner.name}</p>
                         <div className="containerActionButtons">
                             <ModifyButton path={["modify_owner", owner.id_restaurant]} />
-                            <DeleteButton onClick={() => showModalDelete(owner.id_restaurant,owner.name)} />
+                            <DeleteButton onClick={() => showModalDelete(owner.id_restaurant, owner.name)} />
                         </div>
                     </div>
                 ))}
             </div>
             <div className="containerConfirmDelete">
-                <div className="confirmDelete">
-
-                </div>
+                <div className="confirmDelete"></div>
             </div>
             <div onClick={() => {
                 logout();
                 navigate("/");
             }}>Cerrar Sesión
             </div>
-
         </>
     );
 }
