@@ -10,29 +10,10 @@ import {useNavigate} from "react-router-dom";
 
 
 
-export function Admin({logout}) {
+export function Admin(props) {
     const navigate = useNavigate();
-    const [owners, setOwners] = useState([]);
-
-    useEffect(() => {
-        const getOwners = async () => {
-            const responsesesion = await axios.post('http://172.17.0.2:8888/get_sesion', {
-                username: localStorage.getItem('username'),
-                password: localStorage.getItem('password'),
-            });
-
-            if (responsesesion.data.roles == "1"){
-                try {
-                    const response = await axios.get('http://172.17.0.2:8888/get_owners');
-                    setOwners(response.data);
-
-                } catch (error) {
-                    console.error('Error al obtener propietarios:', error);
-                }
-            }
-        };
-        getOwners();
-    }, []);
+    const [owners, setOwners] = useState(props.owners);
+    const [dataLoaded, setDataLoaded] = useState(false);
 
     const showModalDelete = (id,name) => {
         try {
@@ -125,8 +106,8 @@ export function Admin({logout}) {
                 <div className="confirmDelete"></div>
             </div>
             <div onClick={() => {
-                logout();
-                navigate("/");
+                props.logout();
+                navigate("/login");
             }}>Cerrar Sesión
             </div>
         </>

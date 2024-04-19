@@ -1,0 +1,21 @@
+.crossAddButton{
+    position: absolute;
+    left: 10px;
+    width: 40px !important;
+    height: auto !important;
+    transform: rotate(45deg);
+}
+
+.addButton{
+    position: relative;
+    color: white;
+    font-size: 1.5em;
+    width: 90vw;
+    height: 50px;
+    margin: 0 auto;
+    background-color: black;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

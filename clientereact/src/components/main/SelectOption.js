@@ -50,7 +50,7 @@ export function SelectOption(props) {
 
     const closeSesion = () => {
         props.logout()
-        navigate("/");
+        navigate("/login");
     }
 
     return (
