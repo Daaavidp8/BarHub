@@ -21,6 +21,8 @@ $app->add(new BasePathMiddleware($app));
 $app->addErrorMiddleware(true, true, true);
 $app->addBodyParsingMiddleware();
 
+
+
 include "./admin.php";
 include "./owners.php";
 include "./waiters.php";

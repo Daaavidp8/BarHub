@@ -1,0 +1,73 @@
+.flechaVolver{
+    width: 70px;
+    height: auto;
+    position: relative;
+    top: 5px;
+}
+
+.formelements{
+    width: 90vw;
+    margin: 0 auto;
+}
+.containerImage{
+    display: flex;
+}
+.custom-file-upload{
+    width: 60%;
+}
+
+.inputElement{
+    margin-top: 20px;
+}
+
+#imagen{
+    width: 100%;
+    text-wrap: normal;
+}
+
+.containerName{
+    margin-top: 20px;
+}
+
+.inputElement:not([type="file"]) {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.inputElement:not([type="file"]):focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.labelFormElements{
+    font-size: 1.2em;
+}
+
+.containerFormElementActionButton{
+   width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.errorFormElement{
+    margin: 25px;
+    font-size: 0.9em;
+}
+
+.containerActionElementButtons{
+    position: relative;
+    z-index: 5;
+}
+
+.titleForm{
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+

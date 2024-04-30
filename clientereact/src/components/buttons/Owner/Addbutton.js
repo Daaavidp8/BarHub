@@ -7,7 +7,7 @@ export function Addbutton(props) {
 
     const goPath = () => {
         window.scrollTo(0, 0);
-        navigate("/admin/add_section")
+        navigate(props.path);
     }
 
     return (

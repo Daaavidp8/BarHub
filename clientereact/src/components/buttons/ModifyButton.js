@@ -8,7 +8,7 @@ export function ModifyButton({path}) {
 
     const goPath = () => {
         window.scrollTo(0, 0);
-        navigate(path.join('/'));
+        navigate(path);
     }
 
     return (

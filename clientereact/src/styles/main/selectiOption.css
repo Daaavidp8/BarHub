@@ -26,12 +26,17 @@
     height: auto;
 }
 
-.logout{
+.logout {
     width: 100px;
     padding: 10px;
-    background-image: linear-gradient(to bottom, white, red) !important;
+    background-image: linear-gradient(to bottom, white, red);
     border: 1px solid black;
     margin: 40px auto;
     border-radius: 3px;
+    transition: 1s ease;
+}
 
+.logout:hover {
+    cursor: pointer;
+    background-image: linear-gradient(to bottom, black, red);
 }

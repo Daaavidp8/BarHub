@@ -10,6 +10,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { SelectOption } from "./components/main/SelectOption";
 import { SectionAdminOwner } from "./components/main/Owner/SectionAdminOwner";
+import {FormElement} from "./components/form/Owner/FormElement";
 
 library.add(fas);
 
@@ -22,6 +23,7 @@ function App() {
     const [userRestaurant, setuserRestaurant] = useState([]);
     const [owners, setOwners] = useState([]);
     const [sections, setSections] = useState([]);
+    const [articles, setArticles] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
 
     useEffect(() => {
@@ -39,15 +41,20 @@ function App() {
                     })
 
                     setUserRole(roles);
+                    const userRestaurantresponse = await axios.get('http://172.17.0.2:8888/get_owner/' + response.data.restaurant);
 
-                    const userRestaurant = await axios.get('http://172.17.0.2:8888/get_owner/' + response.data.restaurant);
-
-                    setuserRestaurant(userRestaurant.data[0]);
+                    setuserRestaurant(userRestaurantresponse.data[0]);
                     const ownersResponse = await axios.get('http://172.17.0.2:8888/get_owners');
                     setOwners(ownersResponse.data);
 
                     const sectionsResponse = await axios.get('http://172.17.0.2:8888/get_sections/' + response.data.restaurant);
                     setSections(sectionsResponse.data);
+
+                    sectionsResponse.data.map(async (section) => {
+                        let responseArticles = await axios.get('http://172.17.0.2:8888/get_articles/' + section.id_section);
+                        setArticles(prevArticles => [...prevArticles, ...responseArticles.data]);
+                    });
+
 
                     setDataLoaded(true)
 
@@ -95,7 +102,7 @@ function App() {
                         </>
                     ) : loggedIn && !userRole.includes(1) ? (
                         <>
-                            <React.Fragment key={userRestaurant.id_restaurant}>
+                            <React.Fragment>
                                 <>
                                     <Route
                                         path={`/${userRestaurant.name}/admin`}
@@ -105,21 +112,30 @@ function App() {
                                         <>
                                             <Route
                                                 path={`/${userRestaurant.name}/admin/sections`}
-                                                element={<SectionAdminOwner elements={sections} restaurant={userRestaurant.name} title={'Secciones'} table={"sections"}/>}
+                                                element={<SectionAdminOwner restaurant={userRestaurant} title={'Secciones'} table={"sections"}/>}
                                             />
                                             <Route
                                                 path={`/${userRestaurant.name}/admin/add_section`}
-                                                element={null}
+                                                element={<FormElement title={"Añadir Sección"} action={true} element={"sections"} restaurant={userRestaurant}/>}
                                             />
-                                            {sections.map(section => (
-                                                <Route
-                                                    path={`/${userRestaurant.name}/admin/${section.name}`}
-                                                    element={null}
-                                                />
+                                            {sections.map((section, index) => (
+                                                <>
+                                                    <Route key={`modify_section_${section.name}`} path={`/${userRestaurant.name}/admin/modify_section/${section.name}`} element={<FormElement title={"Modificar Sección"} action={false} element={"sections"} restaurant={userRestaurant} data={section}/>} />
+                                                    <Route key={`section_${index}`} path={`/${userRestaurant.name}/admin/${section.name}`} element={<SectionAdminOwner restaurant={userRestaurant} title={section.name} table={"articles"} data={section}/>} />
+                                                    <Route key={`add_article_${section.name}`} path={`/${userRestaurant.name}/admin/add_${section.name}`} element={<FormElement title={"Añadir " + (section.name.endsWith('s') ? section.name.substring(0, section.name.length - 1) : section.name)} action={true} element={"articles"} restaurant={userRestaurant} data={section}/>} />
+                                                </>
                                             ))}
+                                            {articles.map((article) => (
+                                                <Route key={`modify_article_${article.id}`} path={`/${userRestaurant.name}/admin/modify_article/${article.name}`} element={<FormElement title={"Modificar Articulo"} action={false} element={"articles"} restaurant={userRestaurant} data={article}/>} />
+                                            ))}
+
                                             <Route
                                                 path={`/${userRestaurant.name}/admin/workers`}
-                                                element={<SelectOption logout={handleLogout} name={userRestaurant.name} restaurant={userRestaurant.id_restaurant} />}
+                                                element={<SectionAdminOwner restaurant={userRestaurant} title={'Trabajadores'} table={"workers"}/>}
+                                            />
+                                            <Route
+                                                path={`/${userRestaurant.name}/admin/add_worker`}
+                                                element={<SectionAdminOwner restaurant={userRestaurant} title={'Trabajadores'} table={"workers"}/>}
                                             />
                                         </>
                                     )}
@@ -138,9 +154,8 @@ function App() {
                     <Route path="/admin/add_owner" element={loggedIn ? <ActionOwner action={true} /> : <Navigate to="/login" />} />
                     <Route path="/pedido/:id" element={loggedIn ? <SecondScreen /> : <Navigate to="/login" />} />
 
-                    {owners.map((owner) => (
-                        <Route
-                            key={owner.id_restaurant}
+                    {owners.map((owner,index) => (
+                        <Route key={`${owner.id_restaurant}_${index}`}
                             path={`/admin/modify_owner/${owner.id_restaurant}`}
                             element={loggedIn ? <ActionOwner action={false} data={owner} /> : <Navigate to="/login" />}
                         />

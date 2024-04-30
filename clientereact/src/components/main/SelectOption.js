@@ -51,6 +51,7 @@ export function SelectOption(props) {
     const closeSesion = () => {
         props.logout()
         navigate("/login");
+        window.location.reload();
     }
 
     return (

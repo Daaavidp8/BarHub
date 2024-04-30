@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { DefaultTitle } from '../../titles/DefaultTitle';
 import { ReactComponent as Logo } from '../../../images/logosvg.svg';
 import { OpenOwnerButton } from '../../buttons/Admin/OpenOwnerButton';
 import { ModifyButton } from '../../buttons/ModifyButton';
 import { DeleteButton } from '../../buttons/DeleteButton';
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
+import "../../../styles/main/admin/admin.css"
 
 
 
@@ -13,6 +14,9 @@ import {useNavigate} from "react-router-dom";
 export function Admin(props) {
     const navigate = useNavigate();
     const [owners, setOwners] = useState(props.owners);
+    const location = useLocation();
+    const currentPath = location.pathname;
+    const basePath = currentPath.substring(0, currentPath.lastIndexOf('/'));
     const [dataLoaded, setDataLoaded] = useState(false);
 
     const showModalDelete = (id,name) => {
@@ -82,11 +86,11 @@ export function Admin(props) {
 
     return (
         <>
-            <DefaultTitle logo={<Logo className="logoAdmin" />} text="Administración de Propietarios" />
+            <DefaultTitle logo={<Logo className="logoAdmin" />} text={<p className="tituloAdmin">Administración de Propietarios</p>}/>
             <div className="ownersContainer">
                 <OpenOwnerButton />
                 {owners.map((owner) => (
-                    <div key={owner.id_restaurant} className="owner">
+                    <div className="owner">
                         <div className="boximageowner">
                             <img
                                 src={`/images/owners/${owner.name}/img/logo.png`}
@@ -96,7 +100,7 @@ export function Admin(props) {
                         </div>
                         <p className="restaurantName">{owner.name}</p>
                         <div className="containerActionButtons">
-                            <ModifyButton path={["modify_owner", owner.id_restaurant]} />
+                            <ModifyButton path={basePath + "modify_owner/" + owner.id_restaurant} />
                             <DeleteButton onClick={() => showModalDelete(owner.id_restaurant, owner.name)} />
                         </div>
                     </div>
@@ -105,9 +109,10 @@ export function Admin(props) {
             <div className="containerConfirmDelete">
                 <div className="confirmDelete"></div>
             </div>
-            <div onClick={() => {
+            <div className="logout" onClick={() => {
                 props.logout();
                 navigate("/login");
+                window.location.reload();
             }}>Cerrar Sesión
             </div>
         </>

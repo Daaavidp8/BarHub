@@ -71,7 +71,7 @@
     display: flex;
     align-items: center;
 }
-.boximage>div{
+.boximage>div,.containerPreview>div{
     border: 2px solid black;
     width: 70px;
     height: 40px;
@@ -83,7 +83,3 @@
     font-size: 1.2em;
 }
 
-.restaurantName{
-    width: 75%;
-    text-align: center;
-}

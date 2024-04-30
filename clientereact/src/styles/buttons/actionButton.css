@@ -64,3 +64,18 @@
 }
 
 
+@media only screen and (max-width: 400px) {
+    .actionButton {
+        width: 30px;
+        height: 30px;
+        font-size: 0.7em;
+    }
+    .containerElements > div > div {
+        gap: 3px;
+    }
+}
+
+
+
+
+

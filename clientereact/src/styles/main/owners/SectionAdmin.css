@@ -17,6 +17,7 @@
     height: auto;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .containerElements>div{
@@ -31,5 +32,60 @@
 
 .containerElements>div>div{
     display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.deleteAdminOwner{
+    width: 100vw;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    background-color: #e6e6e6;
+    z-index: 10;
+    text-align: center;
+}
+
+
+.containerConfirmButtons{
+    width: 70%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
     gap: 10px;
 }
+
+.textConfirmdeletesection{
+    font-size: 1.8em;
+}
+
+.notElementsFound{
+
+}
+
+.textElement{
+    width: 60%;
+    font-size: 1.3em;
+    font-weight: bold;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.priceElement{
+    font-size: 1.3em;
+    margin-right: 10px;
+}
+
+.containerPrice{
+    margin-top: 20px;
+}
+
+
+@media only screen and (max-width: 400px) {
+    .containerElements{
+        font-size: 0.8em;
+    }
+}
+

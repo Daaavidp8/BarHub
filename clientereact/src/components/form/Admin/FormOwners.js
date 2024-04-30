@@ -73,15 +73,14 @@ export function FormOwners(props) {
             if (validarCampos()){
 
                 const formData = new FormData();
-                formData.append('owner_logo', inputFileRef.current.files[0]);
+                formData.append('owner_logo', logoPreview);
                 formData.append('owner_name', name);
                 formData.append('owner_CIF', cif);
                 formData.append('owner_contact_email', email);
                 formData.append('owner_contact_phone', phone);
-                console.log(formData)
                 const config = {
                     headers: {
-                        'Content-Type': 'multipart/form-data'
+                        'Content-Type': 'application/json'
                     }
                 };
 

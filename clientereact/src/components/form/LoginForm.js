@@ -17,8 +17,6 @@ export function LoginForm({ onLogin }) {
                 password: password,
             });
 
-            console.log(response.data)
-
             if (response.data.status) {
                 onLogin();
                 localStorage.setItem('username', username);

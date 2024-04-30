@@ -34,6 +34,34 @@ $app->get('/get_sections/{id}', function (Request $request, Response $response) 
     }
 });
 
+// Get specific section
+$app->get('/get_section/{id_section}', function (Request $request, Response $response) {
+    $sectionid = $request->getAttribute('id_section');
+    $sql = "SELECT * FROM Sections WHERE id_section = $sectionid";
+
+    try {
+        $db = new DB();
+        $conn = $db->connect();
+        $stmt = $conn->query($sql);
+        $owner = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+
+        $response->getBody()->write(json_encode($owner));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(200);
+    } catch (PDOException $e) {
+        $error = array(
+            "message" => $e->getMessage()
+        );
+
+        $response->getBody()->write(json_encode($error));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(500);
+    }
+});
+
 
 // Get article from specific section
 $app->get('/get_articles/{id_section}', function (Request $request, Response $response) {
@@ -123,15 +151,46 @@ $app->get('/get_workers/{id_owner}', function (Request $request, Response $respo
 $app->post('/create_section/{id_owner}', function (Request $request, Response $response) {
     $ownerid = $request->getAttribute('id_owner');
     $data = $request->getParsedBody();
+    $uploadedFiles = $request->getUploadedFiles();
     $name = $data["section_name"];
 
 
-    $sql = "INSERT INTO Sections (name, id_restaurant) VALUES (:name, :idowner)";
+
+
+
 
     try {
         $db = new DB();
         $conn = $db->connect();
 
+        $sql = "SELECT name FROM Restaurants WHERE id_restaurant = :ownerid";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':ownerid', $ownerid);
+        $result = $stmt->execute();
+
+        if ($result) {
+            $ownername = $stmt->fetchColumn();
+        }
+
+        $ruta = "../../clientereact/public/images/owners/" . $ownername;
+
+        $uploadedFile = $uploadedFiles['section_img'] ?? null;
+
+        if ($uploadedFile !== null && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+            if ($uploadedFile->getClientMediaType() !== 'image/png') {
+                throw new Exception("El archivo subido no tiene extensión PNG.");
+            }
+
+            $directorio = $ruta . "/img/sections/";
+
+            $nombreArchivo = $name . '.png';
+            $rutaArchivo = $directorio . $nombreArchivo;
+
+            $uploadedFile->moveTo($rutaArchivo);
+        }
+
+
+        $sql = "INSERT INTO Sections (name, id_restaurant) VALUES (:name, :idowner)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':idowner', $ownerid);
@@ -160,17 +219,62 @@ $app->post('/create_section/{id_owner}', function (Request $request, Response $r
 $app->post('/create_article/{id_section}', function (Request $request, Response $response) {
     $sectionid = $request->getAttribute('id_section');
     $data = $request->getParsedBody();
+    $uploadedFiles = $request->getUploadedFiles();
     $name = $data["article_name"];
     $price = $data["article_price"];
-    $img = $data["article_img"];
 
 
-    $sql = "INSERT INTO Articles (name, price, id_section) VALUES (:name, :price, :idsection)";
+
+
+
+
 
     try {
         $db = new DB();
         $conn = $db->connect();
 
+
+        $sql = "SELECT id_restaurant FROM Sections WHERE id_section = :sectionid";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':sectionid', $sectionid);
+        $result = $stmt->execute();
+
+        if ($result) {
+            $ownerid = $stmt->fetchColumn();
+        }
+
+        $sql = "SELECT name FROM Restaurants WHERE id_restaurant = :ownerid";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':ownerid', $ownerid);
+        $result = $stmt->execute();
+
+        if ($result) {
+            $ownername = $stmt->fetchColumn();
+        }
+
+
+        $ruta = "../../clientereact/public/images/owners/" . $ownername;
+
+        $uploadedFile = $uploadedFiles['article_img'] ?? null;
+
+        if ($uploadedFile !== null && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+            if ($uploadedFile->getClientMediaType() !== 'image/png') {
+                throw new Exception("El archivo subido no tiene extensión PNG.");
+            }
+
+            $directorio = $ruta . "/img/articles/";
+
+            $nombreArchivo = $name . '.png';
+            $rutaArchivo = $directorio . $nombreArchivo;
+
+            $uploadedFile->moveTo($rutaArchivo);
+        }
+
+
+
+
+
+        $sql = "INSERT INTO Articles (name, price, id_section) VALUES (:name, :price, :idsection)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':price', $price);
@@ -254,25 +358,50 @@ $app->post('/create_worker/{id_owner}', function (Request $request, Response $re
 
 
 
-$app->put('/update_section/{id_section}',function (Request $request, Response $response, array $args)
+$app->put('/update_section/{id_section}', function (Request $request, Response $response)
 {
     $id = $request->getAttribute('id_section');
     $data = $request->getParsedBody();
     $name = $data["section_name"];
+    $img = explode(",",$data["section_img"])[1];
 
-    $sql = "UPDATE Sections SET name = :name WHERE id_section = $id";
+
+
 
     try {
         $db = new Db();
         $conn = $db->connect();
 
+        $sql = "SELECT name FROM Restaurants WHERE id_restaurant = (SELECT id_restaurant FROM Sections WHERE id_section = :id)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $ownername = $stmt->fetchColumn();
+
+
+        $ruta = "../../clientereact/public/images/owners/" . $ownername . "/img/sections/";
+
+        $sql = "SELECT name FROM Sections WHERE id_section = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $oldSectionName = $stmt->fetchColumn();
+
+        unlink($ruta . $oldSectionName . ".png");
+
+
+        $decoded_data = base64_decode($img);
+        file_put_contents($ruta  . $name . ".png", $decoded_data);
+
+
+        $sql = "UPDATE Sections SET name = :name WHERE id_section = $id";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':name', $name);
 
         $result = $stmt->execute();
 
         $db = null;
-        echo "Update successful! ";
+
         $response->getBody()->write(json_encode($result));
         return $response
             ->withHeader('content-type', 'application/json')
@@ -296,12 +425,36 @@ $app->put('/update_article/{id_article}',function (Request $request, Response $r
     $data = $request->getParsedBody();
     $name = $data["article_name"];
     $price = $data["article_price"];
+    $img = explode(",",$data["article_img"])[1];
 
-    $sql = "UPDATE Articles SET name = :name, price = :price WHERE id_article = $id";
 
     try {
         $db = new Db();
         $conn = $db->connect();
+
+        $sql = "SELECT name FROM Restaurants WHERE id_restaurant = (SELECT id_restaurant FROM Sections WHERE id_section = (SELECT id_section FROM Articles WHERE id_article = :id))";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $ownername = $stmt->fetchColumn();
+
+
+
+        $ruta = "../../clientereact/public/images/owners/" . $ownername . "/img/articles/";
+
+        $sql = "SELECT name FROM Articles WHERE id_article = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $oldArticleName = $stmt->fetchColumn();
+
+        unlink($ruta . $oldArticleName . ".png");
+
+
+        $decoded_data = base64_decode($img);
+        file_put_contents($ruta  . $name . ".png", $decoded_data);
+
+        $sql = "UPDATE Articles SET name = :name, price = :price WHERE id_article = $id";
 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':name', $name);
@@ -422,12 +575,35 @@ $app->put('/update_worker/{id_user}',function (Request $request, Response $respo
 $app->delete('/delete_section/{id_section}', function (Request $request, Response $response, array $args) {
     $id = $args["id_section"];
 
-    $sql = "DELETE FROM Sections WHERE id_section = $id";
+
 
     try {
         $db = new Db();
         $conn = $db->connect();
 
+
+        $sql = "SELECT name FROM Restaurants WHERE id_restaurant = (SELECT id_restaurant FROM Sections WHERE id_section = :id)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $ownerName = $stmt->fetchColumn();
+
+        $sql = "SELECT name FROM Sections WHERE id_section = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $sectionName = $stmt->fetchColumn();
+
+
+        $imagenRuta = "../../clientereact/public/images/owners/" . $ownerName . "/img/sections/" . $sectionName . ".png";
+        unlink($imagenRuta);
+
+        $sql = "DELETE FROM Articles WHERE id_section = $id";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+
+        $sql = "DELETE FROM Sections WHERE id_section = $id";
         $stmt = $conn->prepare($sql);
         $result = $stmt->execute();
 
@@ -453,9 +629,28 @@ $app->delete('/delete_article/{id_article}', function (Request $request, Respons
 
 
 
+
     try {
         $db = new Db();
         $conn = $db->connect();
+
+
+        $sql = "SELECT name FROM Restaurants WHERE id_restaurant = (SELECT id_restaurant FROM Sections WHERE id_section = (SELECT id_section FROM Articles WHERE id_article = :id))";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $ownerName = $stmt->fetchColumn();
+
+        $sql = "SELECT name FROM Articles WHERE id_article = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $articleName = $stmt->fetchColumn();
+
+
+        $imagenRuta = "../../clientereact/public/images/owners/" . $ownerName . "/img/articles/" . $articleName . ".png";
+
+        unlink($imagenRuta);
 
         $sql = "DELETE FROM Articles WHERE id_article = $id";
         $stmt = $conn->prepare($sql);
@@ -487,9 +682,11 @@ $app->delete('/delete_worker/{id_worker}', function (Request $request, Response 
 
 
 
+
+
         $sql = "DELETE FROM UsersRoles WHERE id_user = $id";
         $stmt = $conn->prepare($sql);
-        $result = $stmt->execute();
+        $stmt->execute();
 
         $sql = "DELETE FROM Users WHERE id_user = $id";
         $stmt = $conn->prepare($sql);

@@ -138,23 +138,14 @@ $app->post('/create_owner', function (Request $request, Response $response) {
 $app->put('/update_owner/{id}', function (Request $request, Response $response) {
     $id = $request->getAttribute('id');
     $data = $request->getParsedBody();
-    $uploadedFiles = $request->getUploadedFiles();
-
-    $error = array(
-        "message" => $uploadedFiles
-    );
-
-    $response->getBody()->write(json_encode($error));
-    return $response
-        ->withHeader('content-type', 'application/json')
-        ->withStatus(500);
 
 
     $name = $data["owner_name"];
     $cif = $data["owner_CIF"];
     $email = $data["owner_contact_email"];
     $phone = $data["owner_contact_phone"];
-    $rutaOwners = "../../clientereact/public/images/owners/" . $name;
+    $img = explode(",",$data["owner_logo"])[1];
+    $rutaOwners = "../../clientereact/public/images/owners/";
 
 
     try {
@@ -193,6 +184,14 @@ $app->put('/update_owner/{id}', function (Request $request, Response $response) 
         $stmt_update->bindParam(':id', $id);
         $stmt_update->execute();
 
+        $imagePath = $rutaOwners . $old_name . "/img/logo.png";
+
+
+        if ($img != null){
+            $decoded_data = base64_decode($img);
+            file_put_contents($imagePath, $decoded_data);
+        }
+
 
 
 
@@ -205,22 +204,6 @@ $app->put('/update_owner/{id}', function (Request $request, Response $response) 
             } else {
                 throw new Exception("El directorio original no existe.");
             }
-        }
-
-
-        $uploadedFile = $uploadedFiles['owner_logo'] ?? null;
-
-        if ($uploadedFile !== null && $uploadedFile->getError() === UPLOAD_ERR_OK) {
-            if ($uploadedFile->getClientMediaType() !== 'image/png') {
-                throw new Exception("El archivo subido no tiene extensión PNG.");
-            }
-
-            $directorio = $rutaOwners . "/img/";
-
-            $nombreArchivo = 'logo.png';
-            $rutaArchivo = $directorio . $nombreArchivo;
-
-            $uploadedFile->moveTo($rutaArchivo);
         }
 
 
