@@ -19,4 +19,7 @@ Si encuentras algún error o problema, por favor abre un issue en el repositorio
 
 ¡Gracias por contribuir!
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> fb9c1e51a376d280434bbe62556abf08a5e6b54d
