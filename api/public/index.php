@@ -21,36 +21,16 @@ $app->add(new BasePathMiddleware($app));
 $app->addErrorMiddleware(true, true, true);
 $app->addBodyParsingMiddleware();
 
-
-
 include "./admin.php";
 include "./owners.php";
 include "./waiters.php";
 
-
-$app->get('/get_token', function (Request $request, Response $response) {
-    try {
-        $token = bin2hex(random_bytes(16));
-        $response->getBody()->write(json_encode($token));
-        return $response
-            ->withHeader('content-type', 'application/json')
-            ->withStatus(200);
-    } catch (PDOException $e) {
-        $error = array(
-            "message" => $e->getMessage()
-        );
-
-        $response->getBody()->write(json_encode($error));
-        return $response
-            ->withHeader('content-type', 'application/json')
-            ->withStatus(500);
-    }
-});
-
 $app->post('/get_sesion', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
-    $username = $data["username"];
-    $password = $data["password"];
+
+    // Filtrar y validar entrada
+    $username = filter_var($data["username"], FILTER_SANITIZE_STRING);
+    $password = filter_var($data["password"], FILTER_SANITIZE_STRING);
 
     $sql = "SELECT * FROM Users WHERE username = :username";
 
@@ -64,7 +44,8 @@ $app->post('/get_sesion', function (Request $request, Response $response) {
         // Obtener los datos del usuario
         $user = $stmt->fetch();
 
-        if ($username && password_verify($password, $user['password'])) {
+        // Verificar la contraseña
+        if ($user && password_verify($password, $user['password'])) {
             $sql = "SELECT id_role FROM UsersRoles WHERE id_user = :id_user";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id_user', $user['id_user']);
@@ -77,18 +58,12 @@ $app->post('/get_sesion', function (Request $request, Response $response) {
                 "roles" => $roles,
                 "restaurant" => $user['id_restaurant']
             );
-
-
         } else {
             $data = array(
                 "status" => false,
-                "message" => 'No se encontraron roles para el usuario.'
+                "message" => 'Credenciales inválidas.'
             );
         }
-
-
-
-
 
         $response->getBody()->write(json_encode($data));
 
@@ -97,7 +72,7 @@ $app->post('/get_sesion', function (Request $request, Response $response) {
             ->withStatus(200);
     } catch (PDOException $e) {
         $error = array(
-            "message" => $e->getMessage()
+            "message" => "Error en la base de datos"
         );
 
         $response->getBody()->write(json_encode($error));
@@ -108,3 +83,4 @@ $app->post('/get_sesion', function (Request $request, Response $response) {
 });
 
 $app->run();
+

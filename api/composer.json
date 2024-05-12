@@ -2,7 +2,10 @@
     "require": {
         "slim/slim": "4.*",
         "slim/psr7": "^1.6",
-        "selective/basepath": "^2.2"
+        "selective/basepath": "^2.2",
+        "endroid/qr-code": "^5.0",
+        "ph-7/qrcode-generator-php-class": "^2.2",
+        "ext-gd": "*"
     },
     "autoload": {
         "psr-4": {

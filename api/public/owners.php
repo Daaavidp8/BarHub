@@ -9,12 +9,14 @@ use App\Models\DB;
 // Get sections from specific owner
 $app->get('/get_sections/{id}', function (Request $request, Response $response) {
     $id = $request->getAttribute('id');
-    $sql = "SELECT * FROM Sections WHERE id_restaurant = $id";
+    $sql = "SELECT * FROM Sections WHERE id_restaurant = :id";
 
     try {
         $db = new DB();
         $conn = $db->connect();
-        $stmt = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
         $owner = $stmt->fetchAll(PDO::FETCH_OBJ);
         $db = null;
 
@@ -37,12 +39,14 @@ $app->get('/get_sections/{id}', function (Request $request, Response $response) 
 // Get specific section
 $app->get('/get_section/{id_section}', function (Request $request, Response $response) {
     $sectionid = $request->getAttribute('id_section');
-    $sql = "SELECT * FROM Sections WHERE id_section = $sectionid";
+    $sql = "SELECT * FROM Sections WHERE id_section = :sectionid";
 
     try {
         $db = new DB();
         $conn = $db->connect();
-        $stmt = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':sectionid', $sectionid, PDO::PARAM_INT);
+        $stmt->execute();
         $owner = $stmt->fetchAll(PDO::FETCH_OBJ);
         $db = null;
 
@@ -61,41 +65,11 @@ $app->get('/get_section/{id_section}', function (Request $request, Response $res
             ->withStatus(500);
     }
 });
-
 
 // Get article from specific section
 $app->get('/get_articles/{id_section}', function (Request $request, Response $response) {
     $sectionid = $request->getAttribute('id_section');
     $sql = "SELECT * FROM Articles WHERE id_section = $sectionid";
-
-    try {
-        $db = new DB();
-        $conn = $db->connect();
-        $stmt = $conn->query($sql);
-        $owner = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $db = null;
-
-        $response->getBody()->write(json_encode($owner));
-        return $response
-            ->withHeader('content-type', 'application/json')
-            ->withStatus(200);
-    } catch (PDOException $e) {
-        $error = array(
-            "message" => $e->getMessage()
-        );
-
-        $response->getBody()->write(json_encode($error));
-        return $response
-            ->withHeader('content-type', 'application/json')
-            ->withStatus(500);
-    }
-});
-
-
-// Get specific article
-$app->get('/get_article/{id_article}', function (Request $request, Response $response) {
-    $articleid = $request->getAttribute('id_article');
-    $sql = "SELECT * FROM Articles WHERE id_article = $articleid";
 
     try {
         $db = new DB();

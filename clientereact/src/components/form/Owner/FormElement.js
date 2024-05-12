@@ -205,7 +205,7 @@ export function FormElement(props) {
                         <div className="containerPreview">
                             {logoPreview ? (
                                 <img src={logoPreview} alt="Vista previa del logo"
-                                     style={{width: '100px', height: '100px'}}/>
+                                     style={{maxWidth: '100px', maxHeight: '100px'}}/>
                             ) : (
                                 <div>Imagen No Subida</div>
                             )}

@@ -8,6 +8,7 @@ import "../../../styles/main/owners/SectionAdmin.css"
 import {Addbutton} from "../../buttons/Owner/Addbutton";
 import {ModifyButton} from "../../buttons/ModifyButton";
 import {DeleteButton} from "../../buttons/DeleteButton";
+import {DeleteTable} from "../../buttons/Waiter/DeleteTable";
 
 export function SectionAdminOwner(props) {
     const navigate = useNavigate();
@@ -36,6 +37,10 @@ export function SectionAdminOwner(props) {
                     case "workers":
                         const workersResponse = await axios.get('http://172.17.0.2:8888/get_workers/' + props.restaurant.id_restaurant);
                         setelements(workersResponse.data);
+                        break;
+                    case "tables":
+                        const tablesResponse = await axios.get('http://172.17.0.2:8888/get_tables/' + props.restaurant.id_restaurant);
+                        setelements(tablesResponse.data);
                         break;
                     default:
                         break;
@@ -145,6 +150,19 @@ export function SectionAdminOwner(props) {
         document.getElementsByClassName('containerConfirmDelete')[0].style.display = "none";
     };
 
+    const divAction = (element) => {
+        switch (props.table) {
+            case "sections":
+                navigate(`/${props.restaurant.name}/admin/${element.name}`);
+                break;
+            case "tables":
+                navigate(`/${props.restaurant.name}/admin/table/${element.table_number}`);
+                break;
+            default:
+                break;
+        }
+    }
+
     return (
                 <>
                     {dataLoaded && (<>
@@ -164,8 +182,13 @@ export function SectionAdminOwner(props) {
                         {props.table === "articles" ? (
                             <Addbutton text={'Añadir ' + props.title.charAt(0).toUpperCase() + props.title.slice(1)} path={basePath + "/add_" +  props.data.name} />
                         ):(
-                            <Addbutton text={'Añadir ' +  props.title.charAt(0).toUpperCase() + props.title.slice(1)} path={basePath + "/add_" +  props.table.substring(0, props.table.length - 1)} />
+                            <Addbutton text={'Añadir ' +  props.title.charAt(0).toUpperCase() + props.title.slice(1)} path={basePath + "/add_" +  props.table.substring(0, props.table.length - 1)} restaurant={props.restaurant.id_restaurant}/>
                         )}
+
+                        {props.table === "tables" ? (<>
+                                <DeleteTable text={'Eliminar ' +  props.title.charAt(0).toUpperCase() + props.title.slice(1)} restaurant={props.restaurant.id_restaurant}></DeleteTable>
+                                </>
+                        ) : null}
 
 
                         <div className='containerElements'>
@@ -174,16 +197,17 @@ export function SectionAdminOwner(props) {
                                     {elements.map((element,index) => (
                                         <div key={index}>
                                             <div style={{width: "70%", padding: "10px"}}
-                                                 onClick={() => props.table === "sections" && navigate(`/${props.restaurant.name}/admin/${element.name}`)}>
-                                                {props.table === "articles" || props.table === "articles" ? <img
+                                                 onClick={() => divAction(element)}>
+                                                {props.table === "articles" || props.table === "sections" ? <img
                                                     src={`/images/owners/${props.restaurant.name}/img/${props.table}/${element.name}.png`}
                                                     alt={element.name}
-                                                    style={{height: "50px", width: "50px"}}
+                                                    style={{maxWidth: "50px", maxHeight: "50px"}}
                                                 /> : null}
-                                                <p className="textElement"
-                                                   style={{width: `${props.table === "articles" ? 100 : 170}px`}}>
-                                                    {element.name.charAt(0).toUpperCase() + element.name.slice(1)}
-                                                </p>
+
+                                                <p className="textElement" style={props.table === "tables" ? {fontSize: "2em"} : null}>
+                                                        {props.table === "tables" ? "Mesa " + element.table_number
+                                                            : element.name.charAt(0).toUpperCase() + element.name.slice(1)}
+                                                    </p>
                                             </div>
                                             {element.price && (
                                                 <div className="priceElement">
@@ -191,16 +215,19 @@ export function SectionAdminOwner(props) {
                                                 </div>
                                             )}
                                             <div className="containerActionElementButtons">
-                                                <ModifyButton path={`${basePath}/modify_${props.table.substring(0, props.table.length - 1)}/${element.name}`}/>
-                                                <DeleteButton onClick={() => {
-                                                    showModalDelete(element)
-                                                }}/>
+                                                {props.table !== "tables" ? (<>
+                                                        <ModifyButton path={`${basePath}/modify_${props.table.substring(0, props.table.length - 1)}/${element.name}`}/>
+                                                        <DeleteButton onClick={() => {
+                                                            showModalDelete(element)
+                                                        }}/>
+                                                    </>
+                                                ) : null}
                                             </div>
                                         </div>
                                     ))}
                                 </>
                             ) : (
-                                <div className="notElementsFound">Vaya! No hay elementos en esta sección</div>
+                                <div className="notElementsFound">Vaya! No hay elementos en este apartado.</div>
                             )}
                         </div>
                         <div className="containerConfirmDelete deleteAdminOwner">
@@ -211,3 +238,4 @@ export function SectionAdminOwner(props) {
                 </>
     );
 }
+

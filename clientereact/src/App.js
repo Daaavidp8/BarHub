@@ -11,6 +11,8 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { SelectOption } from "./components/main/SelectOption";
 import { SectionAdminOwner } from "./components/main/Owner/SectionAdminOwner";
 import {FormElement} from "./components/form/Owner/FormElement";
+import {FormWorkers} from "./components/form/Owner/FormWorkers";
+import {ShowTable} from "./components/main/Waiter/ShowTable";
 
 library.add(fas);
 
@@ -24,6 +26,7 @@ function App() {
     const [owners, setOwners] = useState([]);
     const [sections, setSections] = useState([]);
     const [articles, setArticles] = useState([]);
+    const [tables, setTables] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
 
     useEffect(() => {
@@ -54,6 +57,9 @@ function App() {
                         let responseArticles = await axios.get('http://172.17.0.2:8888/get_articles/' + section.id_section);
                         setArticles(prevArticles => [...prevArticles, ...responseArticles.data]);
                     });
+
+                    const tableResponse = await axios.get('http://172.17.0.2:8888/get_tables/' + response.data.restaurant);
+                    setTables(tableResponse.data);
 
 
                     setDataLoaded(true)
@@ -135,15 +141,23 @@ function App() {
                                             />
                                             <Route
                                                 path={`/${userRestaurant.name}/admin/add_worker`}
-                                                element={<SectionAdminOwner restaurant={userRestaurant} title={'Trabajadores'} table={"workers"}/>}
+                                                element={<FormWorkers title={"Añadir Trabajador"} action={true} restaurant={userRestaurant}/>}
                                             />
                                         </>
                                     )}
-                                    {userRole.includes(3) && (
+                                    {userRole.includes(3) && (<>
                                         <Route
                                             path={`/${userRestaurant.name}/admin/tables`}
-                                            element={<SelectOption logout={handleLogout} name={userRestaurant.name} restaurant={userRestaurant.id_restaurant} />}
+                                            element={<SectionAdminOwner restaurant={userRestaurant} title={'Mesas'} table={"tables"}/>}
                                         />
+                                            {tables.map((table) => (
+                                                <Route
+                                                    key={userRestaurant.name + "_Mesa" + table.table_number}
+                                                    path={`/${userRestaurant.name}/admin/table/${table.table_number}`}
+                                                    element={<ShowTable table={table.table_number} restaurant={userRestaurant}/>}
+                                                />
+                                            ))}
+                                        </>
                                     )}
                                     <Route path="/" element={<Navigate to={`/${userRestaurant.name}/admin`} />} />
                                 </>

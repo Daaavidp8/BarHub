@@ -38,5 +38,4 @@
 
 .logout:hover {
     cursor: pointer;
-    background-image: linear-gradient(to bottom, black, red);
 }

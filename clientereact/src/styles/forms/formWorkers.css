@@ -1,0 +1,15 @@
+.formWorkers{
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.formWorkers>div{
+    width: 80vw;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.formWorkers>div>div>input{
+    margin-top: 10px;
+}
