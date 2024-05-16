@@ -10,7 +10,6 @@ export function ContenedorFoodcards(props) {
     const [dataLoaded, setdataLoaded] = useState(false);
 
     useEffect(() => {
-        console.log(props)
         const infoowner = async () => {
             const ownerResponse = await axios.get('http://172.17.0.2:8888/get_owner/' + props.table.id_restaurant);
             setOwner(ownerResponse.data[0]);

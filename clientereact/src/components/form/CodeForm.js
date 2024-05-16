@@ -14,7 +14,6 @@ export function CodeForm(props) {
         tablesResponse.data.map(elements => {
             codigos.push(elements.codenumber)
         })
-        console.log(codigos.includes(codigo))
         return codigos.includes(parseInt(codigo))
     }
 

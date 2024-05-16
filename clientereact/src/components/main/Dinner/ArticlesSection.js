@@ -11,38 +11,27 @@ import { DetailsButton } from "../../buttons/Dinner/DetailsButton";
 export function ArticlesSection(props) {
     const [articles, setArticles] = useState([]);
     const [numberArticles, setNumberArticles] = useState([]);
+    const [total, setTotal] = useState(0.0);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    const numArticlesPromises = (farticles) => {
-        return farticles.map(async (article) => {
+    const numArticlesPromises = async (farticles) => {
+        let totalCost = 0.0;
+        let cantidad = [];
+        await Promise.all(farticles.map(async (article) => {
             const numberArticlesResponse = await axios.get(`http://172.17.0.2:8888/get_number_articles/${props.owner.id_restaurant}/${props.table}/${article.id_article}`);
-            return numberArticlesResponse.data;
-        });
-    }
+            totalCost += (article.price * numberArticlesResponse.data);
+            cantidad.push(numberArticlesResponse.data)
+        }));
+        setTotal(totalCost);
+        setNumberArticles(cantidad)
+    };
 
     const getResumeOrder = async () => {
         try {
             const resumeOrderResponse = await axios.get(`http://172.17.0.2:8888/resumeOrder/${props.owner.id_restaurant}/${props.table}`);
-            console.log(resumeOrderResponse.data)
-
             setArticles(resumeOrderResponse.data);
 
-            const numArticles = await Promise.all(numArticlesPromises(resumeOrderResponse.data));
-            setNumberArticles(numArticles);
-
-            setDataLoaded(true);
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    const getArticles = async () => {
-        try {
-            const articlesResponse = await axios.get('http://172.17.0.2:8888/get_articles/' + props.section.id_section);
-            setArticles(articlesResponse.data);
-
-            const numArticles = await Promise.all(numArticlesPromises(articlesResponse.data));
-            setNumberArticles(numArticles);
+            await numArticlesPromises(resumeOrderResponse.data);
 
             setDataLoaded(true);
         } catch (e) {
@@ -50,14 +39,50 @@ export function ArticlesSection(props) {
         }
     };
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        if (props.section){
-            getArticles();
-        } else {
-            getResumeOrder();
+    const getArticles = async () => {
+        try {
+            const articlesResponse = await axios.get('http://172.17.0.2:8888/get_articles/' + props.section.id_section);
+            setArticles(articlesResponse.data);
+
+            await numArticlesPromises(articlesResponse.data);
+
+            setDataLoaded(true);
+        } catch (e) {
+            console.error(e);
         }
-    }, [props.section,props.owner.id_restaurant, props.table]);
+    };
+
+
+    useEffect(() => {
+        let basketInterval;
+        let articlesInterval;
+
+        const startBasketInterval = () => {
+            clearInterval(articlesInterval);
+            basketInterval = setInterval(async () => {
+                getResumeOrder();
+            }, 1000);
+        };
+
+        const startArticlesInterval = () => {
+            clearInterval(basketInterval);
+            articlesInterval = setInterval(async () => {
+                getArticles();
+            }, 1000);
+        };
+
+        if (props.section) {
+            startArticlesInterval();
+        } else {
+            startBasketInterval();
+        }
+
+        return () => {
+            clearInterval(basketInterval);
+            clearInterval(articlesInterval);
+        };
+    }, [props.section, props.owner.id_restaurant, props.table]);
+
 
 
     return (<>
@@ -105,21 +130,27 @@ export function ArticlesSection(props) {
                             </div>
                         )}
 
-                        <div className="containerDetailsButton">
+                        <div className="containerDetailsButton" style={props.section ? null : ({height: "100px"})}>
                             <div>
-                            {props.section ? (<DetailsButton text={`Ver Detalles del Pedido`}/>)
-                                : (<DetailsButton text={`Realizar Pedido`}
-                                       articles={articles}
-                                       table={props.table}
-                                       idOwner={props.owner}
-                                       numberArticles={numberArticles}/>
+                                {props.section ? (
+                                    <DetailsButton text={`Ver Detalles del Pedido`}/>
+                                ) : (
+                                    articles.length > 0 ? (<>
+                                            <div className="totalPrice">Total: {total}€</div>
+                                            <DetailsButton
+                                                text={`Realizar Pedido`}
+                                                table={props.table}
+                                                idOwner={props.owner}
+                                            /></>
+                                    ) : null
                                 )}
                             </div>
+
                         </div>
 
 
                     </div>
-                    </>
+                </>
             ) : null}
         </>
     );

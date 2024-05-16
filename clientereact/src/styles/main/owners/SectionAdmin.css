@@ -23,20 +23,47 @@
 
 .containerElements>div{
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     width: 100%;
     height: 70px;
     border-bottom: black 2px solid;
 
 }
 
+.containerImageandNameElement{
+    height: 100%;
+    width: 60%;
+}
+
+
 .containerElements>div>div{
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
     overflow-wrap: break-word;
     white-space: pre-wrap;
+}
+.containerElementImage{
+    width: 50px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.imageElement{
+    max-width: 100%;
+    max-height: 90%;
+}
+
+.containerPriceAndButtonsOwner{
+    justify-content: space-between;
+}
+
+.containerPriceAndButtonsOwner>div{
+    display: flex;
+    gap: 5px;
 }
 
 .deleteAdminOwner{
@@ -63,7 +90,6 @@
 }
 
 .textElement{
-    width: 80%;
     font-size: 1.3em;
     font-weight: bold;
     overflow-wrap: break-word;
@@ -90,7 +116,22 @@
 
 @media only screen and (max-width: 400px) {
     .containerElements{
-        font-size: 0.8em;
+        font-size: 0.9em;
+    }
+    .containerElements>div>div{
+        gap: 0;
+    }
+}
+
+@media only screen and (max-width: 350px) {
+    .containerElements{
+        font-size: 0.7em;
+    }
+    .containerElements>div>div{
+        gap: 0;
+    }
+    .containerElementImage{
+        width: 40px;
     }
 }
 

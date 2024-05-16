@@ -7,13 +7,11 @@ export function Addbutton(props) {
     const navigate = useNavigate();
 
     const goPath = () => {
-        console.log("Entra en la redireccion a la ruta add_")
         window.scrollTo(0, 0);
         navigate(props.path);
     }
 
     const addTable = async () => {
-        console.log("Añadiendo mesa...")
         const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
             username: localStorage.getItem('username'),
             password: localStorage.getItem('password'),

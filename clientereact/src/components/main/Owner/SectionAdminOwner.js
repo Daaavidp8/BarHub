@@ -19,7 +19,6 @@ export function SectionAdminOwner(props) {
     const [elements,setelements] = useState([]);
 
     useEffect(() => {
-        console.log(props)
         const fetchData = async () => {
             setDataLoaded(false);
             setelements([]);
@@ -196,14 +195,14 @@ export function SectionAdminOwner(props) {
                                 <>
                                     {elements.map((element,index) => (
                                         <div key={index}>
-                                            <div style={{width: "70%", padding: "10px"}}
+                                            <div className="containerImageandNameElement"
                                                  onClick={() => divAction(element)}>
                                                 {props.table === "articles" || props.table === "sections" ?
-                                                    <div className="containerArticleImage">
+                                                    <div className="containerElementImage">
                                                     <img
                                                     src={`/images/owners/${props.restaurant.name}/img/${props.table}/${element.name}.png`}
                                                     alt={element.name}
-                                                    style={{maxWidth: "50px", maxHeight: "50px"}}
+                                                    className="imageElement"
                                                     /></div> : null}
 
                                                 <p className="textElement" style={props.table === "tables" ? {fontSize: "2em"} : null}>
@@ -211,19 +210,21 @@ export function SectionAdminOwner(props) {
                                                             : element.name.charAt(0).toUpperCase() + element.name.slice(1)}
                                                     </p>
                                             </div>
-                                            {element.price && (
-                                                <div className="priceElement">
-                                                    {element.price}€
+                                            <div className="containerPriceAndButtonsOwner">
+                                                {element.price && (
+                                                    <div className="priceElement">
+                                                        {element.price}€
+                                                    </div>
+                                                )}
+                                                <div className="containerActionElementButtons">
+                                                    {props.table !== "tables" ? (<>
+                                                            <ModifyButton path={`${basePath}/modify_${props.table.substring(0, props.table.length - 1)}/${element.name}`}/>
+                                                            <DeleteButton onClick={() => {
+                                                                showModalDelete(element)
+                                                            }}/>
+                                                        </>
+                                                    ) : null}
                                                 </div>
-                                            )}
-                                            <div className="containerActionElementButtons">
-                                                {props.table !== "tables" ? (<>
-                                                        <ModifyButton path={`${basePath}/modify_${props.table.substring(0, props.table.length - 1)}/${element.name}`}/>
-                                                        <DeleteButton onClick={() => {
-                                                            showModalDelete(element)
-                                                        }}/>
-                                                    </>
-                                                ) : null}
                                             </div>
                                         </div>
                                     ))}

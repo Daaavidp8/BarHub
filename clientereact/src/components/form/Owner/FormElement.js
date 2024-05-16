@@ -15,7 +15,6 @@ export function FormElement(props) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log(props)
         setdataloaded(false)
         if (!props.action){
             setName(props.data.name)

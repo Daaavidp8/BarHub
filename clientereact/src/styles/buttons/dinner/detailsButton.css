@@ -39,11 +39,9 @@
     text-align: center;
 }
 
-
-.confirmMessage {
+.message{
+    text-align: center;
     width: 80%;
-    background-color: #4caf50;
-    color: white;
     padding: 15px;
     border-radius: 5px;
     position: fixed;
@@ -52,12 +50,29 @@
     transform: translateX(-50%);
     opacity: 1;
     transition: 3s;
-    animation: fadeOut 3s forwards;
+    animation: fadeOut 4s forwards;
 }
+
+.confirmMessage {
+    background-color: #4caf50;
+    color: white;
+}
+
+.errorMessage{
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.totalPrice{
+    color: white;
+    font-size: 1.5em;
+}
+
 @keyframes fadeOut {
     0% { opacity: 1; }
     90% { opacity: 1; }
-    100% { opacity: 0; }
+    100% { opacity: 0;}
 }
 
 
