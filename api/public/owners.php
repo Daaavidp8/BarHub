@@ -66,7 +66,7 @@ $app->get('/get_section/{id_section}', function (Request $request, Response $res
     }
 });
 
-// Get article from specific section
+
 $app->get('/get_articles/{id_section}', function (Request $request, Response $response) {
     $sectionid = $request->getAttribute('id_section');
     $sql = "SELECT * FROM Articles WHERE id_section = $sectionid";

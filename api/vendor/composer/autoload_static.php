@@ -20,6 +20,10 @@ class ComposerStaticInit56e9614132823821e88475a626970c4a
             'Slim\\' => 5,
             'Selective\\BasePath\\' => 19,
         ),
+        'R' => 
+        array (
+            'RKA\\Middleware\\' => 15,
+        ),
         'P' => 
         array (
             'Psr\\Log\\' => 8,
@@ -66,6 +70,10 @@ class ComposerStaticInit56e9614132823821e88475a626970c4a
         'Selective\\BasePath\\' => 
         array (
             0 => __DIR__ . '/..' . '/selective/basepath/src',
+        ),
+        'RKA\\Middleware\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/akrabat/ip-address-middleware/src',
         ),
         'Psr\\Log\\' => 
         array (

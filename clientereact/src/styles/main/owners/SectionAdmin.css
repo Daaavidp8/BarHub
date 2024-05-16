@@ -1,6 +1,7 @@
 .defaultTitle{
     font-size: 1.3em;
     padding-left: 5px;
+    height: 50px;
 }
 
 .defaultTitle>div{
@@ -10,7 +11,7 @@
 }
 
 .containerElements{
-    margin: 20px auto 0;
+    margin: 20px auto 20px;
     display: flex;
     flex-direction: column;
     width: 90vw;
@@ -61,10 +62,6 @@
     font-size: 1.8em;
 }
 
-.notElementsFound{
-
-}
-
 .textElement{
     width: 80%;
     font-size: 1.3em;
@@ -80,6 +77,14 @@
 
 .containerPrice{
     margin-top: 20px;
+}
+
+.containerSectionimage,.containerArticleImage{
+    width: 50px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 

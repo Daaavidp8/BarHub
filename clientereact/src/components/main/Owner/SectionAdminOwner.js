@@ -170,7 +170,7 @@ export function SectionAdminOwner(props) {
                             text={
                                 <>
                                     {props.table === "articles" ? (
-                                        <img src={`/images/owners/${props.restaurant.name}/img/sections/${props.title}.png`} alt={`Sin imagen`} style={{width: "40px",height: "40px", marginRight: "10px"}} />
+                                        <div className="containerSectionimage"> <img src={`/images/owners/${props.restaurant.name}/img/sections/${props.title}.png`} alt={`Sin imagen`} style={{maxWidth: "100%",maxHeight: "100%", marginRight: "10px"}} /></div>
                                     ) : null}
                                     <p>Administración de {props.title}</p>
                                 </>
@@ -198,11 +198,13 @@ export function SectionAdminOwner(props) {
                                         <div key={index}>
                                             <div style={{width: "70%", padding: "10px"}}
                                                  onClick={() => divAction(element)}>
-                                                {props.table === "articles" || props.table === "sections" ? <img
+                                                {props.table === "articles" || props.table === "sections" ?
+                                                    <div className="containerArticleImage">
+                                                    <img
                                                     src={`/images/owners/${props.restaurant.name}/img/${props.table}/${element.name}.png`}
                                                     alt={element.name}
                                                     style={{maxWidth: "50px", maxHeight: "50px"}}
-                                                /> : null}
+                                                    /></div> : null}
 
                                                 <p className="textElement" style={props.table === "tables" ? {fontSize: "2em"} : null}>
                                                         {props.table === "tables" ? "Mesa " + element.table_number

@@ -1,0 +1,128 @@
+.containerArticles{
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.article:last-child{
+    margin-bottom: 15px;
+}
+
+.containerImgArticle{
+    width: 50px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.article{
+    height: 50px;
+    margin: 0 20px;
+    border-radius: 5px;
+    background-color: #8b8b8b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.containerImageAndText{
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    margin-left: 5px;
+    >p{
+        width: 110px;
+        margin: 0;
+        word-wrap: break-word;
+    }
+}
+.articleDetails{
+    font-size: 1.2em;
+    margin: auto;
+}
+
+.articleImage{
+    max-height: 90%;
+    max-width: 100%;
+}
+
+.background{
+    width: 100vw;
+    min-height: 100vh;
+    height: auto;
+    position: absolute;
+    background-color: black;
+}
+
+.containerPriceAndButtons{
+    height: 100%;
+    display: flex;
+    gap: 5px;
+    margin-right: 5px;
+}
+
+.tituloSectionDinner{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.actionButtons{
+    width: 70px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-error-message{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-message {
+    width: 90vw;
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.minusButton,.plusButton, .quantityButton{
+    background-color: white;
+    text-align: center;
+    width: 15px;
+    font-size: 1.5em;
+    border: 2px solid black;
+}
+
+.quantityButton{
+    width: 30px;
+}
+
+
+.containerDetailsButton{
+    bottom: 0;
+    position: sticky;
+    width: 100%;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+}
+
+.containerDetailsButton>div{
+    width: 100%;
+    margin: 0 20px;
+    height: 70px;
+}
+
+
+
+
+

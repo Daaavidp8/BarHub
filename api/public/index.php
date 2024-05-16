@@ -24,6 +24,7 @@ $app->addBodyParsingMiddleware();
 include "./admin.php";
 include "./owners.php";
 include "./waiters.php";
+include "./dinners.php";
 
 $app->post('/get_sesion', function (Request $request, Response $response) {
     $data = $request->getParsedBody();

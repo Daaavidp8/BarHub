@@ -1,12 +1,12 @@
 import '../../styles/cards/foodCard.css';
-import {SelectFoodCard} from "../buttons/SelectFoodCard";
+import {useLocation, useNavigate} from "react-router-dom";
 export function FoodCard(props) {
+    const navigate = useNavigate();
     return (
         <>
-            <div className="card">
-                <img alt={"Imagen de " + props.section} className="foodimg"/>
-                <p>{props.section}</p>
-                <SelectFoodCard onClick={() => console.log("Boton Pulsado")} value={"Seleccionar " + props.section}/>
+            <div className="card" onClick={() => navigate(props.section)}>
+                <img src={props.path} alt={"Imagen de " + props.section} className="foodimg"/>
+                <p>{props.section.charAt(0).toUpperCase() + props.section.slice(1)}</p>
             </div>
         </>
     );

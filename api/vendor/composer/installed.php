@@ -3,7 +3,7 @@
         'name' => '__root__',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '52d2eba6c0bc3f77099592ad6916956aa758d7e2',
+        'reference' => 'ab10d274d19592d5e5d7f2c791720216f1e9b222',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,11 +13,26 @@
         '__root__' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '52d2eba6c0bc3f77099592ad6916956aa758d7e2',
+            'reference' => 'ab10d274d19592d5e5d7f2c791720216f1e9b222',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'akrabat/ip-address-middleware' => array(
+            'pretty_version' => '2.1.0',
+            'version' => '2.1.0.0',
+            'reference' => '00e090afb08274320b86108130a23f59da9cd3f6',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../akrabat/ip-address-middleware',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'akrabat/rka-ip-address-middleware' => array(
+            'dev_requirement' => false,
+            'replaced' => array(
+                0 => '*',
+            ),
         ),
         'bacon/bacon-qr-code' => array(
             'pretty_version' => 'v3.0.0',

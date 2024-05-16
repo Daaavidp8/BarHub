@@ -5,7 +5,8 @@
         "selective/basepath": "^2.2",
         "endroid/qr-code": "^5.0",
         "ph-7/qrcode-generator-php-class": "^2.2",
-        "ext-gd": "*"
+        "ext-gd": "*",
+        "akrabat/ip-address-middleware": "^2.1"
     },
     "autoload": {
         "psr-4": {

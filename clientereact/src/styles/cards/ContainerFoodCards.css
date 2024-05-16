@@ -1,12 +1,44 @@
 .containerFoodCards{
     width: 90vw;
-    height: max-content;
+    height: 90vh;
     background-color: white;
     display: flex;
     flex-wrap: wrap;
-    padding: 20px 0;
+    padding: 10px 0 0;
     border-radius: 5px;
-    justify-content: center;
+    align-items: center;
     margin: 20px 0;
     gap: 10px;
+    overflow: auto;
 }
+.logoOwnerSections{
+    margin: 0 auto;
+    max-width: 100px;
+}
+.tituloSections{
+    font-family: insaniburger;
+    width: 70vw;
+    text-align: center;
+    font-size: 1.8em;
+    margin: 0 auto;
+    word-wrap: break-word;
+}
+
+.containerFoodCards>div{
+    width: 100%;
+    height: max-content;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    border-radius: 5px;
+    justify-content: center;
+    margin: 10px auto 0;
+    gap: 30px;
+}
+
+@media (min-width: 600px) {
+    .containerFoodCards>div{
+        grid-template-columns: repeat(2, 1fr); /* Cambiar a dos columnas cuando el width sea mayor a 600px */
+    }
+}
+
+

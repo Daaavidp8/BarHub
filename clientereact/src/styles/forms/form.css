@@ -2,27 +2,10 @@
     font-family: insaniburger;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    min-height: 100vh;
     color: white;
     position: relative;
-    top: -100px;
     text-align: center;
-}
-
-form{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-img{
-    position: absolute;
-    top: 150px;
-    max-width: 100px;
-    transition: 3s;
-    animation: logoAnimation 3s infinite;
 }
 
 .input {
@@ -56,13 +39,11 @@ img{
     background-color: #f1e8e8;
 }
 
-h1{
-    transition: all .5s;
-}
 .labelcodeform{
     text-align: center;
     margin-bottom: 10px;
     transition: all 3s;
+    width: 70vw;
 }
 
 .error{
@@ -79,14 +60,8 @@ h1{
 }
 
 
-@keyframes logoAnimation {
-    0% {max-width: 90px;}
-    50% {max-width: 100px;}
-    100% {max-width: 90px;}
-}
-
 @media (width < 400px) {
-    h1{
+    .titleDinner{
         font-size: 1.2em;
     }
     label{
