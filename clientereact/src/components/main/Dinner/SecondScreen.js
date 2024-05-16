@@ -24,8 +24,8 @@ export function SecondScreen(props) {
             </div>
 
             {showConfirmMessage && (
-                <div className={"message " + (message === 2 ? "confirmMessage" : "errorMessage")}>
-                    {message === 2 ?
+                <div className={"message " + (message == 2 ? "confirmMessage" : "errorMessage")}>
+                    {message == 2 ?
                         "Pedido Realizado Correctamente!"
                         :
                         "Ha ocurrido un error. Quizás Alguien de tu mesa ya ha realizado el pedido."}

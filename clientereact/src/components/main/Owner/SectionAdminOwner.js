@@ -170,7 +170,9 @@ export function SectionAdminOwner(props) {
                                 <>
                                     {props.table === "articles" ? (
                                         <div className="containerSectionimage"> <img src={`/images/owners/${props.restaurant.name}/img/sections/${props.title}.png`} alt={`Sin imagen`} style={{maxWidth: "100%",maxHeight: "100%", marginRight: "10px"}} /></div>
-                                    ) : null}
+                                    ) : props.table === "workers" ? (
+                                            <div className="containerSectionimage"> <img src={`/images/waiter.png`} alt={`Sin imagen`} style={{maxWidth: "100%",maxHeight: "100%", marginRight: "10px"}} /></div>
+                                        ) : null}
                                     <p>Administración de {props.title}</p>
                                 </>
                             }

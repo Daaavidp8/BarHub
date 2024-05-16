@@ -20,19 +20,17 @@ export function ArticlesSection(props) {
         await Promise.all(farticles.map(async (article) => {
             const numberArticlesResponse = await axios.get(`http://172.17.0.2:8888/get_number_articles/${props.owner.id_restaurant}/${props.table}/${article.id_article}`);
             totalCost += (article.price * numberArticlesResponse.data);
-            cantidad.push(numberArticlesResponse.data)
+            cantidad.push(numberArticlesResponse.data);
         }));
         setTotal(totalCost);
-        setNumberArticles(cantidad)
+        setNumberArticles(cantidad);
     };
 
     const getResumeOrder = async () => {
         try {
             const resumeOrderResponse = await axios.get(`http://172.17.0.2:8888/resumeOrder/${props.owner.id_restaurant}/${props.table}`);
             setArticles(resumeOrderResponse.data);
-
             await numArticlesPromises(resumeOrderResponse.data);
-
             setDataLoaded(true);
         } catch (e) {
             console.error(e);
@@ -43,32 +41,29 @@ export function ArticlesSection(props) {
         try {
             const articlesResponse = await axios.get('http://172.17.0.2:8888/get_articles/' + props.section.id_section);
             setArticles(articlesResponse.data);
-
             await numArticlesPromises(articlesResponse.data);
-
             setDataLoaded(true);
         } catch (e) {
             console.error(e);
         }
     };
 
-
     useEffect(() => {
+        setDataLoaded(false);
+        setArticles([]);
         let basketInterval;
         let articlesInterval;
 
         const startBasketInterval = () => {
+            getResumeOrder();
             clearInterval(articlesInterval);
-            basketInterval = setInterval(async () => {
-                getResumeOrder();
-            }, 1000);
+            basketInterval = setInterval(getResumeOrder, 1000);
         };
 
         const startArticlesInterval = () => {
+            getArticles(); 
             clearInterval(basketInterval);
-            articlesInterval = setInterval(async () => {
-                getArticles();
-            }, 1000);
+            articlesInterval = setInterval(getArticles, 1000);
         };
 
         if (props.section) {

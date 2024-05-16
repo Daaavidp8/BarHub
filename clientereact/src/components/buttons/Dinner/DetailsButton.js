@@ -6,7 +6,6 @@ import axios from "axios";
 export function DetailsButton(props) {
     const navigate = useNavigate();
 
-    const [articles, setArticles] = useState([]);
     const owner = useLocation().pathname.split('/')[1];
     const codeNumber = useLocation().pathname.split('/')[3];
 
@@ -19,17 +18,17 @@ export function DetailsButton(props) {
     const order = async () => {
         try {
             const resumeOrderResponse = await axios.get(`http://172.17.0.2:8888/resumeOrder/${props.idOwner.id_restaurant}/${props.table}`);
-            setArticles(resumeOrderResponse.data);
 
             if (resumeOrderResponse.data.length > 0){
                 await Promise.all(resumeOrderResponse.data.map(async (article, index) => {
+                    const numberArticlesResponse = await axios.get(`http://172.17.0.2:8888/get_number_articles/${props.idOwner.id_restaurant}/${props.table}/${article.id_article}`);
                     await axios.post('http://172.17.0.2:8888/order_log', {
                         owner_name: props.idOwner.name,
                         article: article.name,
                         price: article.price,
                         number_table: props.table,
                         codetable: codeNumber,
-                        quantity: props.numberArticles[index]
+                        quantity: numberArticlesResponse.data
                     });
                 }));
                 await axios.delete(`http://172.17.0.2:8888/delete_basket/${props.idOwner.id_restaurant}/${props.table}`);
@@ -46,7 +45,7 @@ export function DetailsButton(props) {
 
     return (
         <>
-            <div className="detailsButton" onClick={props.articles ? order : goPath}>
+            <div className="detailsButton" onClick={props.table ? order : goPath}>
                 <p className="textButton">{props.text}</p>
                 <div className="containerImageDinner">
                     <img src={`/images/owners/${owner}/img/logo.png`} alt={`Logo de ${owner}`} />

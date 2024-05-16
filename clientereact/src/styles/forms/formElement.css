@@ -71,3 +71,56 @@
     align-items: center;
 }
 
+.contenedorRoles>div{
+    display: flex;
+}
+
+.contenedorRoles > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.contenedorRoles > div > div > input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #4caf50;
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.contenedorRoles > div > div{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1.2em;
+}
+
+.contenedorRoles > div > div > input[type="checkbox"]:checked {
+    background-color: #4caf50;
+    border-color: #4caf50;
+}
+
+.contenedorRoles > div > div > input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.contenedorRoles > label {
+    font-size: 1em;
+    color: #333;
+    cursor: pointer;
+}
+

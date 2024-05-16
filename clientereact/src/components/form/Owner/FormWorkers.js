@@ -8,6 +8,7 @@ import {useNavigate} from "react-router-dom";
 
 export function FormWorkers(props) {
     const [name, setName] = useState('');
+    const [roles, setRoles] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [dataloaded, setdataloaded] = useState(false);
@@ -23,7 +24,7 @@ export function FormWorkers(props) {
     }, [props.action]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, checked } = e.target;
         switch (name) {
             case 'name':
                 setName(value);
@@ -34,10 +35,25 @@ export function FormWorkers(props) {
             case 'password':
                 setPassword(value);
                 break;
+            case 'admin':
+            case 'waiter':
+                let roleslocal = roles.split(',').filter(Boolean);
+                const roleValue = name === 'admin' ? '2' : '3';
+                if (checked) {
+                    if (!roleslocal.includes(roleValue)) {
+                        roleslocal.push(roleValue);
+                    }
+                } else {
+                    roleslocal = roleslocal.filter(r => r !== roleValue);
+                }
+                setRoles(roleslocal.join(','));
+                break;
             default:
                 break;
         }
-    }
+    };
+
+
 
     const modifyElement = async () => {
         const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
@@ -47,14 +63,15 @@ export function FormWorkers(props) {
 
         if (response.data.roles.includes(2)){
             if (validarCampos()){
-                const config = {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                };
-
                 try {
-
+                    await axios.put('http://172.17.0.2:8888/create_worker/' + props.restaurant.id_restaurant, {
+                        worker_name: name,
+                        worker_username: username,
+                        worker_password: password,
+                        worker_roles: roles
+                    });
+                    navigate("/" + props.restaurant.name + "/admin")
+                    navigate("/" + props.restaurant.name + "/admin/workers")
                     window.location.reload();
                 } catch (error) {
                     console.error('Error al añadir propietario:', error);
@@ -70,10 +87,20 @@ export function FormWorkers(props) {
         });
 
         if (response.data.roles.includes(2)){
-            if (validarCampos()){;
+            if (validarCampos()){
+                console.log("Nombre-> " + name)
+                console.log("Usuario-> " + username)
+                console.log("Contraseña-> " + password)
+                console.log("Roles-> " + roles)
                 try {
-
-
+                    await axios.post('http://172.17.0.2:8888/create_worker/' + props.restaurant.id_restaurant, {
+                        worker_name: name,
+                        worker_username: username,
+                        worker_password: password,
+                        worker_roles: roles
+                    });
+                    navigate("/" + props.restaurant.name + "/admin")
+                    navigate("/" + props.restaurant.name + "/admin/workers")
                     window.location.reload();
                 } catch (error) {
                     console.error('Error al añadir propietario:', error);
@@ -146,6 +173,31 @@ export function FormWorkers(props) {
                                 onChange={handleChange}
                                 required
                             />
+                        </div>
+                        <div className="contenedorRoles">
+                            <label htmlFor="roles" className="labelFormElements">Roles:</label><br/>
+                            <div>
+                                <div>
+                                    <input
+                                        type="checkbox"
+                                        id="admin"
+                                        name="admin"
+                                        value="2"
+                                        onChange={handleChange}
+                                    />
+                                    <label htmlFor="admin">Administrador</label>
+                                </div>
+                                <div>
+                                    <input
+                                        type="checkbox"
+                                        id="waiter"
+                                        name="waiter"
+                                        value="3"
+                                        onChange={handleChange}
+                                    />
+                                    <label htmlFor="waiter">Camarero</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>

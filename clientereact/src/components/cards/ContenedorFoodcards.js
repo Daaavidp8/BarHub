@@ -27,8 +27,8 @@ export function ContenedorFoodcards(props) {
                     <h1 className="tituloSections">{owner.name}</h1>
                     <img src={`/images/owners/${owner.name}/img/logo.png`} alt={`Logo de ${owner.name}`} className="logoOwnerSections"/>
                     <div>
-                        {sections.map((section) => (
-                        <FoodCard section={section.name} path={`/images/owners/${owner.name}/img/sections/${section.name}.png`}/>
+                        {sections.map((section,index) => (
+                        <FoodCard key={`Section_${section}_${index}`} section={section.name} path={`/images/owners/${owner.name}/img/sections/${section.name}.png`}/>
                         ))}
 
                         <DetailsButton text={`Ver Detalles del Pedido`}/>
