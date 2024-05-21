@@ -6,6 +6,9 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 
+
+// Componente para modificar y crear nuevos trabajadores
+
 export function FormWorkers(props) {
     const [name, setName] = useState('');
     const [roles, setRoles] = useState('');
@@ -16,9 +19,17 @@ export function FormWorkers(props) {
 
     useEffect(() => {
         setdataloaded(false)
+        const workerresponse = async () => {
+            let roles = [];
+            const responseworker = await axios.get('http://172.17.0.2:8888/get_worker/' + props.worker)
+            setName(responseworker.data.userData[0].name)
+            setUsername(responseworker.data.userData[0].username)
+            roles.push(JSON.stringify(responseworker.data.roles).includes(2) ? "2" : null)
+            roles.push(JSON.stringify(responseworker.data.roles).includes(3) ? "3" : null)
+            setRoles(roles.join(","))
+        }
         if (!props.action){
-            setName(props.data.name)
-
+            workerresponse();
         }
         setdataloaded(true)
     }, [props.action]);
@@ -61,22 +72,28 @@ export function FormWorkers(props) {
             password: localStorage.getItem('password'),
         });
 
-        if (response.data.roles.includes(2)){
+        if (response.data.roles.includes(2) && response.data.status){
             if (validarCampos()){
                 try {
-                    await axios.put('http://172.17.0.2:8888/create_worker/' + props.restaurant.id_restaurant, {
+                    await axios.put('http://172.17.0.2:8888/update_worker/' + props.worker, {
                         worker_name: name,
                         worker_username: username,
                         worker_password: password,
                         worker_roles: roles
                     });
+                    if (props.worker == localStorage.getItem('id')){
+                        localStorage.setItem('username', username)
+                        localStorage.setItem('password', password)
+                    }
                     navigate("/" + props.restaurant.name + "/admin")
                     navigate("/" + props.restaurant.name + "/admin/workers")
                     window.location.reload();
                 } catch (error) {
-                    console.error('Error al añadir propietario:', error);
+                    console.error('Error al modificar propietario:', error);
                 }
             }
+        }else{
+            navigate("/")
         }
     }
 
@@ -86,7 +103,7 @@ export function FormWorkers(props) {
             password: localStorage.getItem('password'),
         });
 
-        if (response.data.roles.includes(2)){
+        if (response.data.roles.includes(2) && response.data.status){
             if (validarCampos()){
                 console.log("Nombre-> " + name)
                 console.log("Usuario-> " + username)
@@ -106,12 +123,57 @@ export function FormWorkers(props) {
                     console.error('Error al añadir propietario:', error);
                 }
             }
+        }else{
+            navigate("/")
         }
 
     };
 
+    const validatePassword = (password) => {
+        let errorMessage = "";
+        if (password.length < 8) {
+            errorMessage += "-La contraseña debe contener al menos 8 caracteres<br>";
+        } else {
+            let upperCaseLetters = /[A-Z]/g;
+            let numbers = /[0-9]/g;
+            let lowerCaseLetters = /[a-z]/g;
+
+            if (!password.match(upperCaseLetters)) {
+                errorMessage += "-La contraseña debe contener al menos una mayúscula<br>";
+            }
+            if (!password.match(lowerCaseLetters)) {
+                errorMessage += "-La contraseña debe contener al menos una minúscula<br>";
+            }
+            if (!password.match(numbers)) {
+                errorMessage += "-La contraseña debe contener al menos un número<br>";
+            }
+        }
+        return errorMessage;
+    };
+
     const validarCampos = () => {
         let errorMessage = "";
+
+        if (name.length <= 0){
+            errorMessage += "-El nombre está vacio<br>"
+        }
+
+        if (username.length <= 0){
+            errorMessage += "-El nombre de usuario está vacio<br>"
+        }
+
+        if (roles.length <= 0){
+            errorMessage += "-El usuario no puede no tener roles<br>"
+        }
+
+        if (props.action) {
+            errorMessage += validatePassword(password);
+        } else {
+            if (password.length !== 0) {
+                errorMessage += validatePassword(password);
+            }
+        }
+
 
         if (errorMessage !== "") {
             document.getElementsByClassName("errorCard")[0].style.display = "block";
@@ -184,6 +246,7 @@ export function FormWorkers(props) {
                                         name="admin"
                                         value="2"
                                         onChange={handleChange}
+                                        checked={roles.includes(2)}
                                     />
                                     <label htmlFor="admin">Administrador</label>
                                 </div>
@@ -194,6 +257,7 @@ export function FormWorkers(props) {
                                         name="waiter"
                                         value="3"
                                         onChange={handleChange}
+                                        checked={roles.includes(3)}
                                     />
                                     <label htmlFor="waiter">Camarero</label>
                                 </div>

@@ -3,6 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/forms/formOwners.css";
 
+
+// Formulario para crear y modificar restaurantes
 export function FormOwners(props) {
     const navigate = useNavigate();
 
@@ -21,7 +23,7 @@ export function FormOwners(props) {
             password: localStorage.getItem('password'),
         });
 
-        if (response.data.roles == 1){
+        if (response.data.roles == 1 && response.data.status){
             if (validarCampos()){
 
                 const formData = new FormData();
@@ -59,6 +61,8 @@ export function FormOwners(props) {
                     console.error('Error al añadir propietario:', error);
                 }
             }
+        }else{
+            navigate("/")
         }
 
     };
@@ -69,7 +73,7 @@ export function FormOwners(props) {
             password: localStorage.getItem('password'),
         });
 
-        if (response.data.roles == 1){
+        if (response.data.roles == 1 && response.data.status){
             if (validarCampos()){
 
                 const formData = new FormData();
@@ -93,6 +97,8 @@ export function FormOwners(props) {
                 }
             }
 
+        }else{
+            navigate("/")
         }
 
 

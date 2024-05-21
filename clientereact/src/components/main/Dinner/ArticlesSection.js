@@ -14,6 +14,7 @@ export function ArticlesSection(props) {
     const [total, setTotal] = useState(0.0);
     const [dataLoaded, setDataLoaded] = useState(false);
 
+    // Obtiene la cantidad de articulos de cada articulo que hay en la cesta
     const numArticlesPromises = async (farticles) => {
         let totalCost = 0.0;
         let cantidad = [];
@@ -26,6 +27,7 @@ export function ArticlesSection(props) {
         setNumberArticles(cantidad);
     };
 
+    // Obtiene los productos que hay en la cesta
     const getResumeOrder = async () => {
         try {
             const resumeOrderResponse = await axios.get(`http://172.17.0.2:8888/resumeOrder/${props.owner.id_restaurant}/${props.table}`);
@@ -37,6 +39,7 @@ export function ArticlesSection(props) {
         }
     };
 
+    // Obtiene todos los articulos de una sección
     const getArticles = async () => {
         try {
             const articlesResponse = await axios.get('http://172.17.0.2:8888/get_articles/' + props.section.id_section);
@@ -48,6 +51,7 @@ export function ArticlesSection(props) {
         }
     };
 
+    // Muestra los articulos de la cesta o de una sección determinada
     useEffect(() => {
         setDataLoaded(false);
         setArticles([]);

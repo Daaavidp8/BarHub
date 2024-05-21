@@ -10,14 +10,13 @@ import "../../../styles/main/admin/admin.css"
 
 
 
-
+// Componente que muestra al administrador los restaurantes existentes
 export function Admin(props) {
     const navigate = useNavigate();
     const [owners, setOwners] = useState(props.owners);
     const location = useLocation();
     const currentPath = location.pathname;
     const basePath = currentPath.substring(0, currentPath.lastIndexOf('/'));
-    const [dataLoaded, setDataLoaded] = useState(false);
 
     const showModalDelete = (id,name) => {
         try {

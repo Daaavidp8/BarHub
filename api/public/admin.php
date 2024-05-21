@@ -4,7 +4,7 @@ global $app;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Models\DB;
-
+// Función para evitar el error de CORS
 $app->add(function ($request, $handler) {
     $response = $handler->handle($request);
     return $response
@@ -13,6 +13,7 @@ $app->add(function ($request, $handler) {
         ->withHeader('Access-Control-Allow-Methods', 'POST,GET,DELETE,PUT');
 });
 
+// Función que devuelve todos los restaurantes
 $app->get('/get_owners', function (Request $request, Response $response) {
     $sql = "SELECT * FROM Restaurants";
 
@@ -39,6 +40,8 @@ $app->get('/get_owners', function (Request $request, Response $response) {
     }
 });
 
+
+// Devuelve un restaurante especifico
 $app->get('/get_owner/{id}', function (Request $request, Response $response) {
     $id = $request->getAttribute('id');
     $sql = "SELECT * FROM Restaurants WHERE id_restaurant = $id";
@@ -66,6 +69,8 @@ $app->get('/get_owner/{id}', function (Request $request, Response $response) {
     }
 });
 
+
+// Función para crear un restaurante
 $app->post('/create_owner', function (Request $request, Response $response) {
     try {
         $data = $request->getParsedBody();
@@ -133,7 +138,7 @@ $app->post('/create_owner', function (Request $request, Response $response) {
     }
 });
 
-
+// Función para actualizar un restaurante
 $app->put('/update_owner/{id}', function (Request $request, Response $response) {
     $id = $request->getAttribute('id');
     $data = $request->getParsedBody();
@@ -236,7 +241,7 @@ $app->put('/update_owner/{id}', function (Request $request, Response $response) 
 });
 
 
-
+// Funcion para borrar el directorio donde se guardan las imagenes de un restaurante
 function borrar_directorio($directorio)
 {
     if (is_dir($directorio)) {
@@ -259,6 +264,7 @@ function borrar_directorio($directorio)
     }
 }
 
+// Borra un restaurante en concreto
 $app->delete('/delete_owner/{id}', function (Request $request, Response $response, array $args) {
     $id = $args["id"];
     $rutaOwners = "../../clientereact/public/images/owners/";

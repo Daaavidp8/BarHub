@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import {DetailsButton} from "../buttons/Dinner/DetailsButton";
 
+// Componente que contiene la lista de todas las secciones del restaurante
+
 export function ContenedorFoodcards(props) {
     const [owner, setOwner] = useState([]);
     const [sections, setSections] = useState([]);

@@ -6,7 +6,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Models\DB;
 
-// Get sections from specific owner
+// Devuelve la secciones de un restaurante en especifico
 $app->get('/get_sections/{id}', function (Request $request, Response $response) {
     $id = $request->getAttribute('id');
     $sql = "SELECT * FROM Sections WHERE id_restaurant = :id";
@@ -36,7 +36,7 @@ $app->get('/get_sections/{id}', function (Request $request, Response $response) 
     }
 });
 
-// Get specific section
+// Devuelve una sección especifica
 $app->get('/get_section/{id_section}', function (Request $request, Response $response) {
     $sectionid = $request->getAttribute('id_section');
     $sql = "SELECT * FROM Sections WHERE id_section = :sectionid";
@@ -66,7 +66,7 @@ $app->get('/get_section/{id_section}', function (Request $request, Response $res
     }
 });
 
-
+// Devuelve los articulos de una sección especifica
 $app->get('/get_articles/{id_section}', function (Request $request, Response $response) {
     $sectionid = $request->getAttribute('id_section');
     $sql = "SELECT * FROM Articles WHERE id_section = $sectionid";
@@ -94,6 +94,8 @@ $app->get('/get_articles/{id_section}', function (Request $request, Response $re
     }
 });
 
+
+// Devuelve los trabajadores de un restaurante
 $app->get('/get_workers/{id_owner}', function (Request $request, Response $response) {
     $ownerid = $request->getAttribute('id_owner');
 
@@ -122,16 +124,50 @@ $app->get('/get_workers/{id_owner}', function (Request $request, Response $respo
     }
 });
 
+
+// Devuelve un trabajador en concreto
+$app->get('/get_worker/{id_user}', function (Request $request, Response $response) {
+    $workerid = $request->getAttribute('id_user');
+
+
+    try {
+        $db = new DB();
+        $conn = $db->connect();
+        $sql = "SELECT * FROM Users WHERE id_user = $workerid";
+        $stmt = $conn->query($sql);
+        $dataUser = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $sql = "SELECT id_role FROM UsersRoles WHERE id_user = $workerid";
+        $stmt = $conn->query($sql);
+        $roles = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+
+        $data = array(
+            "userData" => $dataUser,
+            "roles" => $roles
+        );
+
+        $response->getBody()->write(json_encode($data));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(200);
+    } catch (PDOException $e) {
+        $error = array(
+            "message" => $e->getMessage()
+        );
+
+        $response->getBody()->write(json_encode($error));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(500);
+    }
+});
+
+// Crea una seccion en un restaurante especifico
 $app->post('/create_section/{id_owner}', function (Request $request, Response $response) {
     $ownerid = $request->getAttribute('id_owner');
     $data = $request->getParsedBody();
     $uploadedFiles = $request->getUploadedFiles();
     $name = $data["section_name"];
-
-
-
-
-
 
     try {
         $db = new DB();
@@ -190,17 +226,14 @@ $app->post('/create_section/{id_owner}', function (Request $request, Response $r
     }
 });
 
+
+// Crea un articulo en una sección determinada
 $app->post('/create_article/{id_section}', function (Request $request, Response $response) {
     $sectionid = $request->getAttribute('id_section');
     $data = $request->getParsedBody();
     $uploadedFiles = $request->getUploadedFiles();
     $name = $data["article_name"];
     $price = $data["article_price"];
-
-
-
-
-
 
 
     try {
@@ -275,6 +308,8 @@ $app->post('/create_article/{id_section}', function (Request $request, Response 
     }
 });
 
+
+// Crea trabajadores en un restaurante en concreto
 $app->post('/create_worker/{id_owner}', function (Request $request, Response $response) {
     $ownerid = $request->getAttribute('id_owner');
     $data = $request->getParsedBody();
@@ -331,7 +366,7 @@ $app->post('/create_worker/{id_owner}', function (Request $request, Response $re
 });
 
 
-
+// Actualiza una sección determinada
 $app->put('/update_section/{id_section}', function (Request $request, Response $response)
 {
     $id = $request->getAttribute('id_section');
@@ -393,6 +428,7 @@ $app->put('/update_section/{id_section}', function (Request $request, Response $
 });
 
 
+// Actualiza un articulo determinado
 $app->put('/update_article/{id_article}',function (Request $request, Response $response, array $args)
 {
     $id = $request->getAttribute('id_article');
@@ -454,13 +490,17 @@ $app->put('/update_article/{id_article}',function (Request $request, Response $r
     }
 });
 
+
+// Actualiza un trabajador en concreto
 $app->put('/update_worker/{id_user}',function (Request $request, Response $response, array $args)
 {
     $userid = $request->getAttribute('id_user');
     $data = $request->getParsedBody();
     $name = $data["worker_name"];
     $username = $data["worker_username"];
-    $password = hash('sha256', $data["worker_password"]);
+    var_dump( $data["worker_password"] );
+    $password = $data["worker_password"] === "" ? "" : password_hash($data["worker_password"], PASSWORD_DEFAULT);
+    var_dump($password);
     $roles = $data["worker_roles"];
 
     try {
@@ -476,20 +516,29 @@ $app->put('/update_worker/{id_user}',function (Request $request, Response $respo
         $sql = "SELECT COUNT(*) FROM Users WHERE username = :username AND id_user != :id_user";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':id_user', $userrid);
+        $stmt->bindParam(':id_user', $userid);
         $stmt->execute();
         $count = $stmt->fetchColumn();
         if ($count > 0) {
             throw new Exception("El nombre de usuario '$username' ya existe.");
         }
 
+
         // Modificar el nuevo usuario
-        $sql = "UPDATE Users SET name = :name, username = :username, password = :password, id_restaurant = :idowner WHERE id_user = $userid";
+        $sql = "UPDATE Users SET name = :name, username = :username,";
+        if ($password !== "") {
+            $sql .= " password = :password,";
+        }
+        $sql .= " id_restaurant = :idowner WHERE id_user = :userid";
+
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':password', $password);
         $stmt->bindParam(':idowner', $ownerid);
+        $stmt->bindParam(':userid', $userid);
+        if ($password !== "") {
+            $stmt->bindParam(':password', $password);
+        }
         $stmt->execute();
 
         // Insertar roles del usuario
@@ -519,7 +568,6 @@ $app->put('/update_worker/{id_user}',function (Request $request, Response $respo
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $role = $row['id_role'];
-            var_dump("Rol->" . $role);
             if (!in_array($role, $roles)) {
                 $sql = "DELETE FROM UsersRoles WHERE id_user = :userid AND id_role = :role";
                 $stmtDelete = $conn->prepare($sql);
@@ -546,6 +594,7 @@ $app->put('/update_worker/{id_user}',function (Request $request, Response $respo
     }
 });
 
+// Borra una sección determinada
 $app->delete('/delete_section/{id_section}', function (Request $request, Response $response, array $args) {
     $id = $args["id_section"];
 
@@ -598,6 +647,7 @@ $app->delete('/delete_section/{id_section}', function (Request $request, Respons
     }
 });
 
+// Borra un articulo determinado
 $app->delete('/delete_article/{id_article}', function (Request $request, Response $response, array $args) {
     $id = $args["id_article"];
 
@@ -647,6 +697,7 @@ $app->delete('/delete_article/{id_article}', function (Request $request, Respons
     }
 });
 
+// Borra un trabajador en concreto
 $app->delete('/delete_worker/{id_worker}', function (Request $request, Response $response, array $args) {
     $id = $args["id_worker"];
 

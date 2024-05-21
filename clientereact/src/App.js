@@ -18,12 +18,15 @@ import { ArticlesSection } from "./components/main/Dinner/ArticlesSection";
 
 library.add(fas);
 
+// Fichero de creación de rutas
+
 function App() {
     const [loggedIn, setLoggedIn] = useState(() => {
         const storedLoggedIn = localStorage.getItem('loggedIn');
         return storedLoggedIn === 'true';
     });
     const [userRole, setUserRole] = useState([]);
+    const [workers, setWorkers] = useState([]);
     const [userRestaurant, setuserRestaurant] = useState([]);
     const [owners, setOwners] = useState([]);
     const [allsections, setAllSections] = useState([]);
@@ -33,6 +36,7 @@ function App() {
     const [tables, setTables] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
 
+    // Carga los datos necesarios para crear las rutas
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -41,30 +45,37 @@ function App() {
                         username: localStorage.getItem('username'),
                         password: localStorage.getItem('password'),
                     });
-                    let roles = [];
 
-                    response.data.roles.forEach((role) => {
-                        roles.push(role)
-                    })
+                    if (response.data.status){
+                        let roles = [];
 
-                    setUserRole(roles);
-                    const userRestaurantresponse = await axios.get('http://172.17.0.2:8888/get_owner/' + response.data.restaurant);
-                    setuserRestaurant(userRestaurantresponse.data[0]);
+                        response.data.roles.forEach((role) => {
+                            roles.push(role)
+                        })
 
-                    const sectionsResponse = await axios.get('http://172.17.0.2:8888/get_sections/' + response.data.restaurant);
-                    setSections(sectionsResponse.data);
+                        setUserRole(roles);
+                        const userRestaurantresponse = await axios.get('http://172.17.0.2:8888/get_owner/' + response.data.restaurant);
+                        setuserRestaurant(userRestaurantresponse.data[0]);
 
-                    const sectionsPromises = sectionsResponse.data.map(async (section) => {
-                        const responseArticles = await axios.get('http://172.17.0.2:8888/get_articles/' + section.id_section);
-                        return responseArticles.data;
-                    });
+                        const sectionsResponse = await axios.get('http://172.17.0.2:8888/get_sections/' + response.data.restaurant);
+                        setSections(sectionsResponse.data);
 
-                    const articlesData = await Promise.all(sectionsPromises);
-                    const allArticles = articlesData.flat();
-                    setArticles(allArticles);
+                        const sectionsPromises = sectionsResponse.data.map(async (section) => {
+                            const responseArticles = await axios.get('http://172.17.0.2:8888/get_articles/' + section.id_section);
+                            return responseArticles.data;
+                        });
 
-                    const tableResponse = await axios.get('http://172.17.0.2:8888/get_tables/' + response.data.restaurant);
-                    setTables(tableResponse.data);
+                        const articlesData = await Promise.all(sectionsPromises);
+                        const allArticles = articlesData.flat();
+                        setArticles(allArticles);
+
+                        const tableResponse = await axios.get('http://172.17.0.2:8888/get_tables/' + response.data.restaurant);
+                        setTables(tableResponse.data);
+
+                        const workersResponse = await axios.get('http://172.17.0.2:8888/get_workers/' + response.data.restaurant);
+                        setWorkers(workersResponse.data);
+                    }
+
                 }
 
             } catch (error) {
@@ -97,6 +108,7 @@ function App() {
         fetchData();
     }, [loggedIn]);
 
+    // Funciones para realizar el login
     const handleLogin = () => {
         localStorage.setItem('loggedIn', 'true');
         setLoggedIn(true);
@@ -111,14 +123,6 @@ function App() {
 
     return (
         <>
-            <Router>
-                <Routes>
-                    <Route path="/login" element={<Login onLogin={handleLogin} />} />
-                    {!loggedIn || localStorage.getItem('username') === '' ? (
-                        <Route path="/" element={<Navigate to="/login" />} />
-                    ) : null}
-                </Routes>
-            </Router>
             {dataLoaded && (
                 <Router>
                     <Routes>
@@ -127,13 +131,14 @@ function App() {
                             <Route path="/" element={<Navigate to="/login" />} />
                         ) : null}
 
+                        // Si el usuario tiene el rol de admin, le cargarán las rutas para administrar restaurantes
                         {loggedIn && userRole.includes(1) ? (
                             <>
                                 <Route path="/admin" element={<Admin logout={handleLogout} owners={owners} />} />
                                 <Route path="/" element={<Navigate to="/admin" />} />
                                 {owners.map((owner, index) => (
                                     <Route
-                                        key={`${owner.id_restaurant}_${index}`}
+                                        key={`${owner.id_restaurant}_${index}_owners`}
                                         path={`/admin/modify_owner/${owner.id_restaurant}`}
                                         element={loggedIn ? <ActionOwner action={false} data={owner} /> : <Navigate to="/login" />}
                                     />
@@ -148,6 +153,7 @@ function App() {
                                             path={`/${userRestaurant.name}/admin`}
                                             element={<SelectOption logout={handleLogout} name={userRestaurant.name} restaurant={userRestaurant.id_restaurant} />}
                                         />
+                                        // Si el usuario tiene el rol de propietario le cargaran las rutas para administrar sus secciones y personal
                                         {userRole.includes(2) && (
                                             <>
                                                 <Route
@@ -161,17 +167,17 @@ function App() {
                                                 {sections.map((section, index) => (
                                                     <>
                                                         <Route
-                                                            key={`modify_section_${section.name}`}
+                                                            key={`modify_section_${section.name}_${section.id_section}`}
                                                             path={`/${userRestaurant.name}/admin/modify_section/${section.name}`}
                                                             element={<FormElement title={"Modificar Sección"} action={false} element={"sections"} restaurant={userRestaurant} data={section} />}
                                                         />
                                                         <Route
-                                                            key={`section_${index}`}
+                                                            key={`section_${section.id_section}`}
                                                             path={`/${userRestaurant.name}/admin/${section.name}`}
                                                             element={<SectionAdminOwner restaurant={userRestaurant} title={section.name} table={"articles"} data={section} />}
                                                         />
                                                         <Route
-                                                            key={`add_article_${section.name}`}
+                                                            key={`add_article_${section.name}_${section.id_section}`}
                                                             path={`/${userRestaurant.name}/admin/add_${section.name}`}
                                                             element={<FormElement title={"Añadir " + (section.name.endsWith('s') ? section.name.substring(0, section.name.length - 1) : section.name)} action={true} element={"articles"} restaurant={userRestaurant} data={section} />}
                                                         />
@@ -179,7 +185,7 @@ function App() {
                                                 ))}
                                                 {articles.map((article) => (
                                                     <Route
-                                                        key={`modify_article_${article.id}`}
+                                                        key={`modify_article_${article.id_article}`}
                                                         path={`/${userRestaurant.name}/admin/modify_article/${article.name}`}
                                                         element={<FormElement title={"Modificar Articulo"} action={false} element={"articles"} restaurant={userRestaurant} data={article} />}
                                                     />
@@ -193,8 +199,19 @@ function App() {
                                                     path={`/${userRestaurant.name}/admin/add_worker`}
                                                     element={<FormWorkers title={"Añadir Trabajador"} action={true} restaurant={userRestaurant} />}
                                                 />
+
+                                                {
+                                                    workers.map((worker) => (
+                                                        <Route
+                                                            key={`${worker.id_user}_trabajador`}
+                                                            path={`/${userRestaurant.name}/admin/modify_worker/${worker.id_user}`}
+                                                            element={<FormWorkers title={"Añadir Trabajador"} action={false} restaurant={userRestaurant} worker={worker.id_user}/>}
+                                                        />
+                                                    ))
+                                                }
                                             </>
                                         )}
+                                        // Si el usuario tiene el rol de camarer le cargaran las rutas para administrar mesas
                                         {userRole.includes(3) && (
                                             <>
                                                 <Route
@@ -203,7 +220,7 @@ function App() {
                                                 />
                                                 {tables.map((table) => (
                                                     <Route
-                                                        key={userRestaurant.name + "_Mesa" + table.table_number}
+                                                        key={userRestaurant.id_restaurant + "_Mesa" + table.table_number}
                                                         path={`/${userRestaurant.name}/admin/table/${table.table_number}`}
                                                         element={<ShowTable table={table.table_number} restaurant={userRestaurant} />}
                                                     />
@@ -216,6 +233,7 @@ function App() {
                             </>
                         ) : null}
 
+                        // Rutas de los codigos de cada mesa de cada restaurante
                         {owners.map((owner, index) => (
                             <>
                                 <Route
@@ -226,7 +244,7 @@ function App() {
                                 {codes[index].map((codigo) => (
                                     <>
                                         <Route
-                                            key={`${owner.name}_${codigo.table_number}_${codigo.codenumber}`}
+                                            key={`${owner.name}_${codigo.table_number}_${codigo.codenumber}_Pedido`}
                                             path={`/${owner.name}/pedido/${codigo.codenumber}`}
                                             element={<SecondScreen table={codigo} />}
                                         />
@@ -237,7 +255,7 @@ function App() {
                                         />
                                         {allsections[index].map((section) => (
                                             <Route
-                                                key={`${owner.restaurant}_${codigo.table_number}_${codigo.codenumber}_${section.name}`}
+                                                key={`${owner.restaurant}_${codigo.table_number}_${codigo.codenumber}_${section.name}_AñadirProducto`}
                                                 path={`/${owner.name}/pedido/${codigo.codenumber}/${section.name}`}
                                                 element={<ArticlesSection section={section} owner={owner} table={codigo.table_number}/>}
                                             />

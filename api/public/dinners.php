@@ -8,6 +8,8 @@ use App\Models\DB;
 
 $app->add(new RKA\Middleware\IpAddress);
 
+
+// Devuelve el numero de un articulo concreto que hay en la cesta de una mesa
 $app->get('/get_number_articles/{idRestaurante}/{numeroMesa}/{idArticulo}', function (Request $request, Response $response, $args) {
     $idRestaurant = $args['idRestaurante'];
     $numeroMesa = $args['numeroMesa'];
@@ -41,6 +43,8 @@ $app->get('/get_number_articles/{idRestaurante}/{numeroMesa}/{idArticulo}', func
     }
 });
 
+
+// Devuelve los articulos que hay en una mesa
 $app->get('/resumeOrder/{idRestaurante}/{numeroMesa}', function (Request $request, Response $response, $args) {
     $idRestaurant = $args['idRestaurante'];
     $numeroMesa = $args['numeroMesa'];
@@ -95,7 +99,7 @@ $app->get('/resumeOrder/{idRestaurante}/{numeroMesa}', function (Request $reques
 });
 
 
-
+// Añade un articulo al pedido
 $app->post('/create_row_basket/{id_owner}', function (Request $request, Response $response) {
     $ownerid = $request->getAttribute('id_owner');
     $data = $request->getParsedBody();
@@ -131,6 +135,7 @@ $app->post('/create_row_basket/{id_owner}', function (Request $request, Response
     }
 });
 
+// Añade el pedido de una mesa a los logs
 $app->post('/order_log', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
     $ipAddress = $request->getAttribute('ip_address');
@@ -175,7 +180,7 @@ $app->post('/order_log', function (Request $request, Response $response) {
 
 
 
-
+// Borra un articulo del pedido de una mesa concreta
 $app->delete('/delete_article_basket/{idRestaurante}/{numeroMesa}/{idArticulo}', function (Request $request, Response $response, $args) {
     $idRestaurant = $args['idRestaurante'];
     $numeroMesa = $args['numeroMesa'];
@@ -210,7 +215,7 @@ $app->delete('/delete_article_basket/{idRestaurante}/{numeroMesa}/{idArticulo}',
     }
 });
 
-
+// Borra todos los articulos del pedido de una mesa
 $app->delete('/delete_basket/{idRestaurante}/{numeroMesa}', function (Request $request, Response $response, $args) {
     $idRestaurant = $args['idRestaurante'];
     $numeroMesa = $args['numeroMesa'];

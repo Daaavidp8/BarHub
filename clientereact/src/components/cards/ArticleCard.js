@@ -1,6 +1,9 @@
 import axios from "axios";
 
+// Componente que contiene los articulos, se utiliza para el resumen del pedido y para mostrar los articulos de una sección
+
 export function ArticleCard(props) {
+
     const addArticleBasket = async (idArticle) => {
         await axios.post('http://172.17.0.2:8888/create_row_basket/' + props.owner.id_restaurant, {
             id_article: idArticle,

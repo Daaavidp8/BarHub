@@ -1,5 +1,7 @@
 import '../../styles/cards/foodCard.css';
-import {useLocation, useNavigate} from "react-router-dom";
+import { useNavigate} from "react-router-dom";
+
+// Componente que contiene una sección
 export function FoodCard(props) {
     const navigate = useNavigate();
     return (

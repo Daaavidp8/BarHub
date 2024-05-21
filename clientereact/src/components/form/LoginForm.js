@@ -1,14 +1,19 @@
 import { useState } from 'react';
-import {Route, Routes, useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Loginbutton } from "../buttons/LoginButton";
 import '../../styles/forms/loginForm.css';
 import axios from 'axios';
 
+
+// Formulario para acceder a la alicación como administrador,propietario o camarero
 export function LoginForm({ onLogin }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
+
+    // Verificador de usuario y contraseña
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
@@ -19,22 +24,22 @@ export function LoginForm({ onLogin }) {
 
             if (response.data.status) {
                 onLogin();
+                localStorage.setItem('id', response.data.id);
                 localStorage.setItem('username', username);
                 localStorage.setItem('password', password);
-                if (response.data.roles == 1){
+                if (response.data.roles === 1) {
                     navigate("/admin");
-                    window.location.reload();
-                }else {
+                } else {
                     const responseowner = await axios.get('http://172.17.0.2:8888/get_owner/' + response.data.restaurant);
                     let restaurantName = responseowner.data[0].name;
                     navigate("/" + restaurantName + '/admin');
                 }
             } else {
-                document.getElementById('loginError').innerHTML = "Usuario o Contraseña incorrecto";
-                document.getElementById('loginError').style.display = "block";
+                setErrorMessage("Usuario o Contraseña incorrecto");
             }
         } catch (error) {
             console.error(error);
+            setErrorMessage("Ocurrió un error. Intente nuevamente.");
         }
     };
 
@@ -61,7 +66,9 @@ export function LoginForm({ onLogin }) {
                     onChange={(event) => setPassword(event.target.value)}
                 />
             </div>
-            <div id="loginError"></div>
+            {errorMessage && (
+                <div id="loginError">{errorMessage}</div>
+            )}
             <Loginbutton onClick={handleSubmit} value={"Acceder"} />
         </div>
     );

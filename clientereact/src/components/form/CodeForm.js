@@ -4,6 +4,8 @@ import '../../styles/forms/form.css';
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 
+
+// Comprobador del código de la mesa
 export function CodeForm(props) {
     const [codigo, setCodigo] = useState('');
     const navigate = useNavigate();

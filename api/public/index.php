@@ -26,6 +26,8 @@ include "./owners.php";
 include "./waiters.php";
 include "./dinners.php";
 
+
+// Validación de credenciales
 $app->post('/get_sesion', function (Request $request, Response $response) {
     $data = $request->getParsedBody();
 
@@ -57,6 +59,7 @@ $app->post('/get_sesion', function (Request $request, Response $response) {
             $data = array(
                 "status" => true,
                 "roles" => $roles,
+                "id" => $user['id_user'],
                 "restaurant" => $user['id_restaurant']
             );
         } else {

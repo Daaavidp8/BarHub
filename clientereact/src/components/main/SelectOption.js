@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import "../../styles/main/selectiOption.css";
 
+// Componente de elección de administración, recibe listas con las mesas,secciones y productos
+
 export function SelectOption(props) {
     const navigate = useNavigate();
 
@@ -37,6 +39,8 @@ export function SelectOption(props) {
                         workersLink.addEventListener('click', () => navigate(`/${ownerdata.name}/admin/tables`));
                         container.appendChild(workersLink);
                     }
+                }else{
+                    navigate("/")
                 }
 
             } catch (error) {

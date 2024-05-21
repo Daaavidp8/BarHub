@@ -17,13 +17,15 @@ export function Addbutton(props) {
             password: localStorage.getItem('password'),
         });
 
-        if (response.data.roles.includes(2)){
+        if (response.data.roles.includes(2) && response.data.status){
             try {
                 await axios.post('http://172.17.0.2:8888/add_table/' + props.restaurant)
                 window.location.reload()
             }catch (e){
                 console.error("Error al añadir mesa: " + e)
             }
+        }else{
+            navigate("/")
         }
     }
 

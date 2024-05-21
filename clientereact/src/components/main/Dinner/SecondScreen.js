@@ -1,6 +1,9 @@
 import { ContenedorFoodcards } from "../../cards/ContenedorFoodcards";
 import { useEffect, useState } from "react";
 
+
+// Componente que contiene la vista de las secciones desde el punto de vista del comensal
+
 export function SecondScreen(props) {
     const [showConfirmMessage, setShowConfirmMessage] = useState(false);
     const [message, setMessage] = useState(false);

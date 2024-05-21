@@ -5,6 +5,8 @@ import {useEffect, useRef, useState} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 
+
+// Componente para crear y modificar secciones y articulos
 export function FormElement(props) {
 
     const [logoPreview, setLogoPreview] = useState(null);
@@ -70,7 +72,7 @@ export function FormElement(props) {
             password: localStorage.getItem('password'),
         });
 
-        if (response.data.roles.includes(2)){
+        if (response.data.roles.includes(2) && response.data.status){
             if (validarCampos()){
                 const formData = new FormData();
                 const config = {
@@ -105,6 +107,8 @@ export function FormElement(props) {
                     console.error('Error al añadir propietario:', error);
                 }
             }
+        }else{
+            navigate("/")
         }
     }
 
@@ -114,7 +118,7 @@ export function FormElement(props) {
             password: localStorage.getItem('password'),
         });
 
-        if (response.data.roles.includes(2)){
+        if (response.data.roles.includes(2) && response.data.status){
             if (validarCampos()){
                 const formData = new FormData();
                 try {
@@ -142,6 +146,8 @@ export function FormElement(props) {
                     console.error('Error al añadir propietario:', error);
                 }
             }
+        }else{
+            navigate("/")
         }
 
     };

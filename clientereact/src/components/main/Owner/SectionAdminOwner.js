@@ -220,7 +220,7 @@ export function SectionAdminOwner(props) {
                                                 )}
                                                 <div className="containerActionElementButtons">
                                                     {props.table !== "tables" ? (<>
-                                                            <ModifyButton path={`${basePath}/modify_${props.table.substring(0, props.table.length - 1)}/${element.name}`}/>
+                                                            <ModifyButton path={`${basePath}/modify_${props.table.substring(0, props.table.length - 1)}/${props.table !== "workers" ? element.name : element.id_user}`}/>
                                                             <DeleteButton onClick={() => {
                                                                 showModalDelete(element)
                                                             }}/>

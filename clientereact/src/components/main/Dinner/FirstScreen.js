@@ -1,6 +1,8 @@
 import {CodeForm} from '../../form/CodeForm';
 import "../../../styles/main/dinner/codeScreen.css"
 
+// Componente utilizado para intoducir el código para iniciar el pedido
+
 export function FirstScreen(props) {
     return (
         <>

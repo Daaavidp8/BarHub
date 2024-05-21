@@ -5,11 +5,14 @@ import { ReactComponent as Flecha } from '../../../images/arrow-sm-left-svgrepo-
 import "../../../styles/main/waiter/showTable.css"
 import { useEffect, useState } from "react";
 import axios from "axios";
-import {DeleteButton} from "../../buttons/DeleteButton";
+import {useNavigate} from "react-router-dom";
+
+// Muestra una ventana con el código QR y el código de la mesa
 
 export function ShowTable(props) {
     const [qr, setQr] = useState('');
     const [dataloaded, setDataloaded] = useState(false);
+    const navigate = useNavigate();
     useEffect(() => {
         const qrgen = async () => {
             try {
@@ -17,11 +20,13 @@ export function ShowTable(props) {
                     username: localStorage.getItem('username'),
                     password: localStorage.getItem('password'),
                 });
-                if (response.data.roles.includes(3)) {
+                if (response.data.roles.includes(3) && response.data.status) {
                     const responseqr = await axios.post('http://172.17.0.2:8888/get_qrTable/' + props.restaurant.id_restaurant, {
                         number_table: props.table,
                     });
                     setQr("data:image/png;base64," + responseqr.data.image)
+                }else{
+                    navigate("/")
                 }
                 setDataloaded(true)
             } catch (e) {

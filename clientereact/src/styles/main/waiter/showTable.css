@@ -19,6 +19,7 @@
     align-items: center;
 }
 .qrCode{
+    max-width: 100%;
     position: relative;
     top: 30px;
     margin: 0 auto;

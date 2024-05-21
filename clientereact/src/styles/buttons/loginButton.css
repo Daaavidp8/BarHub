@@ -1,15 +1,23 @@
 .loginbutton{
     align-self: center;
-    width: 150px;
+    width: 60%;
     border: none;
     background-color: #c8c8c8;
-    font-size: 1em;
+    font-size: 5vw;
     font-weight: normal;
-    margin-top: 10px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    margin-top: 3vw;
+    padding: 2vw 0;
 }
 
 .loginbutton:active{
     background-color: #b8b8b8;
+}
+
+@media screen and (min-width: 450px) {
+    .loginbutton{
+        width: 60%;
+        font-size: 1.2em;
+        margin-top: 15px;
+        padding: 10px 0;
+    }
 }
