@@ -1,3 +1,5 @@
+[![wakatime](https://wakatime.com/badge/user/62fe04e7-e0b9-4d18-8864-edd6a2f369b8/project/018eb9c2-6327-457c-af96-aa09b49ebb4f.svg)](https://wakatime.com/badge/user/62fe04e7-e0b9-4d18-8864-edd6a2f369b8/project/018eb9c2-6327-457c-af96-aa09b49ebb4f)
+
 # BarHub
 
 ## Descripción
