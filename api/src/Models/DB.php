@@ -8,7 +8,7 @@ class DB
 {
     private $host = '172.17.0.2';
     private $user = 'david';
-    private $pass = '1234';
+    private $pass = '****';
     private $dbname = 'BarHub';
 
     public function connect(): PDO
