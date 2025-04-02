@@ -106,6 +106,8 @@ $app->post('/create_row_basket/{id_owner}', function (Request $request, Response
     $article = $data["id_article"];
     $numberTable = $data["number_table"];
 
+    
+
     try {
         $db = new DB();
         $conn = $db->connect();

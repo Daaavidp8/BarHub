@@ -9,6 +9,7 @@ export function SecondScreen(props) {
     const [message, setMessage] = useState(false);
 
     useEffect(() => {
+        console.log("Va a la vista de la mesa")
         const isPedido = localStorage.getItem('pedido') !== 'false';
         setShowConfirmMessage(isPedido);
         if (isPedido) {

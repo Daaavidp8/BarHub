@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { DefaultTitle } from '../../titles/DefaultTitle';
 import { ReactComponent as Logo } from '../../../images/logosvg.svg';
 import { OpenOwnerButton } from '../../buttons/Admin/OpenOwnerButton';
 import { ModifyButton } from '../../buttons/ModifyButton';
 import { DeleteButton } from '../../buttons/DeleteButton';
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import axiosInstance from '../../../utils/axiosConfig';
+import { ENDPOINTS } from '../../../utils/constants';
 import "../../../styles/main/admin/admin.css"
 
 
@@ -74,7 +75,7 @@ export function Admin(props) {
 
     const handleDeleteOwner = async (id) => {
         try {
-            await axios.delete(`http://172.17.0.2:8888/delete_owner/${id}`);
+            await axiosInstance.delete(`${ENDPOINTS.DELETE_OWNER}/${id}`);
             setOwners(owners.filter(owner => owner.id_restaurant !== id));
         } catch (error) {
             console.error('Error al eliminar propietario:', error);

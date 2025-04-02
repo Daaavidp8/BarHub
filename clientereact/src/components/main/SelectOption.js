@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import axiosInstance from '../../utils/axiosConfig';
+import { API_CONFIG, ENDPOINTS, STORAGE_KEYS } from '../../utils/constants';
 import "../../styles/main/selectiOption.css";
 
 // Componente de elección de administración, recibe listas con las mesas,secciones y productos
@@ -11,13 +12,13 @@ export function SelectOption(props) {
     useEffect(() => {
         const getSesion = async () => {
             try {
-                const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
-                    username: localStorage.getItem('username'),
-                    password: localStorage.getItem('password'),
+                const response = await axiosInstance.post(ENDPOINTS.LOGIN, {
+                    username: localStorage.getItem(STORAGE_KEYS.USERNAME),
+                    password: localStorage.getItem(STORAGE_KEYS.PASSWORD),
                 });
 
                 if (response.data.status){
-                    const owner = await axios.get('http://172.17.0.2:8888/get_owner/' + response.data.restaurant);
+                    const owner = await axiosInstance.get(`${ENDPOINTS.GET_OWNER}/${response.data.restaurant}`);
                     let container = document.getElementsByClassName('contenedorPermisos')[0]
                     let ownerdata = owner.data[0]
                     container.innerHTML = "";

@@ -7,6 +7,8 @@ import { BackButton } from "../../buttons/BackButton";
 import "../../../styles/main/dinner/articleSection.css";
 import { ArticleCard } from "../../cards/ArticleCard";
 import { DetailsButton } from "../../buttons/Dinner/DetailsButton";
+import { ENDPOINTS } from '../../../utils/constants'; // Importing ENDPOINTS from constants
+import axiosInstance from '../../../utils/axiosConfig';
 
 export function ArticlesSection(props) {
     const [articles, setArticles] = useState([]);
@@ -19,7 +21,7 @@ export function ArticlesSection(props) {
         let totalCost = 0.0;
         let cantidad = [];
         await Promise.all(farticles.map(async (article) => {
-            const numberArticlesResponse = await axios.get(`http://172.17.0.2:8888/get_number_articles/${props.owner.id_restaurant}/${props.table}/${article.id_article}`);
+            const numberArticlesResponse = await axiosInstance.get(`${ENDPOINTS.GET_NUMBER_ARTICLES}/${props.owner.id_restaurant}/${props.table}/${article.id_article}`);
             totalCost += (article.price * numberArticlesResponse.data);
             cantidad.push(numberArticlesResponse.data);
         }));
@@ -30,19 +32,25 @@ export function ArticlesSection(props) {
     // Obtiene los productos que hay en la cesta
     const getResumeOrder = async () => {
         try {
-            const resumeOrderResponse = await axios.get(`http://172.17.0.2:8888/resumeOrder/${props.owner.id_restaurant}/${props.table}`);
-            setArticles(resumeOrderResponse.data);
-            await numArticlesPromises(resumeOrderResponse.data);
+            console.log("Pilla los articulos");
+            
+            const response = await axiosInstance.get(`${ENDPOINTS.RESUME_ORDER}/${props.owner.id_restaurant}/${props.table}`);
+            setArticles(response.data);
+            await numArticlesPromises(response.data);
             setDataLoaded(true);
+            console.log("Los pilla perfectamente");
         } catch (e) {
             console.error(e);
+            // Set empty articles and mark as loaded to avoid UI being stuck
+            setArticles([]);
+            setDataLoaded(true);
         }
     };
 
     // Obtiene todos los articulos de una sección
     const getArticles = async () => {
         try {
-            const articlesResponse = await axios.get('http://172.17.0.2:8888/get_articles/' + props.section.id_section);
+            const articlesResponse = await axiosInstance.get(`${ENDPOINTS.GET_ARTICLES}/${props.section.id_section}`);
             setArticles(articlesResponse.data);
             await numArticlesPromises(articlesResponse.data);
             setDataLoaded(true);

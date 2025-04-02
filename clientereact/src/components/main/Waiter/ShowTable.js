@@ -4,8 +4,9 @@ import { ReactComponent as Mesa } from '../../../images/mesa.svg';
 import { ReactComponent as Flecha } from '../../../images/arrow-sm-left-svgrepo-com.svg';
 import "../../../styles/main/waiter/showTable.css"
 import { useEffect, useState } from "react";
-import axios from "axios";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from '../../../utils/axiosConfig';
+import { ENDPOINTS, STORAGE_KEYS, ROLES } from '../../../utils/constants';
 
 // Muestra una ventana con el código QR y el código de la mesa
 
@@ -16,16 +17,16 @@ export function ShowTable(props) {
     useEffect(() => {
         const qrgen = async () => {
             try {
-                const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
-                    username: localStorage.getItem('username'),
-                    password: localStorage.getItem('password'),
+                const response = await axiosInstance.post(ENDPOINTS.LOGIN, {
+                    username: localStorage.getItem(STORAGE_KEYS.USERNAME),
+                    password: localStorage.getItem(STORAGE_KEYS.PASSWORD),
                 });
-                if (response.data.roles.includes(3) && response.data.status) {
-                    const responseqr = await axios.post('http://172.17.0.2:8888/get_qrTable/' + props.restaurant.id_restaurant, {
+                if (response.data.roles.includes(ROLES.WAITER) && response.data.status) {
+                    const responseqr = await axiosInstance.post(`${ENDPOINTS.GET_QR_TABLE}/${props.restaurant.id_restaurant}`, {
                         number_table: props.table,
                     });
                     setQr("data:image/png;base64," + responseqr.data.image)
-                }else{
+                } else {
                     navigate("/")
                 }
                 setDataloaded(true)

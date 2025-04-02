@@ -1,10 +1,10 @@
-import {BackButton} from "../../buttons/BackButton";
+import { BackButton } from "../../buttons/BackButton";
 import { ReactComponent as Arrow } from '../../../images/arrow-sm-left-svgrepo-com.svg';
 import "../../../styles/forms/formElement.css"
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
+import { ENDPOINTS } from '../../../utils/constants'; // Importing ENDPOINTS from constants
 
 // Componente para crear y modificar secciones y articulos
 export function FormElement(props) {
@@ -67,13 +67,13 @@ export function FormElement(props) {
     }
 
     const modifyElement = async () => {
-        const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
+        const response = await axios.post(`${ENDPOINTS.LOGIN}`, {
             username: localStorage.getItem('username'),
             password: localStorage.getItem('password'),
         });
 
-        if (response.data.roles.includes(2) && response.data.status){
-            if (validarCampos()){
+        if (response.data.roles.includes(2) && response.data.status) {
+            if (validarCampos()) {
                 const formData = new FormData();
                 const config = {
                     headers: {
@@ -86,7 +86,7 @@ export function FormElement(props) {
                         case "sections":
                             formData.append('section_img', logoPreview);
                             formData.append('section_name', name);
-                            await axios.put(`http://172.17.0.2:8888/update_section/${props.data.id_section}`, formData, config);
+                            await axios.put(`${ENDPOINTS.UPDATE_SECTION}/${props.data.id_section}`, formData, config);
                             navigate("/" + props.restaurant.name + "/admin")
                             navigate("/" + props.restaurant.name + "/admin/sections")
                             break;
@@ -94,8 +94,8 @@ export function FormElement(props) {
                             formData.append('article_img', logoPreview);
                             formData.append('article_name', name);
                             formData.append('article_price', price);
-                            await axios.put('http://172.17.0.2:8888/update_article/' + props.data.id_article, formData, config);
-                            const responseSection = await axios.get('http://172.17.0.2:8888/get_section/' + props.data.id_section, formData);
+                            await axios.put(`${ENDPOINTS.UPDATE_ARTICLE}/${props.data.id_article}`, formData, config);
+                            const responseSection = await axios.get(`${ENDPOINTS.GET_SECTION}/${props.data.id_section}`, formData);
                             navigate("/" + props.restaurant.name + "/admin/")
                             navigate("/" + props.restaurant.name + "/admin/" + responseSection.data[0].name)
                             break;
@@ -107,26 +107,26 @@ export function FormElement(props) {
                     console.error('Error al añadir propietario:', error);
                 }
             }
-        }else{
+        } else {
             navigate("/")
         }
     }
 
     const addElement = async () => {
-        const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
+        const response = await axios.post(`${ENDPOINTS.LOGIN}`, {
             username: localStorage.getItem('username'),
             password: localStorage.getItem('password'),
         });
 
-        if (response.data.roles.includes(2) && response.data.status){
-            if (validarCampos()){
+        if (response.data.roles.includes(2) && response.data.status) {
+            if (validarCampos()) {
                 const formData = new FormData();
                 try {
                     switch (props.element) {
                         case "sections":
                             formData.append('section_img', inputFileRef.current.files[0]);
                             formData.append('section_name', name);
-                            await axios.post('http://172.17.0.2:8888/create_section/' + props.restaurant.id_restaurant, formData);
+                            await axios.post(`${ENDPOINTS.CREATE_SECTION}/${props.restaurant.id_restaurant}`, formData);
                             navigate("/" + props.restaurant.name + "/admin")
                             navigate("/" + props.restaurant.name + "/admin/sections")
                             break;
@@ -134,7 +134,7 @@ export function FormElement(props) {
                             formData.append('article_img', inputFileRef.current.files[0]);
                             formData.append('article_name', name);
                             formData.append('article_price', price);
-                            await axios.post('http://172.17.0.2:8888/create_article/' + props.data.id_section, formData);
+                            await axios.post(`${ENDPOINTS.CREATE_ARTICLE}/${props.data.id_section}`, formData);
                             navigate("/" + props.restaurant.name + "/admin/sections")
                             navigate("/" + props.restaurant.name + "/admin/" + props.data.name)
                             break;
@@ -146,10 +146,9 @@ export function FormElement(props) {
                     console.error('Error al añadir propietario:', error);
                 }
             }
-        }else{
+        } else {
             navigate("/")
         }
-
     };
 
     const validarCampos = () => {

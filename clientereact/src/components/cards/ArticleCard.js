@@ -1,20 +1,42 @@
 import axios from "axios";
+import { ENDPOINTS } from '../../utils/constants'; // Importing ENDPOINTS from constants
+import axiosInstance from '../../utils/axiosConfig';
 
 // Componente que contiene los articulos, se utiliza para el resumen del pedido y para mostrar los articulos de una sección
 
 export function ArticleCard(props) {
 
     const addArticleBasket = async (idArticle) => {
-        await axios.post('http://172.17.0.2:8888/create_row_basket/' + props.owner.id_restaurant, {
-            id_article: idArticle,
-            number_table: props.table,
-        });
+        try {
+            console.log("Sending data:", {
+                id_article: idArticle,
+                number_table: props.table,
+                owner_id: props.owner.id_restaurant
+            });
+            
+            // Make sure we're sending the data in the correct format
+            const response = await axiosInstance.post(`${ENDPOINTS.CREATE_ROW_BASKET}/${props.owner.id_restaurant}`, {
+                id_article: idArticle,
+                number_table: props.table,
+            }, {
+                headers: {
+                     'Content-Type': 'multipart/form-data'
+                }
+            });
+            
+            console.log("Response:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("Error adding article to basket:", error);
+            console.error("Error details:", error.response ? error.response.data : "No response data");
+            throw error;
+        }
     }
 
     const deleteArticleBasket = async (idArticle) => {
         try {
-            await axios.delete(`http://172.17.0.2:8888/delete_article_basket/${props.owner.id_restaurant}/${props.table}/${idArticle}`);
-        }catch (e){
+            await axiosInstance.delete(`${ENDPOINTS.DELETE_ARTICLE}/${props.owner.id_restaurant}/${props.table}/${idArticle}`);
+        } catch (e) {
             console.error("Error al eliminar el articulo de la lista: " + e)
         }
     }
@@ -22,7 +44,7 @@ export function ArticleCard(props) {
     return (
         <>
             <div className="containerArticles">
-                {props.articles.map((article,index) => (
+                {props.articles.map((article, index) => (
                     <div className="article" key={article.id_article}>
                         <div className="containerImageAndText">
                             <div className="containerImgArticle">

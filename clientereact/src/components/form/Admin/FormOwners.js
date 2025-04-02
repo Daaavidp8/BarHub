@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/forms/formOwners.css";
+import axiosInstance from '../../../utils/axiosConfig';
+import { ENDPOINTS, STORAGE_KEYS } from '../../../utils/constants';
 
 
 // Formulario para crear y modificar restaurantes
@@ -18,32 +20,50 @@ export function FormOwners(props) {
     const inputFileRef = useRef(null);
 
     const addOwner = async () => {
-        const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
-            username: localStorage.getItem('username'),
-            password: localStorage.getItem('password'),
+        const response = await axiosInstance.post(ENDPOINTS.LOGIN, {
+            username: localStorage.getItem(STORAGE_KEYS.USERNAME),
+            password: localStorage.getItem(STORAGE_KEYS.PASSWORD),
         });
-
+        console.log("Entra");
+        console.log(response.data);
         if (response.data.roles == 1 && response.data.status){
+            console.log("Entra");
             if (validarCampos()){
 
                 const formData = new FormData();
-                formData.append('owner_logo', inputFileRef.current.files[0]);
+                // Make sure we have a file
+                if (inputFileRef.current && inputFileRef.current.files[0]) {
+                    console.log("Appending file:", inputFileRef.current.files[0]);
+                    formData.append('owner_logo', inputFileRef.current.files[0]);
+                } else {
+                    console.error("No file selected");
+                    // Show error to user
+                    document.getElementsByClassName("errorCard")[0].style.display = "block";
+                    document.getElementsByClassName("errorCard")[0].innerHTML = "Por favor, seleccione un logo.";
+                    return;
+                }
+                
                 formData.append('owner_name', name);
                 formData.append('owner_CIF', cif);
                 formData.append('owner_contact_email', email);
                 formData.append('owner_contact_phone', phone);
 
                 try {
-                    await axios.post('http://172.17.0.2:8888/create_owner', formData);
+                    // Add proper headers for multipart/form-data
+                    const config = {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    };
+                    const response = await axiosInstance.post(ENDPOINTS.CREATE_OWNER, formData, config);
+                    console.log("Create owner response:", response.data);
+                    
+                    const ownersResponse = await axiosInstance.get(ENDPOINTS.GET_OWNERS);
 
-
-
-                    const response = await axios.get('http://172.17.0.2:8888/get_owners');
-
-                    const promises = response.data
+                    const promises = ownersResponse.data
                         .filter(owner => owner.name === name)
                         .map(async owner => {
-                            await axios.post('http://172.17.0.2:8888/create_worker/' + owner.id_restaurant, {
+                            await axiosInstance.post(`${ENDPOINTS.CREATE_WORKER}/${owner.id_restaurant}`, {
                                 worker_name: owner.name + "_admin",
                                 worker_username: username,
                                 worker_password: password,
@@ -53,56 +73,64 @@ export function FormOwners(props) {
 
                     await Promise.all(promises);
 
-
                     navigate("/admin");
-
                     window.location.reload();
                 } catch (error) {
                     console.error('Error al añadir propietario:', error);
+                    // Show error to user
+                    document.getElementsByClassName("errorCard")[0].style.display = "block";
+                    document.getElementsByClassName("errorCard")[0].innerHTML = "Error al añadir propietario: " + error.message;
                 }
             }
-        }else{
+        } else {
             navigate("/")
         }
-
     };
 
     const modifyOwner = async () => {
-        const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
-            username: localStorage.getItem('username'),
-            password: localStorage.getItem('password'),
+        const response = await axiosInstance.post(ENDPOINTS.LOGIN, {
+            username: localStorage.getItem(STORAGE_KEYS.USERNAME),
+            password: localStorage.getItem(STORAGE_KEYS.PASSWORD),
         });
 
         if (response.data.roles == 1 && response.data.status){
             if (validarCampos()){
 
                 const formData = new FormData();
-                formData.append('owner_logo', logoPreview);
+                // Don't append the base64 string directly - we need to convert it to a file or blob
+                if (inputFileRef.current && inputFileRef.current.files[0]) {
+                    formData.append('owner_logo', inputFileRef.current.files[0]);
+                } else if (logoPreview) {
+                    // Convert base64 to blob and append
+                    const blob = await fetch(logoPreview).then(r => r.blob());
+                    formData.append('owner_logo', blob, 'logo.png');
+                }
+                
                 formData.append('owner_name', name);
                 formData.append('owner_CIF', cif);
                 formData.append('owner_contact_email', email);
                 formData.append('owner_contact_phone', phone);
+                
+                // Remove Content-Type header to let browser set it with boundary
                 const config = {
                     headers: {
-                        'Content-Type': 'application/json'
+                        'content-type': 'multipart/form-data'
                     }
                 };
 
                 try {
-                    await axios.put(`http://172.17.0.2:8888/update_owner/${props.data.id_restaurant}`, formData, config);
+                    await axiosInstance.put(`${ENDPOINTS.UPDATE_OWNER}/${props.data.id_restaurant}`, formData, config);
                     navigate("/admin");
                     window.location.reload();
                 } catch (error) {
                     console.error('Error al modificar propietario:', error);
                 }
             }
-
-        }else{
+        } else {
             navigate("/")
         }
-
-
     };
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;

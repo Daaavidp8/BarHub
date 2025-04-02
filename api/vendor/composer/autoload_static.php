@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit56e9614132823821e88475a626970c4a
+class ComposerStaticInit5e0c9c9ff922eded8f58d7cf10fee598
 {
     public static $files = array (
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
@@ -13,6 +13,11 @@ class ComposerStaticInit56e9614132823821e88475a626970c4a
     );
 
     public static $prefixLengthsPsr4 = array (
+        'T' => 
+        array (
+            'Tuupola\\Middleware\\' => 19,
+            'Tuupola\\Http\\Factory\\' => 21,
+        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
@@ -31,8 +36,13 @@ class ComposerStaticInit56e9614132823821e88475a626970c4a
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
         ),
+        'N' => 
+        array (
+            'Neomerx\\Cors\\' => 13,
+        ),
         'F' => 
         array (
+            'Firebase\\JWT\\' => 13,
             'Fig\\Http\\Message\\' => 17,
             'FastRoute\\' => 10,
         ),
@@ -55,6 +65,15 @@ class ComposerStaticInit56e9614132823821e88475a626970c4a
     );
 
     public static $prefixDirsPsr4 = array (
+        'Tuupola\\Middleware\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/tuupola/cors-middleware/src',
+            1 => __DIR__ . '/..' . '/tuupola/callable-handler/src',
+        ),
+        'Tuupola\\Http\\Factory\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/tuupola/http-factory/src',
+        ),
         'Symfony\\Polyfill\\Php80\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
@@ -81,8 +100,8 @@ class ComposerStaticInit56e9614132823821e88475a626970c4a
         ),
         'Psr\\Http\\Server\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-server-handler/src',
-            1 => __DIR__ . '/..' . '/psr/http-server-middleware/src',
+            0 => __DIR__ . '/..' . '/psr/http-server-middleware/src',
+            1 => __DIR__ . '/..' . '/psr/http-server-handler/src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -92,6 +111,14 @@ class ComposerStaticInit56e9614132823821e88475a626970c4a
         'Psr\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
+        ),
+        'Neomerx\\Cors\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/neomerx/cors-psr7/src',
+        ),
+        'Firebase\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
         'Fig\\Http\\Message\\' => 
         array (
@@ -132,9 +159,9 @@ class ComposerStaticInit56e9614132823821e88475a626970c4a
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit56e9614132823821e88475a626970c4a::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit56e9614132823821e88475a626970c4a::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit56e9614132823821e88475a626970c4a::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit5e0c9c9ff922eded8f58d7cf10fee598::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit5e0c9c9ff922eded8f58d7cf10fee598::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit5e0c9c9ff922eded8f58d7cf10fee598::$classMap;
 
         }, null, ClassLoader::class);
     }

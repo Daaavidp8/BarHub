@@ -2,37 +2,40 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loginbutton } from "../buttons/LoginButton";
 import '../../styles/forms/loginForm.css';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosConfig';
+import { ENDPOINTS, STORAGE_KEYS, ROLES } from '../../utils/constants';
 
-
-// Formulario para acceder a la alicación como administrador,propietario o camarero
 export function LoginForm({ onLogin }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
-
-    // Verificador de usuario y contraseña
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await axios.post('http://172.17.0.2:8888/get_sesion', {
+            const response = await axiosInstance.post(ENDPOINTS.LOGIN, {
                 username: username,
                 password: password,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             });
 
             if (response.data.status) {
+                localStorage.setItem(STORAGE_KEYS.TOKEN, response.data.token);
                 onLogin();
-                localStorage.setItem('id', response.data.id);
-                localStorage.setItem('username', username);
-                localStorage.setItem('password', password);
-                if (response.data.roles === 1) {
+                localStorage.setItem(STORAGE_KEYS.USER_ID, response.data.id);
+                localStorage.setItem(STORAGE_KEYS.USERNAME, username);
+                localStorage.setItem(STORAGE_KEYS.PASSWORD, password);
+
+                if (response.data.roles.includes(ROLES.ADMIN)) {
                     navigate("/admin");
                 } else {
-                    const responseowner = await axios.get('http://172.17.0.2:8888/get_owner/' + response.data.restaurant);
+                    const responseowner = await axiosInstance.get(`${ENDPOINTS.GET_OWNER}/${response.data.restaurant}`);
                     let restaurantName = responseowner.data[0].name;
-                    navigate("/" + restaurantName + '/admin');
+                    navigate(`/${restaurantName}/admin`);
                 }
             } else {
                 setErrorMessage("Usuario o Contraseña incorrecto");
@@ -73,3 +76,4 @@ export function LoginForm({ onLogin }) {
         </div>
     );
 }
+

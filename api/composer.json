@@ -6,7 +6,9 @@
         "endroid/qr-code": "^5.0",
         "ph-7/qrcode-generator-php-class": "^2.2",
         "ext-gd": "*",
-        "akrabat/ip-address-middleware": "^2.1"
+        "akrabat/ip-address-middleware": "^2.1",
+        "firebase/php-jwt": "^6.11",
+        "tuupola/cors-middleware": "^1.5"
     },
     "autoload": {
         "psr-4": {

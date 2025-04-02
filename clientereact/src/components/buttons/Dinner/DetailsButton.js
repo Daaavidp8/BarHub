@@ -1,7 +1,8 @@
-import React, {useState, useEffect} from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../../../styles/buttons/dinner/detailsButton.css";
 import axios from "axios";
+import { ENDPOINTS } from '../../../utils/constants'; // Importing ENDPOINTS from constants
 
 export function DetailsButton(props) {
     const navigate = useNavigate();
@@ -17,12 +18,12 @@ export function DetailsButton(props) {
 
     const order = async () => {
         try {
-            const resumeOrderResponse = await axios.get(`http://172.17.0.2:8888/resumeOrder/${props.idOwner.id_restaurant}/${props.table}`);
+            const resumeOrderResponse = await axios.get(`${ENDPOINTS.RESUME_ORDER}/${props.idOwner.id_restaurant}/${props.table}`);
 
-            if (resumeOrderResponse.data.length > 0){
+            if (resumeOrderResponse.data.length > 0) {
                 await Promise.all(resumeOrderResponse.data.map(async (article, index) => {
-                    const numberArticlesResponse = await axios.get(`http://172.17.0.2:8888/get_number_articles/${props.idOwner.id_restaurant}/${props.table}/${article.id_article}`);
-                    await axios.post('http://172.17.0.2:8888/order_log', {
+                    const numberArticlesResponse = await axios.get(`${ENDPOINTS.GET_NUMBER_ARTICLES}/${props.idOwner.id_restaurant}/${props.table}/${article.id_article}`);
+                    await axios.post(`${ENDPOINTS.ORDER_LOG}`, {
                         owner_name: props.idOwner.name,
                         article: article.name,
                         price: article.price,
@@ -31,12 +32,12 @@ export function DetailsButton(props) {
                         quantity: numberArticlesResponse.data
                     });
                 }));
-                await axios.delete(`http://172.17.0.2:8888/delete_basket/${props.idOwner.id_restaurant}/${props.table}`);
+                await axios.delete(`${ENDPOINTS.DELETE_BASKET}/${props.idOwner.id_restaurant}/${props.table}`);
                 navigate(`/${owner}/pedido/${codeNumber}`);
-                localStorage.setItem('pedido','2');
-            }else {
+                localStorage.setItem('pedido', '2');
+            } else {
                 navigate(`/${owner}/pedido/${codeNumber}`);
-                localStorage.setItem('pedido','3');
+                localStorage.setItem('pedido', '3');
             }
         } catch (e) {
             console.error("Error al realizar el pedido: " + e);
