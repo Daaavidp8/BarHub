@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="BarHub.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:local="clr-namespace:BarHub"
+    xmlns:profile="clr-namespace:BarHub.Pages.Profile"
+    Shell.FlyoutBehavior="Disabled"
+    Title="BarHub">
+
+    <TabBar x:Name="tabbar">
+        <ShellContent
+            ContentTemplate="{DataTemplate profile:ProfilePage}" />
+    </TabBar>
+
+</Shell>
