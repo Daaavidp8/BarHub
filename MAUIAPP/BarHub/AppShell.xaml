@@ -7,7 +7,8 @@
     xmlns:local="clr-namespace:BarHub"
     xmlns:profile="clr-namespace:BarHub.Pages.Profile"
     Shell.FlyoutBehavior="Disabled"
-    Title="BarHub">
+    Shell.TabBarForegroundColor="{AppThemeBinding Light=Black, Dark=White}"
+    Shell.TabBarUnselectedColor="{DynamicResource Muted}">
 
     <TabBar x:Name="tabbar">
         <ShellContent

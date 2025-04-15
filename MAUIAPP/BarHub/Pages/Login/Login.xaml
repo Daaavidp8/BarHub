@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+             xmlns:stringResource="clr-namespace:BarHub.Utils.Translation"
+             xmlns:viewModel="clr-namespace:BarHub.ViewModel.Login"
+             x:Class="BarHub.Pages.Login.Login"
+             x:DataType="viewModel:LoginViewModel"
+             Title="Login">
+    <Grid RowDefinitions="*,*,*,*,*" VerticalOptions="Fill" HorizontalOptions="Fill">
+        <VerticalStackLayout Grid.Row="0" Grid.RowSpan="2" VerticalOptions="Center">
+            <VerticalStackLayout HorizontalOptions="Center">
+                <Image Source="app_icon.png" WidthRequest="150" HorizontalOptions="Center" VerticalOptions="Center"/>
+                <Label Text="{stringResource:Translate Name=AppName}" VerticalOptions="Center" FontAttributes="Bold" FontSize="32" HorizontalOptions="Center" Margin="0,-20,0,0"/>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+
+        <Border Grid.Row="2" Grid.RowSpan="3" StrokeShape="RoundRectangle 40,40,0,0" Stroke="Black" Background="{DynamicResource Primary}" Padding="20">
+            <Grid RowDefinitions="*,*,*,*">
+                <Label Grid.Row="0" Text="{stringResource:Translate Name=WelcomeText}" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" FontSize="30"/>
+
+                <VerticalStackLayout Grid.Row="1" Spacing="5">
+                    <material:TextField Text="{Binding Username}" 
+                                        x:Name="username"
+                                        Title="{stringResource:Translate Name=UsernameText}" 
+                                        Icon="{FontImageSource FontFamily=FASolid, Glyph={x:Static fa:Solid.User}}"
+                                        AccentColor="Black"
+                                        SelectionHighlightColor="Orange"
+                                        InputBackgroundColor="{x:DynamicResource White}" 
+                                        BorderThickness="1"
+                                        Grid.Row="0"
+                                    />
+
+                    <material:TextField Text="{Binding Password}" 
+                        x:Name="password"
+                        Title="{stringResource:Translate Name=PasswordText}" 
+                        Icon="{FontImageSource FontFamily=FASolid, Glyph={x:Static fa:Solid.Lock}}"
+                        AccentColor="Black"
+                        SelectionHighlightColor="Orange"
+                        InputBackgroundColor="{x:DynamicResource White}" 
+                        BorderThickness="1"
+                        Grid.Row="0"
+                    />
+                </VerticalStackLayout>
+                
+                <VerticalStackLayout Grid.Row="2" Spacing="15" Margin="0,15,0,0">
+                    <HorizontalStackLayout>
+                        <material:CheckBox 
+                            Color="{DynamicResource Black}" 
+                            Margin="0,0,-10,0" 
+                            BoxSizeRequest="20" 
+                            Text="{stringResource:Translate Name=StayLoggedIn}"
+                            ColumnSpacing="5"
+                            IsChecked="{Binding IsReminding}"
+                            />
+                    </HorizontalStackLayout>
+
+                    <Button Text="{stringResource:Translate Name=LogInText}" Background="{DynamicResource Black}" FontAttributes="Bold" Command="{Binding LoginCommand}"/>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Row="3" VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,10,0">
+                    <Label Text="{stringResource:Translate Name=CopyrightText}" HorizontalOptions="Center" FontSize="12"/>
+                    <Label Text="{stringResource:Translate Name=WebPage}" HorizontalOptions="Center" FontSize="12"/>
+                </VerticalStackLayout>
+                
+            </Grid>
+        </Border>
+        
+    </Grid>
+</ContentPage>

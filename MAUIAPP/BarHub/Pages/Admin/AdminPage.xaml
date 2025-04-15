@@ -1,0 +1,24 @@
+<pages:BarHubBaseContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:BarHub.Pages"
+    x:Class="BarHub.Pages.Admin.AdminPage"
+    xmlns:translation="clr-namespace:BarHub.Utils.Translation"
+    PageTitle="{translation:Translate Name=AdminTitlePage}"
+    Shell.NavBarIsVisible="False">
+
+    <pages:BarHubBaseContentPage.Icon>
+        <Image Source="app_icon" WidthRequest="50"/>
+    </pages:BarHubBaseContentPage.Icon>
+
+    <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
+        <VerticalStackLayout>
+            <Label 
+        Text="Welcome to la zona de Admin"
+        VerticalOptions="Center" 
+        HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+
+    </ContentView>
+</pages:BarHubBaseContentPage>

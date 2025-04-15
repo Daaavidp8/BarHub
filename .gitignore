@@ -1,0 +1,87 @@
+# Build results
+bin/
+obj/
+[Mm]igrations/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.vspscc
+*.vssscc
+
+# Visual Studio 2022
+.vs/
+.vscode/
+
+# Rider
+.idea/
+
+# JetBrains
+*.sln.iml
+
+# Mac builds
+*.DS_Store
+
+# Xamarin/MAUI specifics
+*.apk
+*.apks
+*.aab
+*.ipa
+*.app
+*.dSYM/
+*.xcuserstate
+*.xcworkspace
+*.xcuserdata
+*.entitlements
+*.plist
+
+# MAUI Platforms build outputs
+**/Platforms/Android/obj/
+**/Platforms/Android/bin/
+**/Platforms/iOS/obj/
+**/Platforms/iOS/bin/
+**/Platforms/MacCatalyst/obj/
+**/Platforms/MacCatalyst/bin/
+**/Platforms/Windows/obj/
+**/Platforms/Windows/bin/
+
+# Package cache
+.nuget/
+packages/
+*.nupkg
+
+# Local secrets
+secrets.json
+
+# Logs
+*.log
+
+# Images from previews or hot reloads
+*.snap
+
+# Dotnet CLI
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# SQLite/EF databases
+*.db
+*.sqlite
+*.mdf
+*.ldf
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# Other
+*.orig
+*.rej
+*.bak
+
+# Debug/Release builds
+**/Debug/
+**/Release/
