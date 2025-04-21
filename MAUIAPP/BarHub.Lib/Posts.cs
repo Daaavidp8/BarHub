@@ -17,20 +17,27 @@ namespace BarHub.Lib
             _methods = methods;
         }
 
-        public async Task<User> Login(string username, string password)
+        public async Task<User?> Login(string username, string password)
         {
-            var data = new
+            try
             {
-                username = username,
-                password = password
-            };
+                var data = new
+                {
+                    username = username,
+                    password = password
+                };
 
-            var user = await _methods.Post<object,User>(ApiConstants.LOGIN, data);
+                var user = await _methods.Post<object, User>(ApiConstants.LOGIN, data);
+                _methods.SetToken(user.Token);
+                return user;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
 
-            return user;
         }
 
-
-
+        
     }
 }

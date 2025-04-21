@@ -3,9 +3,12 @@ using BarHub.Models;
 using BarHub.Models.Enums;
 using BarHub.Pages.Admin;
 using BarHub.Pages.Camarero;
+using BarHub.Pages.Login;
 using BarHub.Pages.Profile;
 using BarHub.Pages.Propietario;
 using BarHub.Utils;
+using BarHub.Utils.Shell;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Controls;
 using System.Diagnostics;
 
@@ -13,16 +16,26 @@ namespace BarHub
 {
     public partial class AppShell : Shell
     {
-        private readonly Posts _posts;
 
-        public AppShell(IServiceProvider services = null, User user = null)
+        public AppShell(User user)
         {
             InitializeComponent();
-            _posts = services.GetService<Posts>();
             ConfigureTabsAsync(user);
+            WeakReferenceMessenger.Default.Register<ChangeTabMessage>(this, (r, m) =>
+            {
+                var tabToGo = tabbar.Items.FirstOrDefault(tab => tab.Route == m.Value);
+                if (tabToGo != null)
+                {
+                    tabbar.CurrentItem = tabToGo;
+                }
+                else
+                {
+                    Trace.WriteLine($"No se encontró el tab: {m.Value}");
+                }
+            });
         }
 
-        public async Task ConfigureTabsAsync(User? user = null)
+        public async Task ConfigureTabsAsync(User user)
         {
             try
             {
@@ -34,17 +47,11 @@ namespace BarHub
                     Color = App.Current.Resources["Primary"] as Color
                 };
 
-                if (user == null)
-                {
-                    var username = Preferences.Get("username", string.Empty);
-                    var password = Preferences.Get("password", string.Empty);
-                    user = await _posts.Login(username, password);
-                }
-
                 tabbar.Items.Clear();
                 if (user.Roles.Contains(Roles.ADMIN))
                 {
                     AddTab<AdminPage>(HomeIcon);
+                    Routing.RegisterRoute(nameof(ManageRestaurant), typeof(ManageRestaurant));
                 }
                 else
                 {
@@ -78,21 +85,29 @@ namespace BarHub
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Error configurando tabs: {ex.Message}");
+                Trace.WriteLine($"Error configuring tabs: {ex.Message}");
             }
         }
 
         private void AddTab<TPage>(FontImageSource icon) where TPage : Page
         {
+            var pageType = typeof(TPage);
+            var routeName = pageType.Name;
+
             var shellContent = new ShellContent
             {
+                Route = routeName,
                 Icon = icon,
-                Route = nameof(TPage),
                 ContentTemplate = new DataTemplate(typeof(TPage))
             };
 
             tabbar.Items.Add(shellContent);
+
+            Routing.RegisterRoute(routeName, pageType);
         }
+
+
+
 
 
     }

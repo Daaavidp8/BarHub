@@ -14,8 +14,25 @@ $app->get('/get_owners', function (Request $request, Response $response) {
         $stmt = $conn->query($sql);
         $owners = $stmt->fetchAll(PDO::FETCH_OBJ);
         $db = null;
+        
+        // Add logo to each owner
+        foreach ($owners as $owner) {
+            $logoPath = "./owners/" . $owner->name . "/img/logo.png";
+            if (file_exists($logoPath)) {
+                // Read the image file and convert to base64
+                $imageData = file_get_contents($logoPath);
+                $base64Image = base64_encode($imageData);
+                $owner->logo = "data:image/png;base64," . $base64Image;
+            } else {
+                $owner->logo = null;
+            }
+        }
 
-        $response->getBody()->write(json_encode($owners));
+        // Log the response data
+        $jsonResponse = json_encode($owners);
+        
+        // Send the response
+        $response->getBody()->write($jsonResponse);
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
@@ -74,12 +91,17 @@ $app->post('/create_owner', function (Request $request, Response $response) {
         $email = $data["owner_contact_email"];
         $phone = $data["owner_contact_phone"];
 
-        $ruta = "../../clientereact/public/images/owners/" . $name;
+        if (!is_dir("./owners")) {
+            mkdir("./owners");
+        }
+        
+        $ruta = "./owners/" . $name;
+
 
         if (!is_dir($ruta)) {
-            mkdir($ruta, 0777, true);
-            mkdir($ruta . "/img/sections", 0777, true);
-            mkdir($ruta . "/img/articles", 0777, true);
+            mkdir($ruta);
+            mkdir($ruta . "/img/sections");
+            mkdir($ruta . "/img/articles");
         } else {
             throw new Exception("El directorio ya existe.");
         }

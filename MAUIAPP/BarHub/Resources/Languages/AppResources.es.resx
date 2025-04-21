@@ -117,11 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddRestaurantText" xml:space="preserve">
+    <value>Añadir Restaurante</value>
+  </data>
   <data name="AdminTitlePage" xml:space="preserve">
     <value>Administración de Propietarios</value>
   </data>
   <data name="AppName" xml:space="preserve">
     <value />
+  </data>
+  <data name="CifRestaurantText" xml:space="preserve">
+    <value>CIF</value>
   </data>
   <data name="CopyrightText" xml:space="preserve">
     <value>Copyright © Todos los derechos reservados.</value>
@@ -129,8 +135,14 @@
   <data name="LogInText" xml:space="preserve">
     <value>Iniciar Sesión</value>
   </data>
+  <data name="ModifyRestaurantText" xml:space="preserve">
+    <value>Modificar Restaurante</value>
+  </data>
   <data name="PasswordText" xml:space="preserve">
     <value>Contraseña</value>
+  </data>
+  <data name="RestaurantNameText" xml:space="preserve">
+    <value>Nombre del Restaurante</value>
   </data>
   <data name="StayLoggedIn" xml:space="preserve">
     <value>Mantener iniciada la sesion</value>
@@ -143,5 +155,38 @@
   </data>
   <data name="WelcomeText" xml:space="preserve">
     <value>Bienvenido</value>
+  </data>
+  <data name="ContactEmailText" xml:space="preserve">
+    <value>Email de Contacto</value>
+  </data>
+  <data name="ContactPhoneText" xml:space="preserve">
+    <value>Teléfono de Contacto</value>
+  </data>
+  <data name="InsertLogoText" xml:space="preserve">
+    <value>Insertar Logo</value>
+  </data>
+  <data name="NoImageText" xml:space="preserve">
+    <value>Sin Imagen</value>
+  </data>
+  <data name="RestaurantNamePlaceholder" xml:space="preserve">
+    <value>Nombre de la empresa...</value>
+  </data>
+  <data name="RestaurantCifPlaceholder" xml:space="preserve">
+    <value>CIF de la empresa...</value>
+  </data>
+  <data name="ContactEmailPlaceholder" xml:space="preserve">
+    <value>Ej: correodecontacto@ayuda.com</value>
+  </data>
+  <data name="ContactPhonePlaceholder" xml:space="preserve">
+    <value>Teléfono de la persona de contacto</value>
+  </data>
+  <data name="RestaurantLogoText" xml:space="preserve">
+    <value>Logo del Restaurante</value>
+  </data>
+  <data name="CreateRestaurantText" xml:space="preserve">
+    <value>Crear Restaurante</value>
+  </data>
+  <data name="SaveChangesText" xml:space="preserve">
+    <value>Guardar Cambios</value>
   </data>
 </root>

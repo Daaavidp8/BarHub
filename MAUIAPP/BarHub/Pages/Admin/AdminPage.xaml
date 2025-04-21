@@ -2,10 +2,16 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:BarHub.Pages"
+    xmlns:mpowerkit="clr-namespace:MPowerKit.VirtualizeListView;assembly=MPowerKit.VirtualizeListView"
+    xmlns:models="clr-namespace:BarHub.Models;assembly=BarHub.Models"
+    xmlns:viewModels="clr-namespace:BarHub.ViewModel.Admin"
+    xmlns:adminComponents="clr-namespace:BarHub.Pages.Admin"
     x:Class="BarHub.Pages.Admin.AdminPage"
     xmlns:translation="clr-namespace:BarHub.Utils.Translation"
     PageTitle="{translation:Translate Name=AdminTitlePage}"
-    Shell.NavBarIsVisible="False">
+    Shell.NavBarIsVisible="False"
+    x:DataType="viewModels:AdminViewModel"
+    FabRoute="{Binding GoToCreateRestaurantCommand}">
 
     <pages:BarHubBaseContentPage.Icon>
         <Image Source="app_icon" WidthRequest="50"/>
@@ -13,10 +19,18 @@
 
     <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
         <VerticalStackLayout>
-            <Label 
-        Text="Welcome to la zona de Admin"
-        VerticalOptions="Center" 
-        HorizontalOptions="Center" />
+            <mpowerkit:VirtualizeListView ItemsSource="{Binding Restaurants}">
+                <mpowerkit:VirtualizeListView.ItemsLayout>
+                    <mpowerkit:LinearLayout ItemSpacing="0" />
+                </mpowerkit:VirtualizeListView.ItemsLayout>
+                <mpowerkit:VirtualizeListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Restaurant">
+                        <mpowerkit:VirtualizeListViewCell>
+                            <adminComponents:CardRestaurant Restaurant="{Binding .}"/>
+                        </mpowerkit:VirtualizeListViewCell>
+                    </DataTemplate>
+                </mpowerkit:VirtualizeListView.ItemTemplate>
+            </mpowerkit:VirtualizeListView>
         </VerticalStackLayout>
 
 

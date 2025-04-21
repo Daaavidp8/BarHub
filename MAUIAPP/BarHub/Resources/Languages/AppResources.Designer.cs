@@ -61,6 +61,15 @@ namespace BarHub.Resources.Languages {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Añadir Restaurante.
+        /// </summary>
+        internal static string AddRestaurantText {
+            get {
+                return ResourceManager.GetString("AddRestaurantText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Administración de Propietarios.
         /// </summary>
         internal static string AdminTitlePage {
@@ -79,11 +88,74 @@ namespace BarHub.Resources.Languages {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a CIF.
+        /// </summary>
+        internal static string CifRestaurantText {
+            get {
+                return ResourceManager.GetString("CifRestaurantText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Ej: correodecontacto@ayuda.com.
+        /// </summary>
+        internal static string ContactEmailPlaceholder {
+            get {
+                return ResourceManager.GetString("ContactEmailPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Email de Contacto.
+        /// </summary>
+        internal static string ContactEmailText {
+            get {
+                return ResourceManager.GetString("ContactEmailText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Teléfono de la persona de contacto.
+        /// </summary>
+        internal static string ContactPhonePlaceholder {
+            get {
+                return ResourceManager.GetString("ContactPhonePlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Teléfono de Contacto.
+        /// </summary>
+        internal static string ContactPhoneText {
+            get {
+                return ResourceManager.GetString("ContactPhoneText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Copyright © Todos los derechos reservados..
         /// </summary>
         internal static string CopyrightText {
             get {
                 return ResourceManager.GetString("CopyrightText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Crear Restaurante.
+        /// </summary>
+        internal static string CreateRestaurantText {
+            get {
+                return ResourceManager.GetString("CreateRestaurantText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Insertar Logo.
+        /// </summary>
+        internal static string InsertLogoText {
+            get {
+                return ResourceManager.GetString("InsertLogoText", resourceCulture);
             }
         }
         
@@ -97,11 +169,74 @@ namespace BarHub.Resources.Languages {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Modificar Restaurante.
+        /// </summary>
+        internal static string ModifyRestaurantText {
+            get {
+                return ResourceManager.GetString("ModifyRestaurantText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Sin Imagen.
+        /// </summary>
+        internal static string NoImageText {
+            get {
+                return ResourceManager.GetString("NoImageText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Contraseña.
         /// </summary>
         internal static string PasswordText {
             get {
                 return ResourceManager.GetString("PasswordText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a CIF de la empresa....
+        /// </summary>
+        internal static string RestaurantCifPlaceholder {
+            get {
+                return ResourceManager.GetString("RestaurantCifPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Logo del Restaurante.
+        /// </summary>
+        internal static string RestaurantLogoText {
+            get {
+                return ResourceManager.GetString("RestaurantLogoText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Nombre de la empresa....
+        /// </summary>
+        internal static string RestaurantNamePlaceholder {
+            get {
+                return ResourceManager.GetString("RestaurantNamePlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Nombre del Restaurante.
+        /// </summary>
+        internal static string RestaurantNameText {
+            get {
+                return ResourceManager.GetString("RestaurantNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Guardar Cambios.
+        /// </summary>
+        internal static string SaveChangesText {
+            get {
+                return ResourceManager.GetString("SaveChangesText", resourceCulture);
             }
         }
         

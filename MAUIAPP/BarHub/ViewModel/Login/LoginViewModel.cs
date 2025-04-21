@@ -40,7 +40,7 @@ namespace BarHub.ViewModel.Login
                     Preferences.Set("IsLoggedIn", IsReminding);
                     Preferences.Set("username", Username);
                     Preferences.Set("password", Password);
-                    App.Current.MainPage = new AppShell(_services,user);
+                    App.Current.MainPage = new AppShell(user);
                 }
             }
             catch (Exception ex)

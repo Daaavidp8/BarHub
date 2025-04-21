@@ -13,6 +13,10 @@
     <Color x:Key="SecondaryDarkText">#9880e5</Color>
     <Color x:Key="Tertiary">#2B0B98</Color>
 
+    <Color x:Key="Muted">#9E9E9E</Color>
+    <Color x:Key="RippleLight">#40FFFFFF</Color>
+    <Color x:Key="RippleDark">#40000000</Color>
+
     <Color x:Key="White">White</Color>
     <Color x:Key="Black">Black</Color>
     <Color x:Key="Magenta">#D600AA</Color>
@@ -44,5 +48,17 @@
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
 
 
-    <Color x:Key="Muted">#9E9E9E</Color>
+    <SolidColorBrush x:Key="InversedBackground">
+        <SolidColorBrush.Color>
+            <AppThemeBinding Light="{StaticResource Black}" Dark="{StaticResource White}" />
+        </SolidColorBrush.Color>
+    </SolidColorBrush>
+
+    <SolidColorBrush x:Key="Ripple">
+        <SolidColorBrush.Color>
+            <AppThemeBinding Light="{StaticResource RippleDark}" Dark="{StaticResource RippleLight}" />
+        </SolidColorBrush.Color>
+    </SolidColorBrush>
+
+
 </ResourceDictionary>

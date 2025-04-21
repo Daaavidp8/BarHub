@@ -3,16 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BarHub.Models
 {
     public class Restaurant
     {
-        public Guid Id { get; set; }
+
+        [JsonProperty("id_restaurant")]
+        public int Id { get; set; }
         public string Name { get; set; }
+
+        [JsonProperty("cif")]
         public string Cif { get; set; }
-        public string Address { get; set; }
+
+        [JsonProperty("contactPhone")]
         public string Phone { get; set; }
+
+        [JsonProperty("contactEmail")]
+        public string Email { get; set; }
+
+        [JsonProperty("logo")]
+        public string Logo { get; set; }
 
         public List<Section> Sections { get; set; }
         public List<User> Users { get; set; }

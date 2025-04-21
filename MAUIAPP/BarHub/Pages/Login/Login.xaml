@@ -22,6 +22,7 @@
 
                 <VerticalStackLayout Grid.Row="1" Spacing="5">
                     <material:TextField Text="{Binding Username}" 
+                                        TextColor="{StaticResource Black}"
                                         x:Name="username"
                                         Title="{stringResource:Translate Name=UsernameText}" 
                                         Icon="{FontImageSource FontFamily=FASolid, Glyph={x:Static fa:Solid.User}}"
@@ -32,7 +33,8 @@
                                         Grid.Row="0"
                                     />
 
-                    <material:TextField Text="{Binding Password}" 
+                    <material:TextField Text="{Binding Password}" IsPassword="True"
+                        TextColor="{StaticResource Black}"
                         x:Name="password"
                         Title="{stringResource:Translate Name=PasswordText}" 
                         Icon="{FontImageSource FontFamily=FASolid, Glyph={x:Static fa:Solid.Lock}}"
@@ -40,8 +42,11 @@
                         SelectionHighlightColor="Orange"
                         InputBackgroundColor="{x:DynamicResource White}" 
                         BorderThickness="1"
-                        Grid.Row="0"
-                    />
+                        Grid.Row="0">
+                        <material:TextField.Attachments>
+                            <material:TextFieldPasswordShowHideAttachment />
+                        </material:TextField.Attachments>
+                    </material:TextField>
                 </VerticalStackLayout>
                 
                 <VerticalStackLayout Grid.Row="2" Spacing="15" Margin="0,15,0,0">

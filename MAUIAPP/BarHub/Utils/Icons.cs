@@ -12,5 +12,7 @@ namespace BarHub.Utils
         public static string Table => "\ue8b8";
         public static string Profile => "\uf2bd";
         public static string Chair => "\uf6c0";
+
+        public static string Plus => "\u002b";
     }
 }

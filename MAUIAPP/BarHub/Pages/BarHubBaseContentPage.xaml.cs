@@ -1,9 +1,10 @@
 
 using System.Diagnostics;
-
+using System.Windows.Input;
+using UraniumUI.Pages;
 namespace BarHub.Pages;
 
-public partial class BarHubBaseContentPage : ContentPage
+public partial class BarHubBaseContentPage : UraniumContentPage
 {
     public static readonly BindableProperty PageTitleProperty =
         BindableProperty.Create(
@@ -31,6 +32,20 @@ public partial class BarHubBaseContentPage : ContentPage
     {
         get => (View)GetValue(IconTemplateProperty);
         set => SetValue(IconTemplateProperty, value);
+    }
+
+    public static readonly BindableProperty FabRouteProperty =
+    BindableProperty.Create(
+        nameof(FabRoute),
+        typeof(ICommand),
+        typeof(BarHubBaseContentPage),
+        default(ICommand));
+
+
+    public ICommand FabRoute
+    {
+        get => (ICommand)GetValue(FabRouteProperty);
+        set => SetValue(FabRouteProperty, value);
     }
 
     public BarHubBaseContentPage()

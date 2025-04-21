@@ -50,40 +50,62 @@ namespace BarHub.Lib
         public async Task<U> Post<T, U>(string addressSuffix, T t)
 where T : class
         {
-            PreRequestCall();
+                PreRequestCall();
 
-            // Convertir el objeto T en una cadena JSON usando System.Text.Json
-            string jsonContent = JsonSerializer.Serialize(t);
-            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                // Convertir el objeto T en una cadena JSON usando System.Text.Json
+                string jsonContent = JsonSerializer.Serialize(t);
+                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            // Establecer Content-Length para evitar Transfer-Encoding: chunked
-            httpContent.Headers.ContentLength = Encoding.UTF8.GetByteCount(jsonContent);
+                // Establecer Content-Length para evitar Transfer-Encoding: chunked
+                httpContent.Headers.ContentLength = Encoding.UTF8.GetByteCount(jsonContent);
 
-            // Realizar la solicitud POST
-            HttpResponseMessage response = await this.PostAsync(addressSuffix, httpContent);
-            response.EnsureSuccessStatusCode();
+                // Realizar la solicitud POST
+                HttpResponseMessage response = await this.PostAsync(addressSuffix, httpContent);
+                response.EnsureSuccessStatusCode();
 
-            // Leer y deserializar la respuesta usando System.Text.Json
-            var responseContent = await response.Content.ReadAsStringAsync();
+                // Leer y deserializar la respuesta usando System.Text.Json
+                var responseContent = await response.Content.ReadAsStringAsync();
 
-            // Usar opciones para configuraciones adicionales
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true, // Manejo insensible a mayúsculas/minúsculas
-                IncludeFields = true, // Incluye campos en la deserialización
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                //Converters = { new FavoriteEnumJsonConverter() } // Añadir convertidor personalizado si es necesario
-            };
+                // Usar opciones para configuraciones adicionales
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true, // Manejo insensible a mayúsculas/minúsculas
+                    IncludeFields = true, // Incluye campos en la deserialización
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                    //Converters = { new FavoriteEnumJsonConverter() } // Añadir convertidor personalizado si es necesario
+                };
 
-            U result = JsonSerializer.Deserialize<U>(responseContent, options);
+                U result = JsonSerializer.Deserialize<U>(responseContent, options);
 
-            return result;
+                return result;
+           
         }
+
+        public async Task<T> GetAsync<T>(string AddressSuffix)
+        {
+                PreRequestCall();
+                HttpResponseMessage response = await this.GetAsync(AddressSuffix);
+                response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            Trace.WriteLine($"Response Content: {responseContent}");
+
+            T t = await response.Content.ReadAsAsync<T>();
+                return t;
+        }
+
 
         protected void PreRequestCall()
         {
-            if (this.OnPreRequest != null)
-                this.OnPreRequest();
+            if (!string.IsNullOrEmpty(_token))
+            {
+                if (this.DefaultRequestHeaders.Contains("Authorization"))
+                {
+                    this.DefaultRequestHeaders.Remove("Authorization");
+                }
+
+                this.DefaultRequestHeaders.Add("Authorization", $"Bearer {_token}");
+            }
         }
 
     }
