@@ -42,6 +42,11 @@
 		<EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<Optimize>true</Optimize>
+		<PublishTrimmed>false</PublishTrimmed>
+	</PropertyGroup>
+
 
 
 	<ItemGroup>
@@ -62,19 +67,28 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
+
+
+	<ItemGroup>
+	  <None Remove="C:\Users\David\.nuget\packages\inputkit.maui\4.4.7\contentFiles\any\net8.0-ios17.5\icon512.png" />
+	</ItemGroup>
+
 	<ItemGroup>
 	  <None Include="Platforms\Android\Resources\xml\network_security_config.xml" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
+		<PackageReference Include="CommunityToolkit.Maui.Core" Version="9.1.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="FreakyControls" Version="0.5.1" />
+		<PackageReference Include="InputKit.Maui" Version="4.4.7" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
 		<PackageReference Include="MPowerKit.VirtualizeListView" Version="2.3.2" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.116.1" />
 		<PackageReference Include="UraniumUI" Version="2.11.0" />
 		<PackageReference Include="UraniumUI.Icons.FontAwesome" Version="2.11.0" />
 		<PackageReference Include="UraniumUI.Icons.MaterialIcons" Version="2.11.1" />

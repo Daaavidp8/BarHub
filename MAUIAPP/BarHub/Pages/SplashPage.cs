@@ -36,7 +36,10 @@ public class SplashPage : ContentPage
                 var user = await _posts.Login(Preferences.Get("username", ""), Preferences.Get("password", ""));
                 if (user is not null)
                 {
-                    Application.Current.MainPage = new AppShell(user);
+                    Dispatcher.Dispatch(() =>
+                    {
+                        Application.Current.MainPage = new AppShell(user);
+                    });
                     return;
                 }
             }

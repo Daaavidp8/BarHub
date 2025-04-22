@@ -2,12 +2,9 @@
 using BarHub.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Maui.Controls;
+using Microsoft.Maui.ApplicationModel; 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BarHub.ViewModel.Login
@@ -18,12 +15,12 @@ namespace BarHub.ViewModel.Login
         private readonly IServiceProvider _services;
 
         [ObservableProperty]
-        string username,password;
+        string username, password;
 
         [ObservableProperty]
         bool isReminding = false;
 
-        public LoginViewModel(Posts posts,IServiceProvider services)
+        public LoginViewModel(Posts posts, IServiceProvider services)
         {
             _posts = posts;
             _services = services;
@@ -40,14 +37,17 @@ namespace BarHub.ViewModel.Login
                     Preferences.Set("IsLoggedIn", IsReminding);
                     Preferences.Set("username", Username);
                     Preferences.Set("password", Password);
-                    App.Current.MainPage = new AppShell(user);
+
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        Application.Current.MainPage = new AppShell(user);
+                    });
                 }
             }
             catch (Exception ex)
             {
-               Trace.WriteLine(ex.Message);
+                Trace.WriteLine(ex.Message);
             }
-            
         }
     }
 }

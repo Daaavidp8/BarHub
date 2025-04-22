@@ -51,6 +51,7 @@ public static class MauiProgram
 #if DEBUG
 		builder.Logging.AddDebug();
 #endif
+        builder.Services.AddTransient<AppShell>();
         builder.Services.AddTransient<HttpClient>();
         builder.Services.AddSingleton(new Methods(ApiConstants.BaseUrl));
         builder.Services.AddTransient<Gets>();

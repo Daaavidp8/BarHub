@@ -20,19 +20,7 @@ namespace BarHub
         public AppShell(User user)
         {
             InitializeComponent();
-            ConfigureTabsAsync(user);
-            WeakReferenceMessenger.Default.Register<ChangeTabMessage>(this, (r, m) =>
-            {
-                var tabToGo = tabbar.Items.FirstOrDefault(tab => tab.Route == m.Value);
-                if (tabToGo != null)
-                {
-                    tabbar.CurrentItem = tabToGo;
-                }
-                else
-                {
-                    Trace.WriteLine($"No se encontró el tab: {m.Value}");
-                }
-            });
+            MainThread.BeginInvokeOnMainThread(async () => await ConfigureTabsAsync(user));
         }
 
         public async Task ConfigureTabsAsync(User user)
@@ -44,7 +32,6 @@ namespace BarHub
                     FontFamily = "FASolid",
                     Glyph = Icons.Home,
                     Size = 20,
-                    Color = App.Current.Resources["Primary"] as Color
                 };
 
                 tabbar.Items.Clear();
@@ -64,12 +51,14 @@ namespace BarHub
                             FontFamily = "FASolid",
                             Glyph = Icons.Chair,
                             Size = 20,
-                            Color = App.Current.Resources["Primary"] as Color
                         });
                 }
 
+                if (tabbar is not null && tabbar.Items.Count > 0)
+                {
+                    tabbar.CurrentItem = tabbar.Items[0];
+                }
 
-                tabbar.CurrentItem = tabbar.Items[0];
 
 
                 AddTab<ProfilePage>(new FontImageSource
@@ -77,7 +66,6 @@ namespace BarHub
                     FontFamily = "FASolid",
                     Glyph = Icons.Profile,
                     Size = 20,
-                    Color = App.Current.Resources["Primary"] as Color
                 });
 
 
@@ -86,6 +74,7 @@ namespace BarHub
             catch (Exception ex)
             {
                 Trace.WriteLine($"Error configuring tabs: {ex.Message}");
+                await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
             }
         }
 

@@ -1,22 +1,21 @@
-<pages:BarHubBaseContentPage 
+<pages:BarHubBaseContentPage
+    x:Class="BarHub.Pages.Admin.ManageRestaurant"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:pages="clr-namespace:BarHub.Pages"
-    xmlns:globalComponents="clr-namespace:BarHub.Pages.GlobalComponents"
     xmlns:adminComponents="clr-namespace:BarHub.Pages.Admin"
-    xmlns:mpowerkit="clr-namespace:MPowerKit.VirtualizeListView;assembly=MPowerKit.VirtualizeListView"
-    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:globalComponents="clr-namespace:BarHub.Pages.GlobalComponents"
     xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
     xmlns:models="clr-namespace:BarHub.Models;assembly=BarHub.Models"
+    xmlns:mpowerkit="clr-namespace:MPowerKit.VirtualizeListView;assembly=MPowerKit.VirtualizeListView"
+    xmlns:pages="clr-namespace:BarHub.Pages"
     xmlns:stringResource="clr-namespace:BarHub.Utils.Translation"
-    xmlns:viewModels="clr-namespace:BarHub.ViewModel.Admin"
-    x:Class="BarHub.Pages.Admin.ManageRestaurant"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:translation="clr-namespace:BarHub.Utils.Translation"
-    Shell.NavBarIsVisible="False"
-    Shell.TabBarIsVisible="False"
-    x:Name="this"
+    xmlns:viewModels="clr-namespace:BarHub.ViewModel.Admin"
     x:DataType="viewModels:ManageRestaurantViewModel"
-    PageTitle="{Binding Title}">
+    PageTitle="{Binding Title}"
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarIsVisible="False">
 
     <pages:BarHubBaseContentPage.Icon>
         <globalComponents:GoBackComponent x:Name="goBackComponent">
@@ -27,68 +26,98 @@
     </pages:BarHubBaseContentPage.Icon>
 
     <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
-        <VerticalStackLayout Padding="15" VerticalOptions="Fill" HorizontalOptions="Fill" Spacing="10">
+        <VerticalStackLayout
+            Padding="15"
+            HorizontalOptions="Fill"
+            Spacing="10"
+            VerticalOptions="Fill">
             <Grid ColumnDefinitions="*,*" HorizontalOptions="Fill">
-                <VerticalStackLayout Grid.Column="0" HorizontalOptions="Fill" Spacing="10">
-                    <Label Text="{stringResource:Translate Name=RestaurantLogoText}"/>
-                    <Button Background="{DynamicResource Primary}" Text="Insertar Logo" FontAttributes="Bold" BorderColor="{AppThemeBinding Light={StaticResource Black},Dark={StaticResource White}}" BorderWidth=".5"/>
+                <VerticalStackLayout
+                    Grid.Column="0"
+                    HorizontalOptions="Fill"
+                    Spacing="10">
+                    <Label Text="{stringResource:Translate Name=RestaurantLogoText}" />
+                    <Button
+                        Background="{DynamicResource Primary}"
+                        BorderColor="{AppThemeBinding Light={StaticResource Black},
+                                                      Dark={StaticResource White}}"
+                        BorderWidth=".5"
+                        FontAttributes="Bold"
+                        Text="Insertar Logo" />
                 </VerticalStackLayout>
-                <VerticalStackLayout Grid.Column="1" HorizontalOptions="Fill" VerticalOptions="End">
-                            <Image x:Name="LogoImage" 
-                       Source="{Binding Restaurant.Logo}"
-                       HeightRequest="70" VerticalOptions="End"/>
+                <VerticalStackLayout
+                    Grid.Column="1"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="End">
+                    <Image
+                        x:Name="LogoImage"
+                        HeightRequest="70"
+                        Source="{Binding Restaurant.Logo}"
+                        VerticalOptions="End" />
                 </VerticalStackLayout>
             </Grid>
             <VerticalStackLayout Spacing="5">
-                <Label Text="{stringResource:Translate Name=RestaurantNameText}" FontAttributes="Bold"/>
-                <material:TextField Text="{Binding Restaurant.Name}" TextColor="{StaticResource Black}"
+                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=RestaurantNameText}" />
+                <material:TextField
                     x:Name="nombre"
                     Title="{stringResource:Translate Name=RestaurantNameText}"
-                    AccentColor="Black"
-                    SelectionHighlightColor="Orange"
-                    InputBackgroundColor="{x:DynamicResource White}" 
-                    BorderThickness="1"
                     Grid.Row="0"
-                />
+                    AccentColor="Black"
+                    BorderThickness="1"
+                    InputBackgroundColor="{x:DynamicResource White}"
+                    SelectionHighlightColor="Orange"
+                    Text="{Binding Restaurant.Name}"
+                    TextColor="{StaticResource Black}" />
             </VerticalStackLayout>
             <VerticalStackLayout Spacing="5">
-                <Label Text="{stringResource:Translate Name=CifRestaurantText}" FontAttributes="Bold"/>
-                <material:TextField Text="{Binding Restaurant.Cif}" TextColor="{StaticResource Black}"
-        x:Name="cif"
-        Title="{stringResource:Translate Name=RestaurantCifPlaceholder}"
-        AccentColor="Black"
-        SelectionHighlightColor="Orange"
-        InputBackgroundColor="{x:DynamicResource White}" 
-        BorderThickness="1"
-        Grid.Row="0"
-    />
+                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=CifRestaurantText}" />
+                <material:TextField
+                    x:Name="cif"
+                    Title="{stringResource:Translate Name=RestaurantCifPlaceholder}"
+                    Grid.Row="0"
+                    AccentColor="Black"
+                    BorderThickness="1"
+                    InputBackgroundColor="{x:DynamicResource White}"
+                    SelectionHighlightColor="Orange"
+                    Text="{Binding Restaurant.Cif}"
+                    TextColor="{StaticResource Black}" />
             </VerticalStackLayout>
             <VerticalStackLayout Spacing="5">
-                <Label Text="{stringResource:Translate Name=ContactEmailText}" FontAttributes="Bold"/>
-                <material:TextField Text="{Binding Restaurant.Email}" TextColor="{StaticResource Black}"
-        x:Name="email"
-        Title="{stringResource:Translate Name=ContactEmailPlaceholder}"
-        AccentColor="Black"
-        SelectionHighlightColor="Orange"
-        InputBackgroundColor="{x:DynamicResource White}" 
-        BorderThickness="1"
-        Grid.Row="0"
-    />
+                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=ContactEmailText}" />
+                <material:TextField
+                    x:Name="email"
+                    Title="{stringResource:Translate Name=ContactEmailPlaceholder}"
+                    Grid.Row="0"
+                    AccentColor="Black"
+                    BorderThickness="1"
+                    InputBackgroundColor="{x:DynamicResource White}"
+                    SelectionHighlightColor="Orange"
+                    Text="{Binding Restaurant.Email}"
+                    TextColor="{StaticResource Black}" />
             </VerticalStackLayout>
             <VerticalStackLayout Spacing="5">
-                <Label Text="{stringResource:Translate Name=ContactPhoneText}" FontAttributes="Bold"/>
-                <material:TextField Text="{Binding Restaurant.Phone}" TextColor="{StaticResource Black}"
-        x:Name="telefono"
-        Title="{stringResource:Translate Name=ContactPhonePlaceholder}"
-        AccentColor="Black"
-        SelectionHighlightColor="Orange"
-        InputBackgroundColor="{x:DynamicResource White}" 
-        BorderThickness="1"
-        Grid.Row="0"
-    />
+                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=ContactPhoneText}" />
+                <material:TextField
+                    x:Name="telefono"
+                    Title="{stringResource:Translate Name=ContactPhonePlaceholder}"
+                    Grid.Row="0"
+                    AccentColor="Black"
+                    BorderThickness="1"
+                    InputBackgroundColor="{x:DynamicResource White}"
+                    SelectionHighlightColor="Orange"
+                    Text="{Binding Restaurant.Phone}"
+                    TextColor="{StaticResource Black}" />
             </VerticalStackLayout>
 
-            <Button Text="{Binding ButtonText}" BorderColor="{AppThemeBinding Light={StaticResource Black},Dark={StaticResource White}}" BorderWidth=".5" Background="{DynamicResource Primary}" CornerRadius="5" Margin="20" FontAttributes="Bold"/>
+            <Button
+                Margin="20"
+                Background="{DynamicResource Primary}"
+                BorderColor="{AppThemeBinding Light={StaticResource Black},
+                                              Dark={StaticResource White}}"
+                BorderWidth=".5"
+                CornerRadius="5"
+                FontAttributes="Bold"
+                Text="{Binding ButtonText}" />
         </VerticalStackLayout>
 
     </ContentView>
