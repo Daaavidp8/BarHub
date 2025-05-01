@@ -1,15 +1,29 @@
 ﻿using BarHub.Models;
+using BarHub.ViewModel.Owner;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using static System.Collections.Specialized.BitVector32;
 
 public partial class RestaurantViewModel : ObservableObject
 {
     [ObservableProperty]
     private Restaurant restaurant;
 
+
+    [ObservableProperty]
+    private ObservableCollection<SectionViewModel> sections;
+
     public RestaurantViewModel(Restaurant restaurant)
     {
         this.restaurant = restaurant;
+
+        if (restaurant.Sections is not null)
+        {
+            sections = new ObservableCollection<SectionViewModel>(
+                    restaurant.Sections.Select(s => new SectionViewModel(s)));
+        }
+
     }
 
     public int Id
@@ -48,11 +62,8 @@ public partial class RestaurantViewModel : ObservableObject
         set => SetProperty(restaurant.Logo, value, restaurant, (r, v) => r.Logo = v);
     }
 
-    public List<Section> Sections
-    {
-        get => restaurant.Sections;
-        set => SetProperty(restaurant.Sections, value, restaurant, (r, v) => r.Sections = v);
-    }
+    public List<BarHub.Models.Section> GetSectionModels() => sections.Select(svm => svm.ToModel()).ToList();
+
 
     public List<User> Users
     {

@@ -5,8 +5,10 @@ using BarHub.Pages.Camarero;
 using BarHub.Pages.Login;
 using BarHub.Pages.Profile;
 using BarHub.Pages.Propietario;
+using BarHub.Utils.UI.General;
 using BarHub.ViewModel.Admin;
 using BarHub.ViewModel.Login;
+using BarHub.ViewModel.Owner;
 using CommunityToolkit.Maui;
 
 #if ANDROID
@@ -56,6 +58,8 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
+
+        builder.Services.AddTransient<FunctionsUI>();
         builder.Services.AddTransient<AppShell>();
         builder.Services.AddTransient<HttpClient>();
         builder.Services.AddSingleton(new Methods(ApiConstants.BaseUrl));
@@ -71,6 +75,9 @@ public static class MauiProgram
         builder.Services.AddTransient<AdminPage>();
         builder.Services.AddTransient<ManageRestaurantViewModel>();
         builder.Services.AddTransient<ManageRestaurant>();
+        builder.Services.AddTransient<ManageSectionViewModel>();
+        builder.Services.AddTransient<ManageSection>();
+        builder.Services.AddTransient<OwnerViewModel>();
         builder.Services.AddTransient<OwnerPage>();
         builder.Services.AddTransient<WaiterPage>();
 

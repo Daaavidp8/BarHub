@@ -64,7 +64,7 @@ namespace BarHub.ViewModel.Admin
 
         private async void SetRestaurants(Gets get)
         {
-            Restaurants = new ObservableRangeCollection<RestaurantViewModel>(
+            Restaurants = new ObservableCollection<RestaurantViewModel>(
              (await get.GetOwners()).Select(r => new RestaurantViewModel(r)));
 
         }

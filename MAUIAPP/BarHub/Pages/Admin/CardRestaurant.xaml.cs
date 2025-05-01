@@ -1,4 +1,5 @@
 using BarHub.Models;
+using BarHub.ViewModel.Owner;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -34,6 +35,8 @@ public partial class CardRestaurant : ContentView
             { "restaurantJson" , JsonSerializer.Serialize(Restaurant.Restaurant.Clone()) }
         });
     }
+
+
 
 
 }

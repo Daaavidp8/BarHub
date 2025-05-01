@@ -192,4 +192,7 @@
   <data name="SelectImageText" xml:space="preserve">
     <value>Selecciona una imagen</value>
   </data>
+  <data name="SectionTitlePage" xml:space="preserve">
+    <value>Administración de Secciones</value>
+  </data>
 </root>

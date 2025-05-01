@@ -13,8 +13,7 @@
     x:Name="AdminPageView"
     x:DataType="viewModels:AdminViewModel"
     FabRoute="{Binding GoToManageRestaurantCommand}"
-    PageTitle="{translation:Translate Name=AdminTitlePage}"
-    Shell.NavBarIsVisible="False">
+    PageTitle="{translation:Translate Name=AdminTitlePage}">
 
     <pages:BarHubBaseContentPage.Icon>
         <Image Source="app_icon" WidthRequest="50" />

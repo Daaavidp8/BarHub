@@ -9,18 +9,58 @@ use App\Models\DB;
 // Devuelve la secciones de un restaurante en especifico
 $app->get('/get_sections/{id}', function (Request $request, Response $response) {
     $id = $request->getAttribute('id');
-    $sql = "SELECT * FROM Sections WHERE id_restaurant = :id";
-
+    
     try {
         $db = new DB();
         $conn = $db->connect();
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-        $owner = $stmt->fetchAll(PDO::FETCH_OBJ);
+        
+        // Get restaurant name first
+        $sqlRestaurant = "SELECT name FROM Restaurants WHERE id_restaurant = :id";
+        $stmtRestaurant = $conn->prepare($sqlRestaurant);
+        $stmtRestaurant->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmtRestaurant->execute();
+        $restaurantName = $stmtRestaurant->fetchColumn();
+        
+        // Get all sections for this restaurant
+        $sqlSections = "SELECT * FROM Sections WHERE id_restaurant = :id";
+        $stmtSections = $conn->prepare($sqlSections);
+        $stmtSections->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmtSections->execute();
+        $sections = $stmtSections->fetchAll(PDO::FETCH_ASSOC);
+        
+        // For each section, get its articles and image
+        $result = [];
+        foreach ($sections as $section) {
+            $sectionId = $section['id_section'];
+            $sectionName = $section['name'];
+            
+            // Get section image and encode it in base64
+            $imagePath = "./owners/{$restaurantName}/img/sections/{$sectionName}.png";
+            if (file_exists($imagePath)) {
+                $imageData = file_get_contents($imagePath);
+                $section['image'] = "data:image/png;base64," . base64_encode($imageData);
+            } else {
+                $section['image'] = "";
+            }
+            
+            // Get articles for this section
+            $sqlArticles = "SELECT * FROM Articles WHERE id_section = :sectionId";
+            $stmtArticles = $conn->prepare($sqlArticles);
+            $stmtArticles->bindParam(':sectionId', $sectionId, PDO::PARAM_INT);
+            $stmtArticles->execute();
+            $articles = $stmtArticles->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Add articles to section
+            $section['articles'] = $articles;
+            $result[] = $section;
+        }
+        
         $db = null;
-
-        $response->getBody()->write(json_encode($owner));
+        
+        // Añadimos un log para registrar la información de las secciones
+        error_log("Secciones recuperadas para el restaurante ID: " . $id . " - Total de secciones: " . count($result));
+        
+        $response->getBody()->write(json_encode($result));
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
@@ -182,7 +222,7 @@ $app->post('/create_section/{id_owner}', function (Request $request, Response $r
             $ownername = $stmt->fetchColumn();
         }
 
-        $ruta = "../../clientereact/public/images/owners/" . $ownername;
+        $ruta = "./owners/" . $ownername;
 
         $uploadedFile = $uploadedFiles['section_img'] ?? null;
 

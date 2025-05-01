@@ -16,10 +16,12 @@ namespace BarHub
 {
     public partial class AppShell : Shell
     {
+        private readonly IServiceProvider _services;
 
-        public AppShell(User user)
+        public AppShell(User user, IServiceProvider services)
         {
             InitializeComponent();
+            _services = services;
             MainThread.BeginInvokeOnMainThread(async () => await ConfigureTabsAsync(user));
         }
         public async Task ConfigureTabsAsync(User user)
@@ -43,7 +45,17 @@ namespace BarHub
                 else
                 {
                     if (user.Roles.Contains(Roles.PROPIETARIO))
-                        AddTab<OwnerPage>(homeIcon);
+                    {
+
+                        tabbar.Items.Add(new ShellContent
+                        {
+                            Route = "OwnerPage",
+                            Content = new OwnerPage(user, _services),
+                            Icon = homeIcon
+                        });
+
+                        Routing.RegisterRoute(nameof(ManageSection), typeof(ManageSection));
+                    }
 
                     if (user.Roles.Contains(Roles.CAMARERO) || user.Roles.Contains(Roles.PROPIETARIO))
                         AddTab<WaiterPage>(new FontImageSource

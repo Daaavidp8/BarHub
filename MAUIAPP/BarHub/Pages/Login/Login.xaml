@@ -4,10 +4,18 @@
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
              xmlns:stringResource="clr-namespace:BarHub.Utils.Translation"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:viewModel="clr-namespace:BarHub.ViewModel.Login"
              x:Class="BarHub.Pages.Login.Login"
              x:DataType="viewModel:LoginViewModel"
              Title="Login">
+
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior 
+    StatusBarColor="{StaticResource Black}" 
+    StatusBarStyle="LightContent" />
+    </ContentPage.Behaviors>
+    
     <Grid RowDefinitions="*,*,*,*,*" VerticalOptions="Fill" HorizontalOptions="Fill">
         <VerticalStackLayout Grid.Row="0" Grid.RowSpan="2" VerticalOptions="Center">
             <VerticalStackLayout HorizontalOptions="Center">

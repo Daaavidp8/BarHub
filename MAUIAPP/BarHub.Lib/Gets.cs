@@ -27,5 +27,12 @@ namespace BarHub.Lib
             }
 
         }
+
+        public async Task<List<Section>> GetSections(int id)
+        {
+            var restaurants = await _methods.GetAsync<List<Section>>($"{ApiConstants.GET_SECTIONS}/{id}");
+
+            return restaurants;
+        }
     }
 }

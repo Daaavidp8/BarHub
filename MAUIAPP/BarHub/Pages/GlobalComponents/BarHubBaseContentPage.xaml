@@ -6,6 +6,7 @@
     xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
     xmlns:components="clr-namespace:BarHub.Pages.GlobalComponents"
     xmlns:pages="clr-namespace:BarHub.Pages"
+    Shell.NavBarIsVisible="False"
     x:Name="this">
 
     <uranium:UraniumContentPage.Resources>

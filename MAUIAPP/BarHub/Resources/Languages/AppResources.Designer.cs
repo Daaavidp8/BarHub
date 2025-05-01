@@ -241,6 +241,15 @@ namespace BarHub.Resources.Languages {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Administración de Secciones.
+        /// </summary>
+        internal static string SectionTitlePage {
+            get {
+                return ResourceManager.GetString("SectionTitlePage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Selecciona una imagen.
         /// </summary>
         internal static string SelectImageText {

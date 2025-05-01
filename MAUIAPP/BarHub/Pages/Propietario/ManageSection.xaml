@@ -1,17 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <pages:BarHubBaseContentPage
-    x:Class="BarHub.Pages.Admin.ManageRestaurant"
+    x:Class="BarHub.Pages.Propietario.ManageSection"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:adminComponents="clr-namespace:BarHub.Pages.Admin"
     xmlns:globalComponents="clr-namespace:BarHub.Pages.GlobalComponents"
     xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-    xmlns:models="clr-namespace:BarHub.Models;assembly=BarHub.Models"
-    xmlns:mpowerkit="clr-namespace:MPowerKit.VirtualizeListView;assembly=MPowerKit.VirtualizeListView"
     xmlns:pages="clr-namespace:BarHub.Pages"
     xmlns:stringResource="clr-namespace:BarHub.Utils.Translation"
-    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:viewModels="clr-namespace:BarHub.ViewModel.Admin"
-    x:DataType="viewModels:ManageRestaurantViewModel"
+    xmlns:viewmodel="clr-namespace:BarHub.ViewModel.Owner"
+    x:DataType="viewmodel:ManageSectionViewModel"
     PageTitle="{Binding Title}"
     Shell.TabBarIsVisible="False">
 
@@ -29,6 +26,8 @@
             HorizontalOptions="Fill"
             Spacing="10"
             VerticalOptions="Fill">
+
+
             <Grid ColumnDefinitions="*,*" HorizontalOptions="Fill">
                 <VerticalStackLayout
                     Grid.Column="0"
@@ -51,10 +50,11 @@
                     <Image
                         x:Name="LogoImage"
                         HeightRequest="70"
-                        Source="{Binding Restaurant.Logo}"
+                        Source="{Binding Section.Image}"
                         VerticalOptions="End" />
                 </VerticalStackLayout>
             </Grid>
+
             <VerticalStackLayout Spacing="5">
                 <Label FontAttributes="Bold" Text="{stringResource:Translate Name=RestaurantNameText}" />
                 <material:TextField
@@ -65,46 +65,7 @@
                     BorderThickness="1"
                     InputBackgroundColor="{x:DynamicResource White}"
                     SelectionHighlightColor="Orange"
-                    Text="{Binding Restaurant.Name}"
-                    TextColor="{StaticResource Black}" />
-            </VerticalStackLayout>
-            <VerticalStackLayout Spacing="5">
-                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=CifRestaurantText}" />
-                <material:TextField
-                    x:Name="cif"
-                    Title="{stringResource:Translate Name=RestaurantCifPlaceholder}"
-                    Grid.Row="0"
-                    AccentColor="Black"
-                    BorderThickness="1"
-                    InputBackgroundColor="{x:DynamicResource White}"
-                    SelectionHighlightColor="Orange"
-                    Text="{Binding Restaurant.Cif}"
-                    TextColor="{StaticResource Black}" />
-            </VerticalStackLayout>
-            <VerticalStackLayout Spacing="5">
-                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=ContactEmailText}" />
-                <material:TextField
-                    x:Name="email"
-                    Title="{stringResource:Translate Name=ContactEmailPlaceholder}"
-                    Grid.Row="0"
-                    AccentColor="Black"
-                    BorderThickness="1"
-                    InputBackgroundColor="{x:DynamicResource White}"
-                    SelectionHighlightColor="Orange"
-                    Text="{Binding Restaurant.Email}"
-                    TextColor="{StaticResource Black}" />
-            </VerticalStackLayout>
-            <VerticalStackLayout Spacing="5">
-                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=ContactPhoneText}" />
-                <material:TextField
-                    x:Name="telefono"
-                    Title="{stringResource:Translate Name=ContactPhonePlaceholder}"
-                    Grid.Row="0"
-                    AccentColor="Black"
-                    BorderThickness="1"
-                    InputBackgroundColor="{x:DynamicResource White}"
-                    SelectionHighlightColor="Orange"
-                    Text="{Binding Restaurant.Phone}"
+                    Text="{Binding Section.Name}"
                     TextColor="{StaticResource Black}" />
             </VerticalStackLayout>
 
@@ -114,10 +75,10 @@
                 BorderColor="{AppThemeBinding Light={StaticResource Black},
                                               Dark={StaticResource White}}"
                 BorderWidth=".5"
+                Command="{Binding ActionButtonPressedCommand}"
                 CornerRadius="5"
                 FontAttributes="Bold"
-                Text="{Binding ButtonText}" Command="{Binding ActionButtonPressedCommand}"/>
+                Text="{Binding ButtonText}" />
         </VerticalStackLayout>
-
     </ContentView>
 </pages:BarHubBaseContentPage>

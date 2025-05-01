@@ -37,12 +37,13 @@ namespace BarHub.ViewModel.Login
                 {
                     Preferences.Set("IsLoggedIn", IsReminding);
 
+                    user.Password = Password;
                     string serializedUser = JsonConvert.SerializeObject(user);
                     Preferences.Set("user", serializedUser);
 
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {
-                        Application.Current.MainPage = new AppShell(user);
+                        Application.Current.MainPage = new AppShell(user, _services);
                     });
                 }
             }

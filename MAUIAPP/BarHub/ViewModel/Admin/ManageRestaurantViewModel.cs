@@ -10,12 +10,15 @@ using BarHub.Resources.Languages;
 using System.Text.Json;
 using BarHub.Lib;
 using System.Collections.ObjectModel;
+using BarHub.Utils.UI.General;
 
 namespace BarHub.ViewModel.Admin
 {
     [QueryProperty(nameof(RestaurantJson), "restaurantJson")]
     public partial class ManageRestaurantViewModel : ObservableObject
     {
+
+        private readonly FunctionsUI _functionsUI;
         private readonly Puts _puts;
         private readonly Posts _posts;
 
@@ -25,7 +28,6 @@ namespace BarHub.ViewModel.Admin
         [ObservableProperty]
         private string restaurantJson;
 
-        private List<RestaurantViewModel> Restaurants;
 
         [ObservableProperty]
         private string title = AppResources.AddRestaurantText, buttonText = AppResources.CreateRestaurantText;
@@ -36,11 +38,12 @@ namespace BarHub.ViewModel.Admin
         private Restaurant originalRestaurant;
 
 
-        public ManageRestaurantViewModel(Posts posts, AdminViewModel vm, Puts puts)
+        public ManageRestaurantViewModel(Posts posts, AdminViewModel vm, Puts puts, FunctionsUI fUI)
         {
             _posts = posts;
             _puts = puts;
             _adminViewModel = vm;
+            _functionsUI = fUI;
         }
 
         partial void OnRestaurantJsonChanged(string value)
@@ -89,19 +92,7 @@ namespace BarHub.ViewModel.Admin
         {
             try
             {
-                var result = await FilePicker.PickAsync(new PickOptions
-                {
-                    PickerTitle = AppResources.SelectImageText,
-                    FileTypes = FilePickerFileType.Png,
-                });
-                if (result is not null)
-                {
-                    using var stream = await result.OpenReadAsync();
-                    using var memoryStream = new MemoryStream();
-                    await stream.CopyToAsync(memoryStream);
-                    var base64 = $"data:image/jpeg;base64,{Convert.ToBase64String(memoryStream.ToArray())}";
-                    Restaurant.Logo = base64;
-                }
+               Restaurant.Logo = await _functionsUI.PickFile(AppResources.SelectImageText);
             }
             catch (Exception ex)
             {

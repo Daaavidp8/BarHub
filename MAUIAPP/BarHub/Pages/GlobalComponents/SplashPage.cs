@@ -1,6 +1,8 @@
 using BarHub.Lib;
 using BarHub.Models;
 using BarHub.ViewModel.Login;
+using CommunityToolkit.Maui.Behaviors;
+using CommunityToolkit.Maui.Core;
 using Newtonsoft.Json;
 using System.Diagnostics;
 
@@ -14,22 +16,20 @@ public class SplashPage : ContentPage
     {
         _services = services;
         _posts = services.GetService<Posts>();
-        Content = new StackLayout
+
+        var statusBarBehavior = new StatusBarBehavior
         {
-            VerticalOptions = LayoutOptions.Center,
-            Children =
-            {
-                new ActivityIndicator { IsRunning = true },
-                new Label { Text = "Cargando...", HorizontalOptions = LayoutOptions.Center }
-            }
+            StatusBarColor = (Color)Application.Current.Resources["Black"],
+            StatusBarStyle = StatusBarStyle.LightContent
         };
+
+        this.Behaviors.Add(statusBarBehavior);
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
-
+        
         var isLogged = Preferences.Get("IsLoggedIn", false);
 
         if (isLogged)
@@ -40,8 +40,12 @@ public class SplashPage : ContentPage
                 var user = JsonConvert.DeserializeObject<User>(serializedUser);
                 if (user != null)
                 {
-                    Application.Current.MainPage = new AppShell(user);
-                    return;
+                    var isLoginSuccess = await _posts.Login(user.Username,user.Password);
+                    if (isLoginSuccess is not null)
+                    {
+                        Application.Current.MainPage = new AppShell(user, _services);
+                        return;
+                    }
                 }
             }
         }
