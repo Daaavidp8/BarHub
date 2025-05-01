@@ -1,4 +1,6 @@
-﻿using BarHub.Models;
+﻿
+using BarHub.Models;
+using BarHub.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -72,7 +74,7 @@ where T : class
                     PropertyNameCaseInsensitive = true, // Manejo insensible a mayúsculas/minúsculas
                     IncludeFields = true, // Incluye campos en la deserialización
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                    //Converters = { new FavoriteEnumJsonConverter() } // Añadir convertidor personalizado si es necesario
+                    //Converters = { new EnumListConverter<Roles>() }
                 };
 
                 U result = JsonSerializer.Deserialize<U>(responseContent, options);
@@ -80,6 +82,62 @@ where T : class
                 return result;
            
         }
+
+        public async Task<U> Put<T, U>(string addressSuffix, T t)
+    where T : class
+        {
+            PreRequestCall();
+
+            // Convertir el objeto T en una cadena JSON
+            string jsonContent = JsonSerializer.Serialize(t);
+            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            // Establecer Content-Length
+            httpContent.Headers.ContentLength = Encoding.UTF8.GetByteCount(jsonContent);
+
+            // Realizar la solicitud PUT
+            HttpResponseMessage response = await this.PutAsync(addressSuffix, httpContent);
+            response.EnsureSuccessStatusCode();
+
+            // Leer y deserializar la respuesta
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                IncludeFields = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+
+            U result = JsonSerializer.Deserialize<U>(responseContent, options);
+
+            return result;
+        }
+
+        public async Task<U> Delete<U>(string addressSuffix)
+        {
+            PreRequestCall();
+
+            // Realizar la solicitud DELETE
+            HttpResponseMessage response = await this.DeleteAsync(addressSuffix);
+            response.EnsureSuccessStatusCode();
+
+            // Leer y deserializar la respuesta
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                IncludeFields = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+
+            U result = JsonSerializer.Deserialize<U>(responseContent, options);
+
+            return result;
+        }
+
+
 
         public async Task<T> GetAsync<T>(string AddressSuffix)
         {

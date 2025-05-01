@@ -86,10 +86,12 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
+		<PackageReference Include="Mopups" Version="1.3.2" />
 		<PackageReference Include="MPowerKit.VirtualizeListView" Version="2.3.2" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.116.1" />
-		<PackageReference Include="UraniumUI" Version="2.11.0" />
+		<PackageReference Include="UraniumUI" Version="2.11.1" />
+		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="2.11.1" />
 		<PackageReference Include="UraniumUI.Icons.FontAwesome" Version="2.11.0" />
 		<PackageReference Include="UraniumUI.Icons.MaterialIcons" Version="2.11.1" />
 		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="2.11.1" />
@@ -124,10 +126,13 @@
 	  <MauiXaml Update="Pages\Admin\CardRestaurant.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\Admin\ConfirmDeletePopUp.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\Admin\ManageRestaurant.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\BarHubBaseContentPage.xaml">
+	  <MauiXaml Update="Pages\GlobalComponents\BarHubBaseContentPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\Camarero\WaiterPage.xaml">
@@ -145,7 +150,7 @@
 	  <MauiXaml Update="Pages\Propietario\OwnerPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\TopAppBar.xaml">
+	  <MauiXaml Update="Pages\GlobalComponents\TopAppBar.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

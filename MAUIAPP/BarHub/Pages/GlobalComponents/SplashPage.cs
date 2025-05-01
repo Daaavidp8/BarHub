@@ -1,8 +1,10 @@
 using BarHub.Lib;
+using BarHub.Models;
 using BarHub.ViewModel.Login;
+using Newtonsoft.Json;
 using System.Diagnostics;
 
-namespace BarHub.Pages;
+namespace BarHub.Pages.GlobalComponents;
 
 public class SplashPage : ContentPage
 {
@@ -27,28 +29,24 @@ public class SplashPage : ContentPage
     {
         base.OnAppearing();
 
+
         var isLogged = Preferences.Get("IsLoggedIn", false);
 
         if (isLogged)
         {
-            try
+            var serializedUser = Preferences.Get("user", null);
+            if (!string.IsNullOrEmpty(serializedUser))
             {
-                var user = await _posts.Login(Preferences.Get("username", ""), Preferences.Get("password", ""));
-                if (user is not null)
+                var user = JsonConvert.DeserializeObject<User>(serializedUser);
+                if (user != null)
                 {
-                    Dispatcher.Dispatch(() =>
-                    {
-                        Application.Current.MainPage = new AppShell(user);
-                    });
+                    Application.Current.MainPage = new AppShell(user);
                     return;
                 }
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine($"Error during login: {ex.Message}");
             }
         }
 
         Application.Current.MainPage = _services.GetService<Login.Login>();
     }
+
 }

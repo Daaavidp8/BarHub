@@ -1,38 +1,58 @@
-<pages:BarHubBaseContentPage 
+<pages:BarHubBaseContentPage
+    x:Class="BarHub.Pages.Admin.AdminPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:pages="clr-namespace:BarHub.Pages"
-    xmlns:mpowerkit="clr-namespace:MPowerKit.VirtualizeListView;assembly=MPowerKit.VirtualizeListView"
-    xmlns:models="clr-namespace:BarHub.Models;assembly=BarHub.Models"
-    xmlns:viewModels="clr-namespace:BarHub.ViewModel.Admin"
     xmlns:adminComponents="clr-namespace:BarHub.Pages.Admin"
-    x:Class="BarHub.Pages.Admin.AdminPage"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:models="clr-namespace:BarHub.Models;assembly=BarHub.Models"
+    xmlns:mpowerkit="clr-namespace:MPowerKit.VirtualizeListView;assembly=MPowerKit.VirtualizeListView"
+    xmlns:pages="clr-namespace:BarHub.Pages"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:translation="clr-namespace:BarHub.Utils.Translation"
-    PageTitle="{translation:Translate Name=AdminTitlePage}"
-    Shell.NavBarIsVisible="False"
+    xmlns:viewModels="clr-namespace:BarHub.ViewModel.Admin"
+    x:Name="AdminPageView"
     x:DataType="viewModels:AdminViewModel"
-    FabRoute="{Binding GoToCreateRestaurantCommand}">
+    FabRoute="{Binding GoToManageRestaurantCommand}"
+    PageTitle="{translation:Translate Name=AdminTitlePage}"
+    Shell.NavBarIsVisible="False">
 
     <pages:BarHubBaseContentPage.Icon>
-        <Image Source="app_icon" WidthRequest="50"/>
+        <Image Source="app_icon" WidthRequest="50" />
     </pages:BarHubBaseContentPage.Icon>
 
     <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
-        <VerticalStackLayout>
-            <mpowerkit:VirtualizeListView ItemsSource="{Binding Restaurants}">
-                <mpowerkit:VirtualizeListView.ItemsLayout>
-                    <mpowerkit:LinearLayout ItemSpacing="0" />
-                </mpowerkit:VirtualizeListView.ItemsLayout>
-                <mpowerkit:VirtualizeListView.ItemTemplate>
-                    <DataTemplate x:DataType="models:Restaurant">
-                        <mpowerkit:VirtualizeListViewCell>
-                            <adminComponents:CardRestaurant Restaurant="{Binding .}"/>
-                        </mpowerkit:VirtualizeListViewCell>
-                    </DataTemplate>
-                </mpowerkit:VirtualizeListView.ItemTemplate>
-            </mpowerkit:VirtualizeListView>
-        </VerticalStackLayout>
+        <Grid toolkit:StateContainer.CurrentState="{Binding State}">
+            <toolkit:StateContainer.StateViews>
+                <CollectionView toolkit:StateView.StateKey="Success" ItemsSource="{Binding Restaurants}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Restaurant">
+                            <SwipeView BackgroundColor="Red" SwipeEnded="SwipeView_SwipeEnded">
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItemView>
+                                            <VerticalStackLayout
+                                                Padding="350,0,0,0"
+                                                BackgroundColor="Red"
+                                                HorizontalOptions="Fill"
+                                                VerticalOptions="Center">
+                                                <Image
+                                                    x:Name="iconTrash"
+                                                    Margin="0,0,30,0"
+                                                    Source="trash_icon"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="30" />
+                                            </VerticalStackLayout>
+                                        </SwipeItemView>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
 
 
+                                <adminComponents:CardRestaurant Background="{StaticResource Background}" Restaurant="{Binding .}" />
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </toolkit:StateContainer.StateViews>
+        </Grid>
     </ContentView>
 </pages:BarHubBaseContentPage>

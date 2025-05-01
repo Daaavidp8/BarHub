@@ -15,6 +15,9 @@ using BarHub.Platforms.Android.Shell;
 using InputKit.Handlers;
 using Maui.FreakyControls.Extensions;
 using Microsoft.Extensions.Logging;
+using Mopups.Hosting;
+using Mopups.Interfaces;
+using Mopups.Services;
 using MPowerKit.VirtualizeListView;
 using UraniumUI;
 namespace BarHub;
@@ -26,7 +29,9 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
-			.ConfigureFonts(fonts =>
+            .UseMauiCommunityToolkit()
+            .ConfigureMopups()
+            .ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
@@ -44,23 +49,25 @@ public static class MauiProgram
                 handlers.AddInputKitHandlers();
 
             })
-            .UseMauiCommunityToolkit()
             .UseUraniumUI()
 		    .UseUraniumUIMaterial();
 
+        builder.Services.AddMopupsDialogs();
 #if DEBUG
-		builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
         builder.Services.AddTransient<AppShell>();
         builder.Services.AddTransient<HttpClient>();
         builder.Services.AddSingleton(new Methods(ApiConstants.BaseUrl));
         builder.Services.AddTransient<Gets>();
+        builder.Services.AddTransient<Deletes>();
         builder.Services.AddTransient<Posts>();
+        builder.Services.AddTransient<Puts>();
         builder.Services.AddTransient<Login>();
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<BarHubBaseContentPage>();
         builder.Services.AddTransient<ProfilePage>();
-        builder.Services.AddTransient<AdminViewModel>();
+        builder.Services.AddSingleton<AdminViewModel>();
         builder.Services.AddTransient<AdminPage>();
         builder.Services.AddTransient<ManageRestaurantViewModel>();
         builder.Services.AddTransient<ManageRestaurant>();

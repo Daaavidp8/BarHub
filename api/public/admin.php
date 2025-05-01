@@ -81,51 +81,64 @@ $app->get('/get_owner/{id}', function (Request $request, Response $response) {
 // Función para crear un restaurante
 $app->post('/create_owner', function (Request $request, Response $response) {
     try {
-        $data = $request->getParsedBody();
-        $uploadedFiles = $request->getUploadedFiles();
-
-
-
+        // Get data from request based on content type
+        $contentType = $request->getHeaderLine('Content-Type');
+        
+        // Handle different content types
+        if (strpos($contentType, 'application/json') !== false) {
+            $data = json_decode($request->getBody()->getContents(), true);
+            error_log("CREATE_OWNER received JSON data");
+        } else {
+            // For multipart/form-data or application/x-www-form-urlencoded
+            $data = $request->getParsedBody();
+            error_log("CREATE_OWNER received form data");
+        }
+        
+        // Log received data safely
+        error_log("CREATE_OWNER received data: " . ($data ? json_encode(array_keys($data)) : "No data received"));
+        
         $name = $data["owner_name"];
         $cif = $data["owner_CIF"];
         $email = $data["owner_contact_email"];
         $phone = $data["owner_contact_phone"];
-
+        $logoBase64 = isset($data["owner_logo"]) ? $data["owner_logo"] : null;
+        
         if (!is_dir("./owners")) {
             mkdir("./owners");
         }
         
         $ruta = "./owners/" . $name;
 
-
         if (!is_dir($ruta)) {
             mkdir($ruta);
+            mkdir($ruta . "/img");
             mkdir($ruta . "/img/sections");
             mkdir($ruta . "/img/articles");
         } else {
             throw new Exception("El directorio ya existe.");
         }
 
-        $uploadedFile = $uploadedFiles['owner_logo'] ?? null;
-
-        if ($uploadedFile !== null && $uploadedFile->getError() === UPLOAD_ERR_OK) {
-            // Subimos el logo a la carpeta creada del correspondiente del restaurante
-            if ($uploadedFile->getClientMediaType() !== 'image/png') {
-                throw new Exception("El archivo subido no tiene extensión PNG.");
+        // Process base64 image if provided
+        if ($logoBase64) {
+            // Extract the base64 data part if it includes the data URL prefix
+            if (strpos($logoBase64, 'data:image') !== false) {
+                $logoBase64 = explode(',', $logoBase64)[1];
             }
-
+            
             $directorio = $ruta . "/img/";
-
             $nombreArchivo = 'logo.png';
             $rutaArchivo = $directorio . $nombreArchivo;
-
-            $uploadedFile->moveTo($rutaArchivo);
+            
+            // Decode and save the image
+            $decodedImage = base64_decode($logoBase64);
+            if ($decodedImage === false) {
+                throw new Exception("Error al decodificar la imagen en base64.");
+            }
+            
+            if (file_put_contents($rutaArchivo, $decodedImage) === false) {
+                throw new Exception("Error al guardar la imagen.");
+            }
         }
-
-
-
-
-
 
         // Insertamos los datos en la base de datos
         $sql = "INSERT INTO Restaurants (name, cif, contactEmail, contactPhone) VALUES (:name, :cif, :email, :phone)";
@@ -137,14 +150,26 @@ $app->post('/create_owner', function (Request $request, Response $response) {
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':phone', $phone);
         $stmt->execute();
+        $lastInsertId = $conn->lastInsertId();
         $db = null;
 
-        // Retornamos una respuesta exitosa
+        // Retornamos una respuesta exitosa con el ID del nuevo restaurante
+        $response->getBody()->write(json_encode([
+            "status" => true,
+            "message" => "Restaurante creado correctamente",
+            "id" => $lastInsertId
+        ]));
+        
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (Exception $e) {
         // En caso de errores, retornamos un mensaje de error
+        $response->getBody()->write(json_encode([
+            "status" => false,
+            "message" => $e->getMessage()
+        ]));
+        
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(500);
@@ -154,16 +179,44 @@ $app->post('/create_owner', function (Request $request, Response $response) {
 // Función para actualizar un restaurante
 $app->put('/update_owner/{id}', function (Request $request, Response $response) {
     $id = $request->getAttribute('id');
-    $data = $request->getParsedBody();
-
+    
+    // Get data from request based on content type
+    $contentType = $request->getHeaderLine('Content-Type');
+    
+    // Handle different content types
+    if (strpos($contentType, 'application/json') !== false) {
+        $data = json_decode($request->getBody()->getContents(), true);
+        error_log("UPDATE_OWNER received JSON data");
+    } else {
+        // For multipart/form-data or application/x-www-form-urlencoded
+        $data = $request->getParsedBody();
+        error_log("UPDATE_OWNER received form data");
+    }
+    
+    // Log received data safely (excluding logo)
+    $logData = $data ? array_filter($data, function($key) {
+        return $key !== 'owner_logo';
+    }, ARRAY_FILTER_USE_KEY) : [];
+    error_log("UPDATE_OWNER received data values: " . json_encode($logData));
 
     $name = $data["owner_name"];
     $cif = $data["owner_CIF"];
     $email = $data["owner_contact_email"];
     $phone = $data["owner_contact_phone"];
-    $img = explode(",",$data["owner_logo"])[1];
-    $rutaOwners = "../../clientereact/public/images/owners/";
-
+    
+    // Handle logo data which might be in different formats
+    $logoBase64 = isset($data["owner_logo"]) ? $data["owner_logo"] : null;
+    $img = null;
+    if ($logoBase64) {
+        // Extract the base64 data part if it includes the data URL prefix
+        if (strpos($logoBase64, 'data:image') !== false) {
+            $img = explode(',', $logoBase64)[1];
+        } else {
+            $img = $logoBase64;
+        }
+    }
+    
+    $rutaOwners = "./owners/";
 
     try {
         $db = new DB();
@@ -177,7 +230,6 @@ $app->put('/update_owner/{id}', function (Request $request, Response $response) 
         $stmt_check->execute();
         $count = $stmt_check->fetchColumn();
 
-
         if ($count > 0) {
             throw new Exception("El nuevo nombre de propietario ya está en uso.");
         }
@@ -188,8 +240,6 @@ $app->put('/update_owner/{id}', function (Request $request, Response $response) 
         $stmt_get_old_name->bindParam(':id', $id);
         $stmt_get_old_name->execute();
         $old_name = $stmt_get_old_name->fetchColumn();
-
-
 
         // Actualizar la información del propietario en la base de datos
         $sql_update = "UPDATE Restaurants SET name = :name, cif = :cif, contactEmail = :email, contactPhone = :phone WHERE id_restaurant = :id";
@@ -203,14 +253,10 @@ $app->put('/update_owner/{id}', function (Request $request, Response $response) 
 
         $imagePath = $rutaOwners . $old_name . "/img/logo.png";
 
-
-        if ($img != null){
+        if ($img != null) {
             $decoded_data = base64_decode($img);
             file_put_contents($imagePath, $decoded_data);
         }
-
-
-
 
         if ($name !== $old_name) {
             $old_folder_path = $rutaOwners . $old_name;
@@ -223,16 +269,20 @@ $app->put('/update_owner/{id}', function (Request $request, Response $response) 
             }
         }
 
-
-
-
-
+        // Return success response with updated data
+        $response->getBody()->write(json_encode([
+            "status" => true,
+            "message" => "Restaurante actualizado correctamente",
+            "id" => $id
+        ]));
+        
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (PDOException $e) {
         // Manejar errores de la base de datos
         $error = array(
+            "status" => false,
             "message" => $e->getMessage()
         );
 
@@ -243,6 +293,7 @@ $app->put('/update_owner/{id}', function (Request $request, Response $response) 
     } catch (Exception $e) {
         // Manejar otros tipos de errores
         $error = array(
+            "status" => false,
             "message" => $e->getMessage()
         );
 
@@ -280,7 +331,7 @@ function borrar_directorio($directorio)
 // Borra un restaurante en concreto
 $app->delete('/delete_owner/{id}', function (Request $request, Response $response, array $args) {
     $id = $args["id"];
-    $rutaOwners = "../../clientereact/public/images/owners/";
+    $rutaOwners = "./owners/";
 
     try {
         // Borrar Carpeta

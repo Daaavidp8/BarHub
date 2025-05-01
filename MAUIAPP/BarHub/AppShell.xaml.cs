@@ -22,12 +22,11 @@ namespace BarHub
             InitializeComponent();
             MainThread.BeginInvokeOnMainThread(async () => await ConfigureTabsAsync(user));
         }
-
         public async Task ConfigureTabsAsync(User user)
         {
             try
             {
-                var HomeIcon = new FontImageSource
+                var homeIcon = new FontImageSource
                 {
                     FontFamily = "FASolid",
                     Glyph = Icons.Home,
@@ -35,15 +34,16 @@ namespace BarHub
                 };
 
                 tabbar.Items.Clear();
+
                 if (user.Roles.Contains(Roles.ADMIN))
                 {
-                    AddTab<AdminPage>(HomeIcon);
+                    AddTab<AdminPage>(homeIcon);
                     Routing.RegisterRoute(nameof(ManageRestaurant), typeof(ManageRestaurant));
                 }
                 else
                 {
                     if (user.Roles.Contains(Roles.PROPIETARIO))
-                        AddTab<OwnerPage>(HomeIcon);
+                        AddTab<OwnerPage>(homeIcon);
 
                     if (user.Roles.Contains(Roles.CAMARERO) || user.Roles.Contains(Roles.PROPIETARIO))
                         AddTab<WaiterPage>(new FontImageSource
@@ -54,21 +54,29 @@ namespace BarHub
                         });
                 }
 
+                //AddTab<ProfilePage>(new FontImageSource
+                //{
+                //    FontFamily = "FASolid",
+                //    Glyph = Icons.Profile,
+                //    Size = 20,
+                //});
+
+                tabbar.Items.Add(new ShellContent
+                {
+                    Route = "ProfilePage",
+                    Content = new ProfilePage(user),
+                    Icon = new FontImageSource
+                    {
+                        FontFamily = "FASolid",
+                        Glyph = Icons.Profile,
+                        Size = 20,
+                    }
+                });
+
                 if (tabbar is not null && tabbar.Items.Count > 0)
                 {
                     tabbar.CurrentItem = tabbar.Items[0];
                 }
-
-
-
-                AddTab<ProfilePage>(new FontImageSource
-                {
-                    FontFamily = "FASolid",
-                    Glyph = Icons.Profile,
-                    Size = 20,
-                });
-
-
 
             }
             catch (Exception ex)
@@ -77,6 +85,7 @@ namespace BarHub
                 await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
             }
         }
+
 
         private void AddTab<TPage>(FontImageSource icon) where TPage : Page
         {

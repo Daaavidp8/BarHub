@@ -4,42 +4,19 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BarHub.Lib
 {
-
-    public class Posts
+    public class Puts
     {
         private Methods _methods;
-        public Posts(Methods methods)
+        public Puts(Methods methods)
         {
             _methods = methods;
         }
 
-        public async Task<User?> Login(string username, string password)
-        {
-            try
-            {
-                var data = new
-                {
-                    username = username,
-                    password = password
-                };
-
-                var user = await _methods.Post<object, User>(ApiConstants.LOGIN, data);
-                _methods.SetToken(user.Token);
-                return user;
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-
-        }
-
-        public async Task CreateRestaurant(Restaurant restaurant)
+        public async Task ModifyRestaurant(Restaurant restaurant)
         {
             try
             {
@@ -52,7 +29,7 @@ namespace BarHub.Lib
                     owner_logo = restaurant.Logo,
                 };
 
-                var user = await _methods.Post<object, User>(ApiConstants.CREATE_RESTAURANT, data);
+                var user = await _methods.Put<object, User>($"{ApiConstants.UPDATE_RESTAURANT}/{restaurant.Id}", data);
             }
             catch (Exception e)
             {
@@ -60,7 +37,5 @@ namespace BarHub.Lib
             }
 
         }
-
-
     }
 }

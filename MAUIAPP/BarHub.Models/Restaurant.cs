@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,5 +29,22 @@ namespace BarHub.Models
 
         public List<Section> Sections { get; set; }
         public List<User> Users { get; set; }
+
+
+        public Restaurant Clone()
+        {
+            return new Restaurant
+            {
+                Id = this.Id,
+                Name = this.Name,
+                Cif = this.Cif,
+                Phone = this.Phone,
+                Email = this.Email,
+                Logo = this.Logo,
+                Sections = this.Sections != null ? new List<Section>(this.Sections) : new List<Section>(),
+                Users = this.Users != null ? new List<User>(this.Users) : new List<User>()
+            };
+        }
+
     }
 }

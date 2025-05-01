@@ -9,7 +9,11 @@ namespace BarHub.Lib
     public static class ApiConstants
     {
         // Base URL para la Api
+#if DEBUG
         public const string BaseUrl = "http://10.0.2.2:41063";
+#elif RELEASE
+        public const string BaseUrl = "http://192.168.1.203:41063";
+#endif
 
 
         // EndPoints

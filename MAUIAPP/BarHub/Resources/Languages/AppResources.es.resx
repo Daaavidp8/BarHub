@@ -189,4 +189,7 @@
   <data name="SaveChangesText" xml:space="preserve">
     <value>Guardar Cambios</value>
   </data>
+  <data name="SelectImageText" xml:space="preserve">
+    <value>Selecciona una imagen</value>
+  </data>
 </root>

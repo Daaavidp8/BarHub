@@ -1,5 +1,6 @@
 ﻿using BarHub.Lib;
 using BarHub.Pages;
+using BarHub.Pages.GlobalComponents;
 using BarHub.Pages.Login;
 using BarHub.Utils.Translation;
 using System.Globalization;

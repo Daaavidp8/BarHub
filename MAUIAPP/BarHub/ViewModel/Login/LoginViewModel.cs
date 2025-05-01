@@ -2,7 +2,8 @@
 using BarHub.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Maui.ApplicationModel; 
+using Microsoft.Maui.ApplicationModel;
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -35,8 +36,9 @@ namespace BarHub.ViewModel.Login
                 if (user.Token != null)
                 {
                     Preferences.Set("IsLoggedIn", IsReminding);
-                    Preferences.Set("username", Username);
-                    Preferences.Set("password", Password);
+
+                    string serializedUser = JsonConvert.SerializeObject(user);
+                    Preferences.Set("user", serializedUser);
 
                     await MainThread.InvokeOnMainThreadAsync(() =>
                     {

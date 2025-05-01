@@ -241,6 +241,15 @@ namespace BarHub.Resources.Languages {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Selecciona una imagen.
+        /// </summary>
+        internal static string SelectImageText {
+            get {
+                return ResourceManager.GetString("SelectImageText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Mantener iniciada la sesion.
         /// </summary>
         internal static string StayLoggedIn {
