@@ -16,11 +16,23 @@ namespace BarHub.Lib
             _methods = methods;
         }
 
-        public async Task DeleteRestaurant(string id)
+        public async Task DeleteRestaurant(int id)
         {
             try
             {
                 await _methods.Delete<Restaurant>($"{ApiConstants.DELETE_RESTAURANT}/{id}");
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+            }
+        }
+
+        public async Task DeleteSection(int id)
+        {
+            try
+            {
+                await _methods.Delete<Section>($"{ApiConstants.DELETE_SECTION}/{id}");
             }
             catch (Exception e)
             {

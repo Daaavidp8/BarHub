@@ -29,7 +29,9 @@ public class SplashPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        
+
+        //Preferences.Set("user", null);
+
         var isLogged = Preferences.Get("IsLoggedIn", false);
 
         if (isLogged)

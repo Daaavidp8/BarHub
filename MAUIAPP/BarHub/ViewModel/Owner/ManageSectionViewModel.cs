@@ -2,6 +2,7 @@
 using BarHub.Models;
 using BarHub.Resources.Languages;
 using BarHub.Utils.UI.General;
+using BarHub.ViewModel.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -15,20 +16,13 @@ using System.Threading.Tasks;
 namespace BarHub.ViewModel.Owner
 {
     [QueryProperty(nameof(SectionJson), "sectionJson")]
-    [QueryProperty(nameof(OwnerViewModel), "viewModel")]
     public partial class ManageSectionViewModel : ObservableObject
     {
         private readonly FunctionsUI _functionsUI;
-        private readonly Puts _puts;
-        private readonly Posts _posts;
+        private readonly IContext<SectionViewModel> _sectionContext;
 
-        public OwnerViewModel OwnerViewModel
-        {
-            get => _ownerViewModel;
-            set => _ownerViewModel = value;
-        }
-
-        private OwnerViewModel _ownerViewModel;
+        [ObservableProperty]
+        private int restaurantId;
 
         [ObservableProperty]
         private string sectionJson;
@@ -40,11 +34,10 @@ namespace BarHub.ViewModel.Owner
         private string title = AppResources.AddRestaurantText, buttonText = AppResources.CreateRestaurantText;
 
 
-        public ManageSectionViewModel(Puts puts, Posts posts, FunctionsUI fUI)
+        public ManageSectionViewModel(FunctionsUI fUI,IContext<SectionViewModel> sectionContext)
         {
-            _puts = puts;
-            _posts = posts;
             _functionsUI = fUI;
+            _sectionContext = sectionContext;
         }
 
 
@@ -106,27 +99,14 @@ namespace BarHub.ViewModel.Owner
         {
             try
             {
-                Trace.WriteLine(OwnerViewModel);
-                Trace.WriteLine($"ActionButtonPressed: {SectionJson}");
-
-                //if (sectionJson is null)
-                //{
-                //    _posts.CreateRestaurant(Restaurant.ToModel());
-                //    _adminViewModel.Restaurants.Add(Restaurant);
-                //}
-                //else
-                //{
-                //    _puts.ModifyRestaurant(Restaurant.ToModel());
-                //    var restaurant = _adminViewModel.Restaurants.FirstOrDefault(x => x.Id == originalRestaurant.Id);
-                //    if (restaurant is not null)
-                //    {
-                //        restaurant.Name = Restaurant.Name;
-                //        restaurant.Cif = Restaurant.Cif;
-                //        restaurant.Email = Restaurant.Email;
-                //        restaurant.Phone = Restaurant.Phone;
-                //        restaurant.Logo = Restaurant.Logo;
-                //    }
-                //}
+                if (Section.Id == 0)
+                {
+                    await _sectionContext.NotifyObjectCreated(Section);
+                }
+                else
+                {
+                    await _sectionContext.NotifyObjectModified(Section);
+                }
 
 
                 GoBack();

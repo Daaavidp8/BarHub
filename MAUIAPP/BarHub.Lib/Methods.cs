@@ -146,7 +146,6 @@ where T : class
                 response.EnsureSuccessStatusCode();
 
             var responseContent = await response.Content.ReadAsStringAsync();
-            Trace.WriteLine($"Response Content: {responseContent}");
 
             T t = await response.Content.ReadAsAsync<T>();
                 return t;

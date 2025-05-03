@@ -1,5 +1,6 @@
 using BarHub.Lib;
 using BarHub.ViewModel.Admin;
+using BarHub.ViewModel.Interfaces;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Views;
 using Mopups.Interfaces;
@@ -11,17 +12,12 @@ namespace BarHub.Pages.Admin;
 
 public partial class AdminPage : BarHubBaseContentPage
 {
-    private readonly AdminViewModel _adminViewModel;
-    public AdminPage(AdminViewModel vm ,AdminViewModel adminvm)
+    private readonly IContext<RestaurantViewModel> _context;
+    public AdminPage(AdminViewModel vm ,AdminViewModel adminvm, IContext<RestaurantViewModel> context)
 	{
 		InitializeComponent();
 		BindingContext = vm;
-        _adminViewModel = adminvm;
-    }
-
-    private void SwipedItem(object sender, EventArgs e)
-    {
-        this.ShowPopup(new ConfirmDeletePopUp());
+        _context = context;
     }
 
     private async void SwipeView_SwipeEnded(object sender, SwipeEndedEventArgs e)
@@ -44,7 +40,7 @@ public partial class AdminPage : BarHubBaseContentPage
                 await image.TranslateTo(-380, 0, 300);
 
             
-                var isConfirmed = await this.ShowPopupAsync(new ConfirmDeletePopUp());
+                var isConfirmed = await this.ShowPopupAsync(new ConfirmDeletePopUp($"Desea eliminar {swipeView}"));
 
                 if (isConfirmed is null || !(bool)isConfirmed)
                 {
@@ -55,7 +51,7 @@ public partial class AdminPage : BarHubBaseContentPage
                     try
                     {
                         var restaurant = (RestaurantViewModel)swipeView.BindingContext;
-                        await _adminViewModel.DeleteRestaurant(restaurant);
+                        _context.NotifyObjectDeleted(restaurant);
 
                         await this.DisplaySnackbar("Restaurante eliminado correctamente");
                     }

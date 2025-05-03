@@ -103,6 +103,7 @@ $app->post('/create_owner', function (Request $request, Response $response) {
         $phone = $data["owner_contact_phone"];
         $logoBase64 = isset($data["owner_logo"]) ? $data["owner_logo"] : null;
         
+        // Create owners directory if it doesn't exist
         if (!is_dir("./owners")) {
             mkdir("./owners");
         }
@@ -119,15 +120,22 @@ $app->post('/create_owner', function (Request $request, Response $response) {
         }
 
         // Process base64 image if provided
+        $logoPath = null;
+        $processedLogo = null;
         if ($logoBase64) {
             // Extract the base64 data part if it includes the data URL prefix
             if (strpos($logoBase64, 'data:image') !== false) {
-                $logoBase64 = explode(',', $logoBase64)[1];
+                $parts = explode(',', $logoBase64);
+                $logoBase64 = $parts[1];
+                $processedLogo = $logoBase64; // Store processed logo for response
+            } else {
+                $processedLogo = $logoBase64;
             }
             
             $directorio = $ruta . "/img/";
             $nombreArchivo = 'logo.png';
             $rutaArchivo = $directorio . $nombreArchivo;
+            $logoPath = $rutaArchivo;
             
             // Decode and save the image
             $decodedImage = base64_decode($logoBase64);
@@ -151,25 +159,52 @@ $app->post('/create_owner', function (Request $request, Response $response) {
         $stmt->bindParam(':phone', $phone);
         $stmt->execute();
         $lastInsertId = $conn->lastInsertId();
+        
+        // Log the last insert ID for debugging
+        error_log("CREATE_OWNER last insert ID: " . $lastInsertId);
+        
         $db = null;
-
-        // Retornamos una respuesta exitosa con el ID del nuevo restaurante
-        $response->getBody()->write(json_encode([
-            "status" => true,
-            "message" => "Restaurante creado correctamente",
-            "id" => $lastInsertId
-        ]));
+        
+        // Format the response to match the C# Restaurant model
+        $restaurant = [
+            "Id" => intval($lastInsertId),
+            "Name" => $name,
+            "Cif" => $cif,
+            "Email" => $email,
+            "Phone" => $phone,
+            "Logo" => null,
+            "Sections" => [],
+            "Users" => []
+        ];
+        
+        // Log the restaurant object for debugging
+        error_log("CREATE_OWNER restaurant object: " . json_encode($restaurant));
+        
+        // Add logo to the restaurant data if it exists
+        if ($logoPath && file_exists($logoPath)) {
+            // Use a smaller logo for the response to avoid JSON size issues
+            $restaurant['Logo'] = "data:image/png;base64," . $processedLogo;
+        }
+        
+        // Ensure proper JSON encoding with error handling
+        $jsonResponse = json_encode($restaurant, JSON_PARTIAL_OUTPUT_ON_ERROR);
+        if ($jsonResponse === false) {
+            throw new Exception("Error encoding JSON response: " . json_last_error_msg());
+        }
+        
+        // Retornamos una respuesta exitosa con el restaurante completo
+        $response->getBody()->write($jsonResponse);
         
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (Exception $e) {
         // En caso de errores, retornamos un mensaje de error
-        $response->getBody()->write(json_encode([
-            "status" => false,
-            "message" => $e->getMessage()
-        ]));
+        $errorResponse = json_encode([
+            "error" => $e->getMessage()
+        ]);
         
+        $response->getBody()->write($errorResponse);
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(500);

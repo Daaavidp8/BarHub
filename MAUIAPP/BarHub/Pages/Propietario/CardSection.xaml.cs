@@ -28,34 +28,14 @@ public partial class CardSection : ContentView
 
     private async void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
     {
-        var ownerViewModel = FindOwnerViewModel(sender);
-        if (ownerViewModel is null)
-        {
-            Debug.WriteLine("OwnerViewModel not found in visual tree.");
-            return;
-        }
-
         await Shell.Current.GoToAsync(nameof(ManageSection), true, new Dictionary<string, object>
         {
-            { "sectionJson" , JsonSerializer.Serialize(Section.Section) },
-            { "viewModel" , ownerViewModel }
+            { "sectionJson" , JsonSerializer.Serialize(Section.Section) }
         });
     }
 
-    private OwnerViewModel? FindOwnerViewModel(object sender)
+    private void TapGestureRecognizer_Tapped_1(object sender, TappedEventArgs e)
     {
-        if (sender is not Element element)
-            return null;
-
-        while (element != null)
-        {
-            if (element.BindingContext is OwnerViewModel ownerVm)
-                return ownerVm;
-
-            element = element.Parent;
-        }
-
-        return null;
+        Trace.WriteLine("Hola dfsg");
     }
-
 }

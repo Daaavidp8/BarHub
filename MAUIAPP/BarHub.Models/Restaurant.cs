@@ -13,6 +13,8 @@ namespace BarHub.Models
 
         [JsonProperty("id_restaurant")]
         public int Id { get; set; }
+
+        [JsonProperty("name")]
         public string Name { get; set; }
 
         [JsonProperty("cif")]
@@ -27,7 +29,10 @@ namespace BarHub.Models
         [JsonProperty("logo")]
         public string Logo { get; set; }
 
+        [JsonProperty("sections")]
         public List<Section> Sections { get; set; }
+
+        [JsonProperty("users")]
         public List<User> Users { get; set; }
 
 

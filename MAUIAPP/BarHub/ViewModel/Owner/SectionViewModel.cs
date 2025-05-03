@@ -21,9 +21,13 @@ namespace BarHub.ViewModel.Owner
         public SectionViewModel(Section section)
         {
             this.section = section;
-            articles = new ObservableCollection<ArticleViewModel>(
-                section.Articles.Select(a => new ArticleViewModel(a))
-            );
+            if (section.Articles is not null)
+            {
+                articles = new ObservableCollection<ArticleViewModel>(
+                                section.Articles.Select(a => new ArticleViewModel(a))
+                            );
+            }
+                
         }
 
         public int Id
@@ -42,6 +46,12 @@ namespace BarHub.ViewModel.Owner
         {
             get => section.Image;
             set => SetProperty(section.Image, value, section, (r, v) => r.Image = v);
+        }
+
+        public int IdRestaurant
+        {
+            get => section.IdRestaurant;
+            set => SetProperty(section.IdRestaurant, value, section, (r, v) => r.IdRestaurant = v);
         }
 
 

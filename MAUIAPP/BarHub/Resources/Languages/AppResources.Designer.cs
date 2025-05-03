@@ -232,20 +232,20 @@ namespace BarHub.Resources.Languages {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Administración de Secciones.
+        /// </summary>
+        internal static string RestaurantTitlePage {
+            get {
+                return ResourceManager.GetString("RestaurantTitlePage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Guardar Cambios.
         /// </summary>
         internal static string SaveChangesText {
             get {
                 return ResourceManager.GetString("SaveChangesText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a Administración de Secciones.
-        /// </summary>
-        internal static string SectionTitlePage {
-            get {
-                return ResourceManager.GetString("SectionTitlePage", resourceCulture);
             }
         }
         

@@ -39,7 +39,7 @@ namespace BarHub.Lib
 
         }
 
-        public async Task CreateRestaurant(Restaurant restaurant)
+        public async Task<Restaurant?> CreateRestaurant(Restaurant restaurant)
         {
             try
             {
@@ -52,11 +52,33 @@ namespace BarHub.Lib
                     owner_logo = restaurant.Logo,
                 };
 
-                var user = await _methods.Post<object, User>(ApiConstants.CREATE_RESTAURANT, data);
+                return await _methods.Post<object, Restaurant>(ApiConstants.CREATE_RESTAURANT, data);
+                
             }
             catch (Exception e)
             {
                 Trace.WriteLine(e.Message);
+                return null;
+            }
+
+        }
+
+        public async Task<Section?> CreateSection(Section section,int? id)
+        {
+            try
+            {
+                var data = new
+                {
+                    section_name = section.Name,
+                    section_img = section.Image
+                };
+
+                return await _methods.Post<object, Section>($"{ApiConstants.CREATE_SECTION}/{id}", data);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+                return null;
             }
 
         }

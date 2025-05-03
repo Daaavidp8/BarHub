@@ -126,7 +126,7 @@
 	  <MauiXaml Update="Pages\Admin\CardRestaurant.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\Admin\ConfirmDeletePopUp.xaml">
+	  <MauiXaml Update="Pages\GlobalComponents\PopUps\ConfirmDeletePopUp.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\Admin\ManageRestaurant.xaml">

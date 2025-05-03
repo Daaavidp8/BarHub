@@ -205,9 +205,38 @@ $app->get('/get_worker/{id_user}', function (Request $request, Response $respons
 // Crea una seccion en un restaurante especifico
 $app->post('/create_section/{id_owner}', function (Request $request, Response $response) {
     $ownerid = $request->getAttribute('id_owner');
-    $data = $request->getParsedBody();
-    $uploadedFiles = $request->getUploadedFiles();
-    $name = $data["section_name"];
+    $contentType = $request->getHeaderLine('Content-Type');
+    
+    // Check if the request is JSON or multipart form data
+    if (strpos($contentType, 'application/json') !== false) {
+        // Handle JSON request
+        $data = $request->getParsedBody();
+        if (!$data) {
+            $data = json_decode($request->getBody()->getContents(), true);
+        }
+        
+        if (!isset($data["section_name"])) {
+            throw new Exception("El campo 'section_name' es requerido");
+        }
+        
+        $name = $data["section_name"];
+        $imageBase64 = isset($data["section_img"]) ? $data["section_img"] : null;
+        
+        // Log received data for debugging
+        error_log("Received section name: " . $name);
+        error_log("Received base64 image: " . (empty($imageBase64) ? "No" : "Yes, length: " . strlen($imageBase64)));
+    } else {
+        // Handle multipart form data
+        $data = $request->getParsedBody();
+        $uploadedFiles = $request->getUploadedFiles();
+        
+        if (!isset($data["section_name"])) {
+            throw new Exception("El campo 'section_name' es requerido");
+        }
+        
+        $name = $data["section_name"];
+        $imageBase64 = null;
+    }
 
     try {
         $db = new DB();
@@ -218,43 +247,108 @@ $app->post('/create_section/{id_owner}', function (Request $request, Response $r
         $stmt->bindParam(':ownerid', $ownerid);
         $result = $stmt->execute();
 
-        if ($result) {
-            $ownername = $stmt->fetchColumn();
+        if (!$result || !($ownername = $stmt->fetchColumn())) {
+            throw new Exception("No se encontró el restaurante con ID: " . $ownerid);
         }
 
+        // Create full directory path
         $ruta = "./owners/" . $ownername;
+        $directorio = $ruta . "/img/sections/";
+        
+        // Ensure all parent directories exist
+        if (!is_dir($ruta)) {
+            if (!mkdir($ruta, 0777, true)) {
+                throw new Exception("No se pudo crear el directorio base: " . $ruta);
+            }
+        }
+        
+        if (!is_dir($ruta . "/img")) {
+            if (!mkdir($ruta . "/img", 0777, true)) {
+                throw new Exception("No se pudo crear el directorio de imágenes: " . $ruta . "/img");
+            }
+        }
+        
+        if (!is_dir($directorio)) {
+            if (!mkdir($directorio, 0777, true)) {
+                throw new Exception("No se pudo crear el directorio de secciones: " . $directorio);
+            }
+        }
+        
+        $nombreArchivo = $name . '.png';
+        $rutaArchivo = $directorio . $nombreArchivo;
+        
+        error_log("Saving image to: " . $rutaArchivo);
 
-        $uploadedFile = $uploadedFiles['section_img'] ?? null;
-
-        if ($uploadedFile !== null && $uploadedFile->getError() === UPLOAD_ERR_OK) {
+        // Handle file upload or base64 image
+        if (isset($uploadedFiles['section_img']) && $uploadedFiles['section_img']->getError() === UPLOAD_ERR_OK) {
+            $uploadedFile = $uploadedFiles['section_img'];
             if ($uploadedFile->getClientMediaType() !== 'image/png') {
                 throw new Exception("El archivo subido no tiene extensión PNG.");
             }
-
-            $directorio = $ruta . "/img/sections/";
-
-            $nombreArchivo = $name . '.png';
-            $rutaArchivo = $directorio . $nombreArchivo;
-
             $uploadedFile->moveTo($rutaArchivo);
+            error_log("Image uploaded successfully via multipart form");
+        } elseif ($imageBase64) {
+            // Handle base64 encoded image
+            // Remove data URI prefix if present
+            if (strpos($imageBase64, 'data:image/png;base64,') === 0) {
+                $imageBase64 = substr($imageBase64, strlen('data:image/png;base64,'));
+            } elseif (strpos($imageBase64, 'data:image/jpeg;base64,') === 0) {
+                $imageBase64 = substr($imageBase64, strlen('data:image/jpeg;base64,'));
+            }
+            
+            // Ensure the base64 string is clean (remove any whitespace)
+            $imageBase64 = trim($imageBase64);
+            
+            // Decode the base64 data
+            $imageData = base64_decode($imageBase64, true);
+            if ($imageData === false) {
+                throw new Exception("Error al decodificar la imagen en base64. Formato inválido.");
+            }
+            
+            // Save the image file
+            $bytesWritten = file_put_contents($rutaArchivo, $imageData);
+            if ($bytesWritten === false) {
+                throw new Exception("Error al guardar la imagen: " . $rutaArchivo);
+            }
+            
+            error_log("Image saved successfully from base64. Bytes written: " . $bytesWritten);
+        } else {
+            error_log("No image provided");
         }
 
-
+        // Insert section into database
         $sql = "INSERT INTO Sections (name, id_restaurant) VALUES (:name, :idowner)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':idowner', $ownerid);
 
         $result = $stmt->execute();
+        $sectionId = $conn->lastInsertId();
+        
+        // Create the complete section object to return
+        $section = [
+            "id" => intval($sectionId),
+            "name" => $name,
+            "id_restaurant" => intval($ownerid),
+            "image" => null,
+            "articles" => []
+        ];
+        
+        // Add the image to the response if it exists
+        if (file_exists($rutaArchivo)) {
+            $imageData = file_get_contents($rutaArchivo);
+            $section['image'] = "data:image/png;base64," . base64_encode($imageData);
+        }
 
         $db = null;
 
-        $response->getBody()->write(json_encode($result));
+        // Return the complete section data
+        $response->getBody()->write(json_encode($section));
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (PDOException $e) {
-
+        error_log("Database error: " . $e->getMessage());
         $error = array(
             "message" => $e->getMessage()
         );
@@ -263,6 +357,16 @@ $app->post('/create_section/{id_owner}', function (Request $request, Response $r
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(500);
+    } catch (Exception $e) {
+        error_log("General error: " . $e->getMessage());
+        $error = array(
+            "message" => $e->getMessage()
+        );
+
+        $response->getBody()->write(json_encode($error));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(400);
     }
 });
 
@@ -410,12 +514,37 @@ $app->post('/create_worker/{id_owner}', function (Request $request, Response $re
 $app->put('/update_section/{id_section}', function (Request $request, Response $response)
 {
     $id = $request->getAttribute('id_section');
-    $data = $request->getParsedBody();
+    $contentType = $request->getHeaderLine('Content-Type');
+    
+    // Handle different content types
+    if (strpos($contentType, 'application/json') !== false) {
+        // Handle JSON request
+        $data = json_decode($request->getBody()->getContents(), true);
+        error_log("UPDATE_SECTION received JSON data");
+    } else {
+        // For multipart/form-data or application/x-www-form-urlencoded
+        $data = $request->getParsedBody();
+        error_log("UPDATE_SECTION received form data");
+    }
+    
+    // Log received data safely (excluding image data)
+    error_log("UPDATE_SECTION received data for section ID: " . $id);
+    
+    if (!isset($data["section_name"])) {
+        throw new Exception("El campo 'section_name' es requerido");
+    }
+    
     $name = $data["section_name"];
-    $img = explode(",",$data["section_img"])[1];
-
-
-
+    $imageBase64 = isset($data["section_img"]) ? $data["section_img"] : null;
+    
+    // Process base64 image if provided
+    if ($imageBase64) {
+        // Extract the base64 data part if it includes the data URL prefix
+        if (strpos($imageBase64, 'data:image') !== false) {
+            $parts = explode(',', $imageBase64);
+            $imageBase64 = $parts[1];
+        }
+    }
 
     try {
         $db = new Db();
@@ -427,8 +556,15 @@ $app->put('/update_section/{id_section}', function (Request $request, Response $
         $stmt->execute();
         $ownername = $stmt->fetchColumn();
 
+        // Get section ID for response
+        $sql = "SELECT id_restaurant FROM Sections WHERE id_section = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $restaurantId = $stmt->fetchColumn();
 
-        $ruta = "../../clientereact/public/images/owners/" . $ownername . "/img/sections/";
+        // Use the correct path for images
+        $ruta = "./owners/" . $ownername . "/img/sections/";
 
         $sql = "SELECT name FROM Sections WHERE id_section = :id";
         $stmt = $conn->prepare($sql);
@@ -436,26 +572,48 @@ $app->put('/update_section/{id_section}', function (Request $request, Response $
         $stmt->execute();
         $oldSectionName = $stmt->fetchColumn();
 
-        unlink($ruta . $oldSectionName . ".png");
+        // Only try to delete if the file exists
+        if (file_exists($ruta . $oldSectionName . ".png")) {
+            unlink($ruta . $oldSectionName . ".png");
+        }
 
+        // Save the new image
+        if ($imageBase64) {
+            $decoded_data = base64_decode($imageBase64);
+            file_put_contents($ruta . $name . ".png", $decoded_data);
+        }
 
-        $decoded_data = base64_decode($img);
-        file_put_contents($ruta  . $name . ".png", $decoded_data);
-
-
-        $sql = "UPDATE Sections SET name = :name WHERE id_section = $id";
+        // Update the section in the database
+        $sql = "UPDATE Sections SET name = :name WHERE id_section = :id";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':name', $name);
-
+        $stmt->bindParam(':id', $id);
         $result = $stmt->execute();
+
+        // Create response object with updated section data
+        $section = [
+            "id_section" => intval($id),
+            "name" => $name,
+            "id_restaurant" => intval($restaurantId),
+            "image" => null,
+            "articles" => []
+        ];
+        
+        // Add the image to the response if it exists
+        if (file_exists($ruta . $name . ".png")) {
+            $imageData = file_get_contents($ruta . $name . ".png");
+            $section['image'] = "data:image/png;base64," . base64_encode($imageData);
+        }
 
         $db = null;
 
-        $response->getBody()->write(json_encode($result));
+        // Return the updated section data
+        $response->getBody()->write(json_encode($section));
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (PDOException $e) {
+        error_log("Database error in UPDATE_SECTION: " . $e->getMessage());
         $error = array(
             "message" => $e->getMessage()
         );
@@ -464,6 +622,16 @@ $app->put('/update_section/{id_section}', function (Request $request, Response $
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(500);
+    } catch (Exception $e) {
+        error_log("General error in UPDATE_SECTION: " . $e->getMessage());
+        $error = array(
+            "message" => $e->getMessage()
+        );
+
+        $response->getBody()->write(json_encode($error));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(400);
     }
 });
 

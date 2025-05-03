@@ -37,5 +37,23 @@ namespace BarHub.Lib
             }
 
         }
+
+        public async Task ModifySection(Section section, int id)
+        {
+            try
+            {
+                var data = new
+                {
+                    section_name = section.Name,
+                    section_img = section.Image,
+                };
+
+                await _methods.Put<object, Section>($"{ApiConstants.UPDATE_SECTION}/{section.Id}", data);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+            }
+        }
     }
 }

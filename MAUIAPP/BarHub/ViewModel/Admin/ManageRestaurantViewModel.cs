@@ -11,6 +11,7 @@ using System.Text.Json;
 using BarHub.Lib;
 using System.Collections.ObjectModel;
 using BarHub.Utils.UI.General;
+using BarHub.ViewModel.Interfaces;
 
 namespace BarHub.ViewModel.Admin
 {
@@ -19,10 +20,7 @@ namespace BarHub.ViewModel.Admin
     {
 
         private readonly FunctionsUI _functionsUI;
-        private readonly Puts _puts;
-        private readonly Posts _posts;
-
-        private readonly AdminViewModel _adminViewModel;
+        private readonly IContext<RestaurantViewModel> _restaurantContext;
 
 
         [ObservableProperty]
@@ -38,12 +36,10 @@ namespace BarHub.ViewModel.Admin
         private Restaurant originalRestaurant;
 
 
-        public ManageRestaurantViewModel(Posts posts, AdminViewModel vm, Puts puts, FunctionsUI fUI)
+        public ManageRestaurantViewModel(FunctionsUI fUI, IContext<RestaurantViewModel> restaurantContext)
         {
-            _posts = posts;
-            _puts = puts;
-            _adminViewModel = vm;
             _functionsUI = fUI;
+            _restaurantContext = restaurantContext;
         }
 
         partial void OnRestaurantJsonChanged(string value)
@@ -108,24 +104,12 @@ namespace BarHub.ViewModel.Admin
             {
                 if (originalRestaurant is null)
                 {
-                    _posts.CreateRestaurant(Restaurant.ToModel());
-                    _adminViewModel.Restaurants.Add(Restaurant);
+                    await _restaurantContext.NotifyObjectCreated(Restaurant);
                 }
                 else
                 {
-                    _puts.ModifyRestaurant(Restaurant.ToModel());
-                    var restaurant = _adminViewModel.Restaurants.FirstOrDefault(x => x.Id == originalRestaurant.Id);
-                    if (restaurant is not null)
-                    {
-                        restaurant.Name = Restaurant.Name;
-                        restaurant.Cif = Restaurant.Cif;
-                        restaurant.Email = Restaurant.Email;
-                        restaurant.Phone = Restaurant.Phone;
-                        restaurant.Logo = Restaurant.Logo;
-                    }
+                    await _restaurantContext.NotifyObjectModified(Restaurant);
                 }
-
-
                 GoBack();
 
             }
