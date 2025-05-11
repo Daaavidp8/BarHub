@@ -6,7 +6,7 @@ namespace BarHub.Models
 {
     public class User
     {
-        [JsonProperty("id")]
+        [JsonProperty("id_user")]
         public int Id { get; set; }
 
         [JsonProperty("name")]

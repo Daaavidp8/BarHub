@@ -6,6 +6,9 @@ using BarHub.Pages.Camarero;
 using BarHub.Pages.Login;
 using BarHub.Pages.Profile;
 using BarHub.Pages.Propietario;
+using BarHub.Pages.Propietario.Articles;
+using BarHub.Pages.Propietario.Workers;
+using BarHub.Pages.Waiter;
 using BarHub.Utils;
 using BarHub.Utils.Shell;
 using CommunityToolkit.Mvvm.Messaging;
@@ -54,24 +57,41 @@ namespace BarHub
                             Icon = homeIcon
                         });
 
+                        tabbar.Items.Add(new ShellContent
+                        {
+                            Route = "WorkerPage",
+                            Content = new WorkerPage(user, _services),
+                            Icon = new FontImageSource
+                            {
+                                FontFamily = "FASolid",
+                                Glyph = Icons.Workers,
+                                Size = 20,
+                            }
+                        });
+
                         Routing.RegisterRoute(nameof(ManageSection), typeof(ManageSection));
+                        Routing.RegisterRoute(nameof(ArticlesPage), typeof(ArticlesPage));
+                        Routing.RegisterRoute(nameof(ManageArticle), typeof(ManageArticle));
+                        Routing.RegisterRoute(nameof(ManageWorker), typeof(ManageWorker));
                     }
 
                     if (user.Roles.Contains(Roles.CAMARERO) || user.Roles.Contains(Roles.PROPIETARIO))
-                        AddTab<WaiterPage>(new FontImageSource
+                    {
+                        tabbar.Items.Add(new ShellContent
                         {
-                            FontFamily = "FASolid",
-                            Glyph = Icons.Chair,
-                            Size = 20,
+                            Route = "WaiterPage",
+                            Content = new WaiterPage(user, _services),
+                            Icon = user.Roles.Contains(Roles.PROPIETARIO) ? new FontImageSource
+                            {
+                                FontFamily = "FASolid",
+                                Glyph = Icons.Chair,
+                                Size = 20,
+                            } : homeIcon
                         });
-                }
 
-                //AddTab<ProfilePage>(new FontImageSource
-                //{
-                //    FontFamily = "FASolid",
-                //    Glyph = Icons.Profile,
-                //    Size = 20,
-                //});
+                        Routing.RegisterRoute(nameof(TableDetails), typeof(TableDetails));
+                    }
+                }
 
                 tabbar.Items.Add(new ShellContent
                 {

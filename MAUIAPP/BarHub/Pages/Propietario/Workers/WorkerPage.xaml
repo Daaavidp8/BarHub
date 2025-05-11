@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pages:BarHubBaseContentPage
+    x:Class="BarHub.Pages.Propietario.Workers.WorkerPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:models="clr-namespace:BarHub.Models;assembly=BarHub.Models"
+    xmlns:workerComponents="clr-namespace:BarHub.Pages.Propietario.Workers"
+    xmlns:pages="clr-namespace:BarHub.Pages"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:translation="clr-namespace:BarHub.Utils.Translation"
+    xmlns:viewModels="clr-namespace:BarHub.ViewModel.Owner.Workers"
+    PageTitle="Administrador de Personal"
+    x:Name="AdminPageView"
+    x:DataType="viewModels:WorkersPageViewModel"
+    FabRoute="{Binding GoToManageWorkerCommand}">
+
+
+    <pages:BarHubBaseContentPage.Icon>
+        <Image Source="app_icon" WidthRequest="50" />
+    </pages:BarHubBaseContentPage.Icon>
+
+    <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
+        <Grid toolkit:StateContainer.CurrentState="{Binding State}">
+            <toolkit:StateContainer.StateViews>
+                <CollectionView ItemsUpdatingScrollMode="KeepLastItemInView" toolkit:StateView.StateKey="Success" ItemsSource="{Binding Workers}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:WorkerViewModel">
+                            <SwipeView BackgroundColor="Red" SwipeEnded="SwipeView_SwipeEnded">
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItemView>
+                                            <VerticalStackLayout
+                                                Padding="350,0,0,0"
+                                                BackgroundColor="Red"
+                                                HorizontalOptions="Fill"
+                                                VerticalOptions="Center">
+                                                <Image
+                                                    x:Name="iconTrash"
+                                                    Margin="0,0,30,0"
+                                                    Source="trash_icon"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="30" />
+                                            </VerticalStackLayout>
+                                        </SwipeItemView>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+
+                                <workerComponents:CardWorker Worker="{Binding .}"/>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </toolkit:StateContainer.StateViews>
+        </Grid>
+    </ContentView>
+</pages:BarHubBaseContentPage>

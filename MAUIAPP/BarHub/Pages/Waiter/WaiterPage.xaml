@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pages:BarHubBaseContentPage
+    x:Class="BarHub.Pages.Camarero.WaiterPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:models="clr-namespace:BarHub.Models;assembly=BarHub.Models"
+    xmlns:pages="clr-namespace:BarHub.Pages"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:touchEffects="clr-namespace:Maui.FreakyEffects.TouchEffects;assembly=Maui.FreakyEffects"
+    xmlns:translation="clr-namespace:BarHub.Utils.Translation"
+    xmlns:viewModels="clr-namespace:BarHub.ViewModel.Waiter"
+    x:Name="WaiterPageView"
+    x:DataType="viewModels:WaiterViewModel"
+    PageTitle="Administrador de Mesas">
+
+
+    <pages:BarHubBaseContentPage.Icon>
+        <Image Source="app_icon" WidthRequest="50" />
+    </pages:BarHubBaseContentPage.Icon>
+
+    <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
+        <Grid RowDefinitions="*,Auto">
+            <Grid Grid.Row="0" toolkit:StateContainer.CurrentState="{Binding State}">
+                <toolkit:StateContainer.StateViews>
+                    <CollectionView
+                    Grid.Row="0"
+                    toolkit:StateView.StateKey="Success"
+                    ItemsSource="{Binding Tables}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Table">
+                                <Grid
+                                Padding="25,10"
+                                touchEffects:TouchEffect.Color="{AppThemeBinding Light={StaticResource RippleDark},
+                                                                                 Dark={StaticResource RippleLight}}"
+                                BackgroundColor="{StaticResource Background}"
+                                ColumnDefinitions="Auto,*"
+                                ColumnSpacing="15">
+                                    <Image Grid.Column="0" HeightRequest="50">
+                                        <Image.Source>
+                                            <AppThemeBinding>
+                                                <AppThemeBinding.Light>
+                                                    <FileImageSource File="table_icon_light.png" />
+                                                </AppThemeBinding.Light>
+                                                <AppThemeBinding.Dark>
+                                                    <FileImageSource File="table_icon_dark.png" />
+                                                </AppThemeBinding.Dark>
+                                            </AppThemeBinding>
+                                        </Image.Source>
+                                    </Image>
+
+                                    <Label
+                                    Grid.Column="1"
+                                    FontAttributes="Bold"
+                                    FontSize="20"
+                                    Text="{Binding TableNumber, StringFormat='Mesa {0}'}"
+                                    VerticalOptions="Center" />
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WaiterViewModel}}, Path=GoToTableDetailCommand}"
+                                        CommandParameter="{Binding .}" />
+                                    </Grid.GestureRecognizers>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </toolkit:StateContainer.StateViews>
+            </Grid>
+            <Grid
+                Grid.Row="1"
+                Padding="5"
+                ColumnDefinitions="*,*"
+                ColumnSpacing="5"
+                HorizontalOptions="Fill">
+                <Button
+                    x:Name="btnAdd"
+                    Grid.Column="0"
+                    BackgroundColor="{StaticResource Error}"
+                    Command="{Binding RemoveTableCommand}"
+                    HorizontalOptions="Fill"
+                    Text="Eliminar Mesa"
+                    TextColor="{StaticResource White}"
+                    VerticalOptions="Fill">
+                    <Button.ImageSource>
+                        <FontImageSource
+                            FontFamily="FASolid"
+                            Glyph="{x:Static fa:Solid.Trash}"
+                            Size="15"
+                            Color="{StaticResource White}" />
+                    </Button.ImageSource>
+                </Button>
+                <Button
+                    x:Name="btnDelete"
+                    Grid.Column="1"
+                    BackgroundColor="{StaticResource Primary}"
+                    Command="{Binding AddTableCommand}"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Fill"
+                    Text="Añadir Mesa"
+                    TextColor="{StaticResource White}"
+                    VerticalOptions="Fill">
+                    <Button.ImageSource>
+                        <FontImageSource
+                            FontFamily="FASolid"
+                            Glyph="{x:Static fa:Solid.Plus}"
+                            Size="15"
+                            Color="{StaticResource White}" />
+                    </Button.ImageSource>
+                </Button>
+            </Grid>
+        </Grid>
+    </ContentView>
+</pages:BarHubBaseContentPage>

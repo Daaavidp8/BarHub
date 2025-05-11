@@ -14,13 +14,19 @@
                                                          Dark={StaticResource RippleLight}}"
         HorizontalOptions="Fill"
         Spacing="10">
-        <Image Source="{Binding Logo}" WidthRequest="30" />
+        <VerticalStackLayout HeightRequest="30" WidthRequest="30">
+            <Image
+                HorizontalOptions="Center"
+                MaximumHeightRequest="30"
+                MaximumWidthRequest="30"
+                Source="{Binding Logo}" />
+        </VerticalStackLayout>
         <Label
             FontAttributes="Bold"
             Text="{Binding Name}"
             VerticalOptions="Center" />
         <HorizontalStackLayout.GestureRecognizers>
-            <TapGestureRecognizer Tapped="OnNavigateToEditRestaurant"/>
+            <TapGestureRecognizer Tapped="OnNavigateToEditRestaurant" />
         </HorizontalStackLayout.GestureRecognizers>
     </HorizontalStackLayout>
 </ContentView>

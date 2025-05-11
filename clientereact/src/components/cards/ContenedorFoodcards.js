@@ -1,52 +1,57 @@
-import '../../styles/cards/ContainerFoodCards.css';
-import { FoodCard } from './FoodCard';
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { DetailsButton } from "../buttons/Dinner/DetailsButton";
-import { ENDPOINTS } from '../../utils/constants'; // Importing ENDPOINTS from constants
-import axiosInstance from '../../utils/axiosConfig';
-
-// Componente que contiene la lista de todas las secciones del restaurante
+import React from "react";
+import { Link } from "react-router-dom";
+import "../../styles/cards/foodcards.css";
 
 export function ContenedorFoodcards(props) {
-    const [owner, setOwner] = useState(props.table.id_restaurant);
-    const [sections, setSections] = useState([]);
-    const [dataLoaded, setdataLoaded] = useState(false);
-
-    useEffect(() => {
-        const infoowner = async () => {
-            try {
-                console.log("Pilla las secciones");
-                try {
-                    const response = await axiosInstance.get(`${ENDPOINTS.GET_SECTIONS}/${props.table.id_restaurant}`);
-                    setSections(response.data);
-                    setdataLoaded(true); 
-                } catch (sectionsError) {
-                    console.error("Error fetching sections, using fallback:", sectionsError);
-                }
-                console.log("LAs pilla bien");
-            } catch (error) {
-                console.error("Error in main process:", error);
-            }
-        };
-        infoowner();
-    }, [props.table.id_restaurant]);
-
+    const { table, sections, owner, codenumber } = props;
+    
     return (
-        <>
-            {dataLoaded ? (
-                <div className="containerFoodCards">
-                    <h1 className="tituloSections">{owner.name}</h1>
-                    <img src={`/images/owners/${owner.name}/img/logo.png`} alt={`Logo de ${owner.name}`} className="logoOwnerSections"/>
-                    <div>
-                        {sections.map((section, index) => (
-                            <FoodCard key={`Section_${section}_${index}`} section={section.name} path={`/images/owners/${owner.name}/img/sections/${section.name}.png`} />
-                        ))}
-
-                        <DetailsButton text={`Ver Detalles del Pedido`} />
-                    </div>
+        <div className="foodCardsContainer">
+            <h2>Menú de {owner?.name || "Restaurante"}</h2>
+            
+            {/* Display table information if available */}
+            {table && (
+                <div className="tableInfo">
+                    <h3>Mesa: {table.table_number}</h3>
+                    <p>Código: {table.codenumber || codenumber}</p>
                 </div>
-            ) : null}
-        </>
+            )}
+            
+            {/* Display sections with their base64 images */}
+            <div className="sectionsGrid">
+                {sections && sections.length > 0 ? (
+                    sections.map((section) => (
+                        <Link 
+                            key={section.id_section} 
+                            to={`/${owner.name}/pedido/${codenumber || (table && table.codenumber)}/${section.name}`}
+                            className="sectionCard"
+                        >
+                            <div className="sectionImageContainer">
+                                {section.image ? (
+                                    <img 
+                                        src={section.image} 
+                                        alt={`Sección ${section.name}`} 
+                                        className="sectionImage"
+                                    />
+                                ) : (
+                                    <div className="noImage">Sin imagen</div>
+                                )}
+                            </div>
+                            <h3 className="sectionName">{section.name}</h3>
+                        </Link>
+                    ))
+                ) : (
+                    <p className="noSections">No hay secciones disponibles</p>
+                )}
+            </div>
+            
+            {/* Link to view current order */}
+            <Link 
+                to={`/${owner.name}/pedido/${codenumber || (table && table.codenumber)}/order`}
+                className="viewOrderButton"
+            >
+                Ver Pedido Actual
+            </Link>
+        </div>
     );
 }

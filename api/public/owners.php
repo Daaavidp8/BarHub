@@ -50,6 +50,34 @@ $app->get('/get_sections/{id}', function (Request $request, Response $response) 
             $stmtArticles->execute();
             $articles = $stmtArticles->fetchAll(PDO::FETCH_ASSOC);
             
+            // Process each article to include its image
+            foreach ($articles as &$article) {
+                $articleName = $article['name'];
+                $articleImagePath = "./owners/{$restaurantName}/img/articles/{$articleName}.png";
+                
+                if (file_exists($articleImagePath)) {
+                    try {
+                        $articleImageData = file_get_contents($articleImagePath);
+                        // Ensure valid base64 encoding by properly sanitizing the data
+                        $base64Data = base64_encode($articleImageData);
+                        // Validate the base64 string before adding it to the response
+                        if (base64_decode($base64Data, true) !== false) {
+                            $article['image'] = "data:image/png;base64," . $base64Data;
+                        } else {
+                            // If there's an issue with the base64 encoding, return empty string
+                            $article['image'] = "";
+                            error_log("Invalid base64 encoding for article image: {$articleName}");
+                        }
+                    } catch (Exception $e) {
+                        // Handle any exceptions during image processing
+                        $article['image'] = "";
+                        error_log("Error processing article image {$articleName}: " . $e->getMessage());
+                    }
+                } else {
+                    $article['image'] = "";
+                }
+            }
+            
             // Add articles to section
             $section['articles'] = $articles;
             $result[] = $section;
@@ -139,20 +167,48 @@ $app->get('/get_articles/{id_section}', function (Request $request, Response $re
 $app->get('/get_workers/{id_owner}', function (Request $request, Response $response) {
     $ownerid = $request->getAttribute('id_owner');
 
-    $sql = "SELECT * FROM Users WHERE id_restaurant = $ownerid";
-
     try {
         $db = new DB();
         $conn = $db->connect();
-        $stmt = $conn->query($sql);
-        $customers = $stmt->fetchAll(PDO::FETCH_OBJ);
+        
+        // Get all workers for this restaurant
+        $sql = "SELECT * FROM Users WHERE id_restaurant = :ownerid";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':ownerid', $ownerid, PDO::PARAM_INT);
+        $stmt->execute();
+        $workers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // For each worker, get their roles
+        foreach ($workers as &$worker) {
+            $userId = $worker['id_user'];
+            
+            // Get roles for this worker
+            $sqlRoles = "SELECT id_role FROM UsersRoles WHERE id_user = :userId";
+            $stmtRoles = $conn->prepare($sqlRoles);
+            $stmtRoles->bindParam(':userId', $userId, PDO::PARAM_INT);
+            $stmtRoles->execute();
+            
+            // Fetch all roles and convert to integers
+            $roles = [];
+            while ($role = $stmtRoles->fetchColumn()) {
+                $roles[] = intval($role);
+            }
+            
+            // Add roles array to worker data
+            $worker['roles'] = $roles;
+            
+            // Remove password from response for security
+            unset($worker['password']);
+        }
+        
         $db = null;
 
-        $response->getBody()->write(json_encode($customers));
+        $response->getBody()->write(json_encode($workers));
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (PDOException $e) {
+        error_log("Database error in GET_WORKERS: " . $e->getMessage());
         $error = array(
             "message" => $e->getMessage()
         );
@@ -163,7 +219,6 @@ $app->get('/get_workers/{id_owner}', function (Request $request, Response $respo
             ->withStatus(500);
     }
 });
-
 
 // Devuelve un trabajador en concreto
 $app->get('/get_worker/{id_user}', function (Request $request, Response $response) {
@@ -374,16 +429,45 @@ $app->post('/create_section/{id_owner}', function (Request $request, Response $r
 // Crea un articulo en una sección determinada
 $app->post('/create_article/{id_section}', function (Request $request, Response $response) {
     $sectionid = $request->getAttribute('id_section');
-    $data = $request->getParsedBody();
-    $uploadedFiles = $request->getUploadedFiles();
-    $name = $data["article_name"];
-    $price = $data["article_price"];
-
+    $contentType = $request->getHeaderLine('Content-Type');
+    
+    // Check if the request is JSON or multipart form data
+    if (strpos($contentType, 'application/json') !== false) {
+        // Handle JSON request
+        $data = $request->getParsedBody();
+        if (!$data) {
+            $data = json_decode($request->getBody()->getContents(), true);
+        }
+        
+        if (!isset($data["article_name"]) || !isset($data["article_price"])) {
+            throw new Exception("Los campos 'article_name' y 'article_price' son requeridos");
+        }
+        
+        $name = $data["article_name"];
+        $price = $data["article_price"];
+        $imageBase64 = isset($data["article_img"]) ? $data["article_img"] : null;
+        
+        // Log received data for debugging
+        error_log("Received article name: " . $name);
+        error_log("Received article price: " . $price);
+        error_log("Received base64 image: " . (empty($imageBase64) ? "No" : "Yes, length: " . strlen($imageBase64)));
+    } else {
+        // Handle multipart form data
+        $data = $request->getParsedBody();
+        $uploadedFiles = $request->getUploadedFiles();
+        
+        if (!isset($data["article_name"]) || !isset($data["article_price"])) {
+            throw new Exception("Los campos 'article_name' y 'article_price' son requeridos");
+        }
+        
+        $name = $data["article_name"];
+        $price = $data["article_price"];
+        $imageBase64 = null;
+    }
 
     try {
         $db = new DB();
         $conn = $db->connect();
-
 
         $sql = "SELECT id_restaurant FROM Sections WHERE id_section = :sectionid";
         $stmt = $conn->prepare($sql);
@@ -403,44 +487,85 @@ $app->post('/create_article/{id_section}', function (Request $request, Response 
             $ownername = $stmt->fetchColumn();
         }
 
+        $ruta = "./owners/" . $ownername;
+        $directorio = $ruta . "/img/articles/";
+        
+        // Ensure directory exists
+        if (!is_dir($directorio)) {
+            if (!mkdir($directorio, 0777, true)) {
+                throw new Exception("No se pudo crear el directorio de artículos: " . $directorio);
+            }
+        }
+        
+        $nombreArchivo = $name . '.png';
+        $rutaArchivo = $directorio . $nombreArchivo;
 
-        $ruta = "../../clientereact/public/images/owners/" . $ownername;
-
-        $uploadedFile = $uploadedFiles['article_img'] ?? null;
-
+        // Handle file upload or base64 image
+        $uploadedFile = isset($uploadedFiles['article_img']) ? $uploadedFiles['article_img'] : null;
         if ($uploadedFile !== null && $uploadedFile->getError() === UPLOAD_ERR_OK) {
             if ($uploadedFile->getClientMediaType() !== 'image/png') {
                 throw new Exception("El archivo subido no tiene extensión PNG.");
             }
-
-            $directorio = $ruta . "/img/articles/";
-
-            $nombreArchivo = $name . '.png';
-            $rutaArchivo = $directorio . $nombreArchivo;
-
             $uploadedFile->moveTo($rutaArchivo);
+            error_log("Image uploaded successfully via multipart form");
+        } elseif ($imageBase64) {
+            // Handle base64 encoded image
+            // Remove data URI prefix if present
+            if (strpos($imageBase64, 'data:image/png;base64,') === 0) {
+                $imageBase64 = substr($imageBase64, strlen('data:image/png;base64,'));
+            } elseif (strpos($imageBase64, 'data:image/jpeg;base64,') === 0) {
+                $imageBase64 = substr($imageBase64, strlen('data:image/jpeg;base64,'));
+            }
+            
+            // Ensure the base64 string is clean (remove any whitespace)
+            $imageBase64 = trim($imageBase64);
+            
+            // Decode the base64 data
+            $imageData = base64_decode($imageBase64, true);
+            if ($imageData === false) {
+                throw new Exception("Error al decodificar la imagen en base64. Formato inválido.");
+            }
+            
+            // Save the image file
+            $bytesWritten = file_put_contents($rutaArchivo, $imageData);
+            if ($bytesWritten === false) {
+                throw new Exception("Error al guardar la imagen: " . $rutaArchivo);
+            }
+            
+            error_log("Image saved successfully from base64. Bytes written: " . $bytesWritten);
         }
-
-
-
-
 
         $sql = "INSERT INTO Articles (name, price, id_section) VALUES (:name, :price, :idsection)";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':price', $price);
         $stmt->bindParam(':idsection', $sectionid);
-
         $result = $stmt->execute();
+        $articleId = $conn->lastInsertId();
+        
+        // Create the complete article object to return
+        $article = [
+            "id" => intval($articleId),
+            "name" => $name,
+            "price" => floatval($price),
+            "id_section" => intval($sectionid),
+            "image" => null
+        ];
+        
+        // Add the image to the response if it exists
+        if (file_exists($rutaArchivo)) {
+            $imageData = file_get_contents($rutaArchivo);
+            $article['image'] = "data:image/png;base64," . base64_encode($imageData);
+        }
 
         $db = null;
 
-        $response->getBody()->write(json_encode($result));
+        $response->getBody()->write(json_encode($article));
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (PDOException $e) {
-
+        error_log("Database error: " . $e->getMessage());
         $error = array(
             "message" => $e->getMessage()
         );
@@ -449,18 +574,78 @@ $app->post('/create_article/{id_section}', function (Request $request, Response 
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(500);
+    } catch (Exception $e) {
+        error_log("General error: " . $e->getMessage());
+        $error = array(
+            "message" => $e->getMessage()
+        );
+
+        $response->getBody()->write(json_encode($error));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(400);
     }
 });
 
 
 // Crea trabajadores en un restaurante en concreto
+// Crea trabajadores en un restaurante en concreto
 $app->post('/create_worker/{id_owner}', function (Request $request, Response $response) {
     $ownerid = $request->getAttribute('id_owner');
-    $data = $request->getParsedBody();
+    
+    // Log para ver qué tipo de contenido se está recibiendo
+    $contentType = $request->getHeaderLine('Content-Type');
+    error_log("CREATE_WORKER - Content-Type: " . $contentType);
+    
+    // Log del cuerpo de la solicitud
+    $requestBody = $request->getBody()->getContents();
+    error_log("CREATE_WORKER - Request Body: " . $requestBody);
+    
+    // Intentar obtener los datos según el tipo de contenido
+    if (strpos($contentType, 'application/json') !== false) {
+        // Para JSON
+        $data = json_decode($requestBody, true);
+        error_log("CREATE_WORKER - JSON data: " . json_encode($data));
+    } else {
+        // Para form data
+        $data = $request->getParsedBody();
+        error_log("CREATE_WORKER - Form data: " . json_encode($data));
+    }
+    
+    // Verificar si los datos están presentes
+    if (!$data) {
+        error_log("CREATE_WORKER - No se recibieron datos");
+        throw new Exception("No se recibieron datos en la solicitud");
+    }
+    
+    // Verificar cada campo individualmente
+    if (!isset($data["worker_name"])) {
+        error_log("CREATE_WORKER - Falta worker_name");
+        throw new Exception("El campo 'worker_name' es requerido");
+    }
+    
+    if (!isset($data["worker_username"])) {
+        error_log("CREATE_WORKER - Falta worker_username");
+        throw new Exception("El campo 'worker_username' es requerido");
+    }
+    
+    if (!isset($data["worker_password"])) {
+        error_log("CREATE_WORKER - Falta worker_password");
+        throw new Exception("El campo 'worker_password' es requerido");
+    }
+    
+    if (!isset($data["worker_roles"])) {
+        error_log("CREATE_WORKER - Falta worker_roles");
+        throw new Exception("El campo 'worker_roles' es requerido");
+    }
+    
     $name = $data["worker_name"];
     $username = $data["worker_username"];
     $password = password_hash($data["worker_password"], PASSWORD_DEFAULT);
     $roles = $data["worker_roles"];
+    
+    // Log de los datos procesados
+    error_log("CREATE_WORKER - Datos procesados: name={$name}, username={$username}, roles={$roles}");
 
     try {
         $db = new DB();
@@ -487,22 +672,65 @@ $app->post('/create_worker/{id_owner}', function (Request $request, Response $re
 
         // Obtener el ID del usuario recién insertado
         $userid = $conn->lastInsertId();
+        error_log("CREATE_WORKER - Usuario creado con ID: {$userid}");
 
         // Insertar roles del usuario
-        $roles = explode(',', $roles);
-        foreach ($roles as $role) {
-            $sql = "INSERT INTO UsersRoles (id_user, id_role) VALUES (:id_user, :id_role)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':id_user', $userid);
-            $stmt->bindParam(':id_role', $role);
-            $stmt->execute();
+        if (is_array($roles)) {
+            error_log("CREATE_WORKER - Roles es un array");
+            foreach ($roles as $role) {
+                $sql = "INSERT INTO UsersRoles (id_user, id_role) VALUES (:id_user, :id_role)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':id_user', $userid);
+                $stmt->bindParam(':id_role', $role);
+                $stmt->execute();
+                error_log("CREATE_WORKER - Rol {$role} asignado al usuario {$userid}");
+            }
+        } else {
+            error_log("CREATE_WORKER - Roles no es un array, es: " . gettype($roles));
+            $rolesArray = explode(',', $roles);
+            foreach ($rolesArray as $role) {
+                if (trim($role) === '') continue;
+                $sql = "INSERT INTO UsersRoles (id_user, id_role) VALUES (:id_user, :id_role)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':id_user', $userid);
+                $stmt->bindParam(':id_role', $role);
+                $stmt->execute();
+                error_log("CREATE_WORKER - Rol {$role} asignado al usuario {$userid}");
+            }
         }
 
-        $db = null;
-
-        $response->getBody()->write(json_encode(array("success" => true)));
+        $sql = "SELECT * FROM Users WHERE id_user = :userid";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':userid', $userid);
+        $stmt->execute();
+        $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Get the roles for this user
+        $sqlRoles = "SELECT id_role FROM UsersRoles WHERE id_user = :userid";
+        $stmtRoles = $conn->prepare($sqlRoles);
+        $stmtRoles->bindParam(':userid', $userid);
+        $stmtRoles->execute();
+        
+        // Fetch all roles and convert to integers
+        $roles = [];
+        while ($role = $stmtRoles->fetchColumn()) {
+            $roles[] = intval($role);
+        }
+        
+        // Add roles to user data
+        $userData['roles'] = $roles;
+        
+        // Remove password from response for security
+        unset($userData['password']);
+        
+        // Change id_user to id in the response
+        $userData['id'] = $userData['id_user'];
+        unset($userData['id_user']);
+        
+        $response->getBody()->write(json_encode($userData));
         return $response->withHeader('content-type', 'application/json')->withStatus(200);
     } catch (Exception $e) {
+        error_log("CREATE_WORKER - Error: " . $e->getMessage());
         $error = array("error" => $e->getMessage());
         $response->getBody()->write(json_encode($error));
         return $response->withHeader('content-type', 'application/json')->withStatus(500);
@@ -637,14 +865,47 @@ $app->put('/update_section/{id_section}', function (Request $request, Response $
 
 
 // Actualiza un articulo determinado
-$app->put('/update_article/{id_article}',function (Request $request, Response $response, array $args)
+$app->put('/update_article/{id_article}', function (Request $request, Response $response, array $args)
 {
     $id = $request->getAttribute('id_article');
-    $data = $request->getParsedBody();
-    $name = $data["article_name"];
-    $price = $data["article_price"];
-    $img = explode(",",$data["article_img"])[1];
-
+    $contentType = $request->getHeaderLine('Content-Type');
+    
+    // Check if the request is JSON or multipart form data
+    if (strpos($contentType, 'application/json') !== false) {
+        // Handle JSON request
+        $data = $request->getParsedBody();
+        if (!$data) {
+            $data = json_decode($request->getBody()->getContents(), true);
+        }
+        
+        if (!isset($data["article_name"]) || !isset($data["article_price"])) {
+            throw new Exception("Los campos 'article_name' y 'article_price' son requeridos");
+        }
+        
+        $name = $data["article_name"];
+        $price = $data["article_price"];
+        $imageBase64 = isset($data["article_img"]) ? $data["article_img"] : null;
+        
+        // Extract base64 data if it includes the data URL prefix
+        if ($imageBase64 && strpos($imageBase64, 'data:image') !== false) {
+            $parts = explode(',', $imageBase64);
+            $img = $parts[1];
+        } else {
+            $img = $imageBase64;
+        }
+    } else {
+        // Handle multipart form data
+        $data = $request->getParsedBody();
+        
+        if (!isset($data["article_name"]) || !isset($data["article_price"])) {
+            throw new Exception("Los campos 'article_name' y 'article_price' son requeridos");
+        }
+        
+        $name = $data["article_name"];
+        $price = $data["article_price"];
+        $img = isset($data["article_img"]) && !empty($data["article_img"]) ? 
+               explode(",", $data["article_img"])[1] : null;
+    }
 
     try {
         $db = new Db();
@@ -656,37 +917,66 @@ $app->put('/update_article/{id_article}',function (Request $request, Response $r
         $stmt->execute();
         $ownername = $stmt->fetchColumn();
 
+        $ruta = "./owners/" . $ownername . "/img/articles/";
+        
+        // Ensure directory exists
+        if (!is_dir($ruta)) {
+            if (!mkdir($ruta, 0777, true)) {
+                throw new Exception("No se pudo crear el directorio de artículos: " . $ruta);
+            }
+        }
 
-
-        $ruta = "../../clientereact/public/images/owners/" . $ownername . "/img/articles/";
-
-        $sql = "SELECT name FROM Articles WHERE id_article = :id";
+        $sql = "SELECT name, id_section FROM Articles WHERE id_article = :id";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
-        $oldArticleName = $stmt->fetchColumn();
+        $articleData = $stmt->fetch(PDO::FETCH_ASSOC);
+        $oldArticleName = $articleData['name'];
+        $sectionId = $articleData['id_section'];
 
-        unlink($ruta . $oldArticleName . ".png");
+        // Only try to delete if the file exists
+        if (file_exists($ruta . $oldArticleName . ".png")) {
+            unlink($ruta . $oldArticleName . ".png");
+        }
 
+        // Save the new image if provided
+        if ($img) {
+            $decoded_data = base64_decode($img);
+            file_put_contents($ruta . $name . ".png", $decoded_data);
+        }
 
-        $decoded_data = base64_decode($img);
-        file_put_contents($ruta  . $name . ".png", $decoded_data);
-
-        $sql = "UPDATE Articles SET name = :name, price = :price WHERE id_article = $id";
-
+        // Update the article in the database
+        $sql = "UPDATE Articles SET name = :name, price = :price WHERE id_article = :id";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':price', $price);
-
+        $stmt->bindParam(':id', $id);
         $result = $stmt->execute();
 
+        // Create response object with updated article data
+        $article = [
+            "id_article" => intval($id),
+            "name" => $name,
+            "price" => floatval($price),
+            "id_section" => intval($sectionId),
+            "image" => null
+        ];
+        
+        // Add the image to the response if it exists
+        if (file_exists($ruta . $name . ".png")) {
+            $imageData = file_get_contents($ruta . $name . ".png");
+            $article['image'] = "data:image/png;base64," . base64_encode($imageData);
+        }
+
         $db = null;
-        echo "Update successful! ";
-        $response->getBody()->write(json_encode($result));
+
+        // Return the updated article data
+        $response->getBody()->write(json_encode($article));
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (PDOException $e) {
+        error_log("Database error in UPDATE_ARTICLE: " . $e->getMessage());
         $error = array(
             "message" => $e->getMessage()
         );
@@ -695,6 +985,16 @@ $app->put('/update_article/{id_article}',function (Request $request, Response $r
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(500);
+    } catch (Exception $e) {
+        error_log("General error in UPDATE_ARTICLE: " . $e->getMessage());
+        $error = array(
+            "message" => $e->getMessage()
+        );
+
+        $response->getBody()->write(json_encode($error));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(400);
     }
 });
 
@@ -703,18 +1003,90 @@ $app->put('/update_article/{id_article}',function (Request $request, Response $r
 $app->put('/update_worker/{id_user}',function (Request $request, Response $response, array $args)
 {
     $userid = $request->getAttribute('id_user');
-    $data = $request->getParsedBody();
+    
+    // Log the raw request body for debugging
+    $requestBody = $request->getBody()->getContents();
+    error_log("UPDATE_WORKER - Raw request body: " . $requestBody);
+    
+    // Try to parse the request body based on content type
+    $contentType = $request->getHeaderLine('Content-Type');
+    
+    if (strpos($contentType, 'application/json') !== false) {
+        // For JSON data
+        $data = json_decode($requestBody, true);
+        error_log("UPDATE_WORKER - JSON data: " . json_encode($data));
+    } else {
+        // For form data or other formats
+        $data = $request->getParsedBody();
+        
+        // If parsed body is empty, try to parse manually
+        if (empty($data) && strpos($requestBody, '=') !== false) {
+            $data = [];
+            // Split by commas and process each key-value pair
+            $pairs = explode(',', $requestBody);
+            foreach ($pairs as $pair) {
+                $parts = explode('=', $pair, 2);
+                if (count($parts) == 2) {
+                    $key = trim($parts[0]);
+                    $value = trim($parts[1]);
+                    
+                    // Handle the special case for roles which might be in C# format
+                    if ($key === 'worker_roles' && strpos($value, 'System.Collections.Generic.List') !== false) {
+                        // Extract role IDs from the string
+                        preg_match_all('/\d+/', $value, $matches);
+                        $data[$key] = implode(',', $matches[0]);
+                    } else {
+                        $data[$key] = $value;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Check if we have the required data
+    if (empty($data) || !isset($data["worker_name"]) || !isset($data["worker_username"])) {
+        error_log("UPDATE_WORKER - Missing required fields in request");
+        $error = array("message" => "Datos incompletos en la solicitud");
+        $response->getBody()->write(json_encode($error));
+        return $response->withHeader('content-type', 'application/json')->withStatus(400);
+    }
+    
     $name = $data["worker_name"];
     $username = $data["worker_username"];
-    var_dump( $data["worker_password"] );
-    $password = $data["worker_password"] === "" ? "" : password_hash($data["worker_password"], PASSWORD_DEFAULT);
-    var_dump($password);
-    $roles = $data["worker_roles"];
+    
+    // Check if password is provided and not empty
+    $passwordProvided = isset($data["worker_password"]) && $data["worker_password"] !== "";
+    if ($passwordProvided) {
+        $password = password_hash($data["worker_password"], PASSWORD_DEFAULT);
+        error_log("UPDATE_WORKER - Password will be updated");
+    } else {
+        error_log("UPDATE_WORKER - Password will not be updated (empty or not provided)");
+    }
+    
+    // Handle roles in different formats
+    if (isset($data["worker_roles"])) {
+        $roles = $data["worker_roles"];
+        
+        // Check if roles is already an array
+        if (is_array($roles)) {
+            error_log("UPDATE_WORKER - Roles is an array with " . count($roles) . " elements");
+        } 
+        // Otherwise, assume it's a comma-separated string
+        else {
+            error_log("UPDATE_WORKER - Roles is a string: " . $roles);
+            $roles = explode(',', $roles);
+        }
+    } else {
+        $roles = [];
+    }
+    
+    error_log("UPDATE_WORKER - Datos procesados: name={$name}, username={$username}, roles=" . json_encode($roles));
 
     try {
         $db = new DB();
         $conn = $db->connect();
 
+        // Rest of the function remains the same...
         $sql = "SELECT id_restaurant FROM Users WHERE id_user = $userid";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -731,26 +1103,23 @@ $app->put('/update_worker/{id_user}',function (Request $request, Response $respo
             throw new Exception("El nombre de usuario '$username' ya existe.");
         }
 
-
-        // Modificar el nuevo usuario
-        $sql = "UPDATE Users SET name = :name, username = :username,";
-        if ($password !== "") {
-            $sql .= " password = :password,";
+        // Modificar el usuario - solo actualizar la contraseña si se proporcionó una nueva
+        if ($passwordProvided) {
+            $sql = "UPDATE Users SET name = :name, username = :username, password = :password, id_restaurant = :idowner WHERE id_user = :userid";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':password', $password);
+        } else {
+            $sql = "UPDATE Users SET name = :name, username = :username, id_restaurant = :idowner WHERE id_user = :userid";
+            $stmt = $conn->prepare($sql);
         }
-        $sql .= " id_restaurant = :idowner WHERE id_user = :userid";
-
-        $stmt = $conn->prepare($sql);
+        
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':username', $username);
         $stmt->bindParam(':idowner', $ownerid);
         $stmt->bindParam(':userid', $userid);
-        if ($password !== "") {
-            $stmt->bindParam(':password', $password);
-        }
         $stmt->execute();
 
-        // Insertar roles del usuario
-        $roles = explode(',', $roles);
+        // Insertar roles del usuario - no need to explode again, we already have an array
         foreach ($roles as $role) {
             $sql = "SELECT COUNT(*) FROM UsersRoles WHERE id_user = $userid AND id_role = $role";
             $stmt = $conn->prepare($sql);
@@ -764,7 +1133,6 @@ $app->put('/update_worker/{id_user}',function (Request $request, Response $respo
                 $stmt->bindParam(':id_user', $userid);
                 $stmt->bindParam(':id_role', $role);
                 $stmt->execute();
-
             }
         }
 
@@ -796,9 +1164,7 @@ $app->put('/update_worker/{id_user}',function (Request $request, Response $respo
         );
 
         $response->getBody()->write(json_encode($error));
-        return $response
-            ->withHeader('content-type', 'application/json')
-            ->withStatus(500);
+        return $response->withHeader('content-type', 'application/json')->withStatus(500);
     }
 });
 
@@ -826,7 +1192,7 @@ $app->delete('/delete_section/{id_section}', function (Request $request, Respons
         $sectionName = $stmt->fetchColumn();
 
 
-        $imagenRuta = "../../clientereact/public/images/owners/" . $ownerName . "/img/sections/" . $sectionName . ".png";
+        $imagenRuta = "./owners/" . $ownerName . "/img/sections/" . $sectionName . ".png";
         unlink($imagenRuta);
 
         $sql = "DELETE FROM Articles WHERE id_section = $id";
@@ -880,7 +1246,7 @@ $app->delete('/delete_article/{id_article}', function (Request $request, Respons
         $articleName = $stmt->fetchColumn();
 
 
-        $imagenRuta = "../../clientereact/public/images/owners/" . $ownerName . "/img/articles/" . $articleName . ".png";
+        $imagenRuta = "./owners/" . $ownerName . "/img/articles/" . $articleName . ".png";
 
         unlink($imagenRuta);
 

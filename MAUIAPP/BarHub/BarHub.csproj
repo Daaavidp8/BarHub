@@ -135,7 +135,10 @@
 	  <MauiXaml Update="Pages\GlobalComponents\BarHubBaseContentPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\Camarero\WaiterPage.xaml">
+	  <MauiXaml Update="Pages\Waiter\TableDetails.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\Waiter\WaiterPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\GlobalComponents\GoBackComponent.xaml">
@@ -147,16 +150,31 @@
 	  <MauiXaml Update="Pages\Profile\ProfilePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\Propietario\CardSection.xaml">
+	  <MauiXaml Update="Pages\Propietario\Articles\ArticlesPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\Propietario\ManageSection.xaml">
+	  <MauiXaml Update="Pages\Propietario\Articles\CardArticle.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\Propietario\OwnerPage.xaml">
+	  <MauiXaml Update="Pages\Propietario\Articles\CardArticle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\Propietario\Articles\ManageArticle.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\Propietario\Articles\OwnerPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\GlobalComponents\TopAppBar.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\Propietario\Workers\CardWorker.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\Propietario\Workers\ManageWorker.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\Propietario\Workers\WorkerPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

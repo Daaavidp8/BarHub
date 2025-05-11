@@ -9,7 +9,7 @@
     <Border
         Margin="20"
         Padding="30"
-        Background="{StaticResource Background}"
+        Background="{StaticResource MainBackground}"
         StrokeShape="RoundRectangle 20"
         StrokeThickness="2">
 

@@ -13,7 +13,7 @@ import { FormElement } from "./components/form/Owner/FormElement";
 import { FormWorkers } from "./components/form/Owner/FormWorkers";
 import { ShowTable } from "./components/main/Waiter/ShowTable";
 import { FirstScreen } from "./components/main/Dinner/FirstScreen";
-import { ArticlesSection } from "./components/main/Dinner/ArticlesSection";
+import { ArticlesSection } from "./components/main/Dinner/ArticleSection";
 import axiosInstance from './utils/axiosConfig';
 import { ENDPOINTS, STORAGE_KEYS } from './utils/constants';
 import { useFetchData } from './hooks/useFetchData';
@@ -220,7 +220,10 @@ function App() {
                                         <Route
                                             key={`${owner.name}_generic_pedido`}
                                             path={`/${owner.name}/pedido/:codenumber`}
-                                            element={<SecondScreen owner={owner} />}
+                                            element={<SecondScreen 
+                                                owner={owner} 
+                                                sections={allsections && allsections[index] ? allsections[index] : []}
+                                            />}
                                         />
                                         {codes && codes[index] && codes[index].length > 0 && codes[index].map((codigo) => (
                                             <React.Fragment key={`code-fragment-${codigo.codenumber}`}>

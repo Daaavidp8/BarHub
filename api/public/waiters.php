@@ -15,16 +15,56 @@ use Endroid\QrCode\Logo\Logo;
 
 $app->get('/get_tables/{id_owner}', function (Request $request, Response $response) {
     $id = $request->getAttribute('id_owner');
-    $sql = "SELECT * FROM DinnerTables WHERE id_restaurant = $id";
-
+    
     try {
         $db = new DB();
         $conn = $db->connect();
-        $stmt = $conn->query($sql);
-        $owners = $stmt->fetchAll(PDO::FETCH_OBJ);
+        
+        // Get restaurant name for QR URL
+        $sql = "SELECT name FROM Restaurants WHERE id_restaurant = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        $restaurantName = $stmt->fetchColumn();
+        
+        // Get all tables
+        $sql = "SELECT * FROM DinnerTables WHERE id_restaurant = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        $tables = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Format tables with proper property names and generate QR codes
+        $formattedTables = [];
+        foreach ($tables as $table) {
+            $codenumber = $table['codenumber'];
+            $url = 'http://172.17.0.2/' . $restaurantName . "/pedido/" . $codenumber;
+            
+            $qrCode = QrCode::create($url)
+                ->setSize(250)
+                ->setMargin(40);
+
+            $label = Label::create($codenumber);
+
+            $writer = new PngWriter;
+            $result = $writer->write($qrCode, null, $label);
+            $imageBase64 = base64_encode($result->getString());
+            
+            // Create formatted table with PascalCase property names
+            $formattedTable = [
+                'id_restaurant' => intval($table['id_restaurant']),
+                'table_number' => intval($table['table_number']),
+                'codenumber' => $table['codenumber'],
+                'qr_image' => $imageBase64,
+                'url' => $url
+            ];
+            
+            $formattedTables[] = $formattedTable;
+        }
+        
         $db = null;
 
-        $response->getBody()->write(json_encode($owners));
+        $response->getBody()->write(json_encode($formattedTables));
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
@@ -103,44 +143,75 @@ $app->post('/add_table/{id_owner}', function (Request $request, Response $respon
     $ownerid = $request->getAttribute('id_owner');
 
     try {
-
         $db = new DB();
         $conn = $db->connect();
 
+        // Get restaurant name for QR URL
+        $sql = "SELECT name FROM Restaurants WHERE id_restaurant = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':id', $ownerid, PDO::PARAM_INT);
+        $stmt->execute();
+        $restaurantName = $stmt->fetchColumn();
+
+        // Get existing table codes to avoid duplicates
         $sql = "SELECT codenumber AS num_tables FROM DinnerTables WHERE id_restaurant = $ownerid";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $tableNumbers = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
+        // Generate a unique code number
         do {
             $randomNumber = rand(0, 999999);
             $randomNumber = str_pad($randomNumber, 6, '0', STR_PAD_LEFT);
         } while (in_array($randomNumber, $tableNumbers));
 
-
+        // Get next table number
         $sql = "SELECT COUNT(*) AS num_tables FROM DinnerTables WHERE id_restaurant = $ownerid";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $next_table = $stmt->fetchColumn() + 1;
 
+        // Insert the new table
         $sql = "INSERT INTO DinnerTables (id_restaurant, table_number, codenumber) VALUES (:id_restaurant, :table_number, :codenumber)";
-
         $stmt = $conn->prepare($sql);
-
         $stmt->bindParam(':id_restaurant', $ownerid);
         $stmt->bindParam(':table_number', $next_table);
         $stmt->bindParam(':codenumber', $randomNumber);
+        $stmt->execute();
+        
+        // Get the ID of the newly created table
+        $tableId = $conn->lastInsertId();
+        
+        // Create table data to return
+        $newTable = [
+            'id_restaurant' => intval($ownerid),
+            'table_number' => intval($next_table),
+            'codenumber' => $randomNumber,
+            'qr_image' => $imageBase64
+        ];
+        
+        // Generate QR code for the new table
+        $url = 'http://172.17.0.2/' . $restaurantName . "/pedido/" . $randomNumber;
+        $qrCode = QrCode::create($url)
+            ->setSize(250)
+            ->setMargin(40);
 
-        $result = $stmt->execute();
+        $label = Label::create($randomNumber);
+
+        $writer = new PngWriter;
+        $result = $writer->write($qrCode, null, $label);
+        $imageBase64 = base64_encode($result->getString());
+        
+        // Add QR code to table data
+        $newTable['qr_image'] = $imageBase64;
 
         $db = null;
 
-        $response->getBody()->write(json_encode($result));
+        $response->getBody()->write(json_encode($newTable));
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (PDOException $e) {
-
         $error = array(
             "message" => $e->getMessage()
         );

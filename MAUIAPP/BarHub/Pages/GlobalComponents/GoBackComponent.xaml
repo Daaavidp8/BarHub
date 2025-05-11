@@ -9,5 +9,8 @@
     <Border BackgroundColor="Transparent" Padding="10" StrokeThickness="0" VerticalOptions="Center">
         <Image VerticalOptions="Center" Source="{FontImageSource FontFamily=FASolid,Size=15, Glyph={x:Static fa:Solid.ChevronLeft},Color={DynamicResource Muted}}" />
     </Border>
-    
+
+    <ContentView.GestureRecognizers>
+        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+    </ContentView.GestureRecognizers>
 </ContentView>

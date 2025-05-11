@@ -102,7 +102,7 @@ export function ArticlesSection(props) {
                                     <div className="tituloSectionDinner">
                                         <div className="containerImgArticle">
                                             <img
-                                                src={`/images/owners/${props.owner.name}/img/sections/${props.section.name}.png`}
+                                                src={`/../api/public/owners/${props.owner.name}/img/sections/${props.section.name}.png`}
                                                 alt={`Sección de ${props.section.name}`}
                                                 style={{maxWidth: "100%", maxHeight: "100%", left: "10px"}}
                                             />

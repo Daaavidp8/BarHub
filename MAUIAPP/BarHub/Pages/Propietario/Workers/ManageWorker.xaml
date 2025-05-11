@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pages:BarHubBaseContentPage
+    x:Class="BarHub.Pages.Propietario.Workers.ManageWorker"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:globalComponents="clr-namespace:BarHub.Pages.GlobalComponents"
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    xmlns:pages="clr-namespace:BarHub.Pages"
+    xmlns:stringResource="clr-namespace:BarHub.Utils.Translation"
+    xmlns:viewmodel="clr-namespace:BarHub.ViewModel.Owner.Workers"
+    x:DataType="viewmodel:ManageWorkerViewModel"
+    PageTitle="{Binding Title}"
+    Shell.TabBarIsVisible="False">
+
+
+    <pages:BarHubBaseContentPage.Icon>
+        <globalComponents:GoBackComponent x:Name="goBackComponent">
+            <globalComponents:GoBackComponent.GestureRecognizers />
+        </globalComponents:GoBackComponent>
+    </pages:BarHubBaseContentPage.Icon>
+
+    <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
+        <VerticalStackLayout
+            Padding="15"
+            HorizontalOptions="Fill"
+            Spacing="10"
+            VerticalOptions="Fill">
+            <VerticalStackLayout Spacing="5">
+                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=RestaurantNameText}" />
+                <material:TextField
+                    x:Name="nombre"
+                    Title="{stringResource:Translate Name=RestaurantNameText}"
+                    Grid.Row="0"
+                    AccentColor="Black"
+                    BorderThickness="1"
+                    InputBackgroundColor="{x:DynamicResource White}"
+                    SelectionHighlightColor="Orange"
+                    Text="{Binding Worker.Name}"
+                    TextColor="{StaticResource Black}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="5">
+                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=RestaurantNameText}" />
+                <material:TextField
+                    x:Name="username"
+                    Title="{stringResource:Translate Name=RestaurantNameText}"
+                    Grid.Row="0"
+                    AccentColor="Black"
+                    BorderThickness="1"
+                    InputBackgroundColor="{x:DynamicResource White}"
+                    SelectionHighlightColor="Orange"
+                    Text="{Binding Worker.Username}"
+                    TextColor="{StaticResource Black}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="5">
+                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=RestaurantNameText}" />
+                <material:TextField
+                    x:Name="password"
+                    Title="{stringResource:Translate Name=PasswordText}"
+                    Grid.Row="0"
+                    AccentColor="Black"
+                    BorderThickness="1"
+                    InputBackgroundColor="{x:DynamicResource White}"
+                    SelectionHighlightColor="Orange"
+                    Text="{Binding Worker.Password}"
+                    TextColor="{StaticResource Black}">
+                    <material:TextField.Attachments>
+                        <material:TextFieldPasswordShowHideAttachment />
+                    </material:TextField.Attachments>
+                </material:TextField>
+            </VerticalStackLayout>
+
+            <CollectionView ItemsSource="{Binding Worker.RolesUsuario}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout ItemSpacing="5" Orientation="Horizontal" />
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.FooterTemplate>
+                    <DataTemplate>
+                        <VerticalStackLayout
+                            Margin="0,0,15,0"
+                            HeightRequest="30"
+                            VerticalOptions="Center"
+                            WidthRequest="30">
+
+                            <Border
+                                Margin="0,2.5,0,0"
+                                Background="{DynamicResource MainBackground}"
+                                BackgroundColor="Transparent"
+                                HeightRequest="25"
+                                HorizontalOptions="Center"
+                                StrokeThickness=".5"
+                                VerticalOptions="Center"
+                                WidthRequest="25">
+
+                                <Border.StrokeShape>
+                                    <Ellipse VerticalOptions="Center" />
+                                </Border.StrokeShape>
+
+                                <Grid
+                                    HorizontalOptions="Center"
+                                    RowDefinitions="*"
+                                    VerticalOptions="Center">
+
+                                    <HorizontalStackLayout
+                                        Grid.Row="0"
+                                        Padding="0"
+                                        Spacing="3"
+                                        VerticalOptions="Fill">
+                                        <Image
+                                            HeightRequest="15"
+                                            HorizontalOptions="Center"
+                                            Source="{FontImageSource FontFamily=FARegular,
+                                                                     Glyph={x:Static fa:Solid.Plus},
+                                                                     Color={DynamicResource Muted}}"
+                                            VerticalOptions="Center"
+                                            WidthRequest="15" />
+                                    </HorizontalStackLayout>
+
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:ManageWorkerViewModel}}, Path=AddRoleCommand}" />
+                                    </Grid.GestureRecognizers>
+
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.FooterTemplate>
+
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border StrokeShape="RoundRectangle 15">
+                            <Grid
+                                Padding="10,5"
+                                ColumnDefinitions="*,Auto"
+                                ColumnSpacing="5">
+                                <Label Grid.Column="0" Text="{Binding .}" />
+                                <Image Grid.Column="1">
+                                    <Image.Source>
+                                        <FontImageSource
+                                            FontFamily="FASolid"
+                                            Glyph="{x:Static fa:Solid.Xmark}"
+                                            Size="15"
+                                            Color="{StaticResource Muted}" />
+                                    </Image.Source>
+                                    <Image.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:ManageWorkerViewModel}}, Path=DeleteRoleCommand}" CommandParameter="{Binding .}" />
+                                    </Image.GestureRecognizers>
+                                </Image>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:ManageWorkerViewModel}}, Path=ChangeRoleCommand}" CommandParameter="{Binding .}" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button
+                Margin="20"
+                Background="{DynamicResource Primary}"
+                BorderColor="{AppThemeBinding Light={StaticResource Black},
+                                              Dark={StaticResource White}}"
+                BorderWidth=".5"
+                Command="{Binding ActionButtonPressedCommand}"
+                CornerRadius="5"
+                FontAttributes="Bold"
+                Text="{Binding ButtonText}" />
+        </VerticalStackLayout>
+    </ContentView>
+</pages:BarHubBaseContentPage>

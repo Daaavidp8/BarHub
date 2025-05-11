@@ -22,7 +22,7 @@ public partial class RestaurantViewModel : ObservableObject
 
         if (restaurant.Sections is not null)
         {
-            sections = new ObservableCollection<SectionViewModel>(
+            Sections = new ObservableCollection<SectionViewModel>(
                     restaurant.Sections.Select(s => new SectionViewModel(s)));
         }
 
@@ -64,7 +64,7 @@ public partial class RestaurantViewModel : ObservableObject
         set => SetProperty(restaurant.Logo, value, restaurant, (r, v) => r.Logo = v);
     }
 
-    public List<BarHub.Models.Section> GetSectionModels() => sections.Select(svm => svm.ToModel()).ToList();
+    public List<BarHub.Models.Section> GetSectionModels() => Sections.Select(svm => svm.ToModel()).ToList();
 
 
     public List<User> Users

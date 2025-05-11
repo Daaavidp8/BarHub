@@ -17,9 +17,7 @@
 
     <pages:BarHubBaseContentPage.Icon>
         <globalComponents:GoBackComponent x:Name="goBackComponent">
-            <globalComponents:GoBackComponent.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding GoBackCommand}" />
-            </globalComponents:GoBackComponent.GestureRecognizers>
+            <globalComponents:GoBackComponent.GestureRecognizers/>
         </globalComponents:GoBackComponent>
     </pages:BarHubBaseContentPage.Icon>
 

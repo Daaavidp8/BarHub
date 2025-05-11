@@ -30,9 +30,23 @@ namespace BarHub.Lib
 
         public async Task<List<Section>> GetSections(int id)
         {
-            var restaurants = await _methods.GetAsync<List<Section>>($"{ApiConstants.GET_SECTIONS}/{id}");
+            var sections = await _methods.GetAsync<List<Section>>($"{ApiConstants.GET_SECTIONS}/{id}");
 
-            return restaurants;
+            return sections;
+        }
+
+        public async Task<List<User>> GetWorkers(int id)
+        {
+            var workers = await _methods.GetAsync<List<User>>($"{ApiConstants.GET_WORKERS}/{id}");
+
+            return workers;
+        }
+
+        public async Task<List<Table>> GetTables(int id)
+        {
+            var workers = await _methods.GetAsync<List<Table>>($"{ApiConstants.GET_TABLES}/{id}");
+
+            return workers;
         }
     }
 }

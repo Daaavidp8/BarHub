@@ -1,10 +1,6 @@
 ﻿using BarHub.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Section = BarHub.Models.Section;
 
 namespace BarHub.Lib
 {
@@ -15,6 +11,8 @@ namespace BarHub.Lib
         {
             _methods = methods;
         }
+
+        
 
         public async Task ModifyRestaurant(Restaurant restaurant)
         {
@@ -38,7 +36,7 @@ namespace BarHub.Lib
 
         }
 
-        public async Task ModifySection(Section section, int id)
+        public async Task ModifySection(Section section)
         {
             try
             {
@@ -49,6 +47,46 @@ namespace BarHub.Lib
                 };
 
                 await _methods.Put<object, Section>($"{ApiConstants.UPDATE_SECTION}/{section.Id}", data);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+            }
+        }
+
+        public async Task ModifyArticle(Article article)
+        {
+            try
+            {
+                var data = new
+                {
+                    article_name = article.Name,
+                    article_price = article.Price,
+                    article_img = article.Image
+                };
+
+                await _methods.Put<object, Article>($"{ApiConstants.UPDATE_ARTICLE}/{article.Id}", data);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+            }
+        }
+
+
+        public async Task ModifyWorker(User worker)
+        {
+            try
+            {
+                var data = new
+                {
+                    worker_name = worker.Name,
+                    worker_username = worker.Username,
+                    worker_password = worker.Password,
+                    worker_roles = worker.Roles.Select(role => (int)role).ToArray()
+                };
+
+                await _methods.Put<object, User>($"{ApiConstants.UPDATE_WORKER}/{worker.Id}", data);
             }
             catch (Exception e)
             {

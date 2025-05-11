@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pages:BarHubBaseContentPage
+    x:Class="BarHub.Pages.Propietario.ManageSection"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:globalComponents="clr-namespace:BarHub.Pages.GlobalComponents"
+    xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+    xmlns:pages="clr-namespace:BarHub.Pages"
+    xmlns:stringResource="clr-namespace:BarHub.Utils.Translation"
+    xmlns:viewmodel="clr-namespace:BarHub.ViewModel.Owner"
+    x:DataType="viewmodel:ManageSectionViewModel"
+    PageTitle="{Binding Title}"
+    Shell.TabBarIsVisible="False">
+
+    <pages:BarHubBaseContentPage.Icon>
+        <globalComponents:GoBackComponent x:Name="goBackComponent">
+            <globalComponents:GoBackComponent.GestureRecognizers/>
+        </globalComponents:GoBackComponent>
+    </pages:BarHubBaseContentPage.Icon>
+
+    <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
+        <VerticalStackLayout
+            Padding="15"
+            HorizontalOptions="Fill"
+            Spacing="10"
+            VerticalOptions="Fill">
+
+
+            <Grid ColumnDefinitions="*,*" HorizontalOptions="Fill">
+                <VerticalStackLayout
+                    Grid.Column="0"
+                    HorizontalOptions="Fill"
+                    Spacing="10">
+                    <Label Text="{stringResource:Translate Name=RestaurantLogoText}" />
+                    <Button
+                        Background="{DynamicResource Primary}"
+                        BorderColor="{AppThemeBinding Light={StaticResource Black},
+                                                      Dark={StaticResource White}}"
+                        BorderWidth=".5"
+                        Command="{Binding PickFileCommand}"
+                        FontAttributes="Bold"
+                        Text="Insertar Logo" />
+                </VerticalStackLayout>
+                <VerticalStackLayout
+                    Grid.Column="1"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="End">
+                    <Image
+                        x:Name="LogoImage"
+                        HeightRequest="70"
+                        Source="{Binding Section.Image}"
+                        VerticalOptions="End" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <VerticalStackLayout Spacing="5">
+                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=RestaurantNameText}" />
+                <material:TextField
+                    x:Name="nombre"
+                    Title="{stringResource:Translate Name=RestaurantNameText}"
+                    Grid.Row="0"
+                    AccentColor="Black"
+                    BorderThickness="1"
+                    InputBackgroundColor="{x:DynamicResource White}"
+                    SelectionHighlightColor="Orange"
+                    Text="{Binding Section.Name}"
+                    TextColor="{StaticResource Black}" />
+            </VerticalStackLayout>
+
+            <Button
+                Margin="20"
+                Background="{DynamicResource Primary}"
+                BorderColor="{AppThemeBinding Light={StaticResource Black},
+                                              Dark={StaticResource White}}"
+                BorderWidth=".5"
+                Command="{Binding ActionButtonPressedCommand}"
+                CornerRadius="5"
+                FontAttributes="Bold"
+                Text="{Binding ButtonText}" />
+        </VerticalStackLayout>
+    </ContentView>
+</pages:BarHubBaseContentPage>

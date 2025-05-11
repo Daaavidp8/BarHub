@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="BarHub.Pages.Propietario.Workers.CardWorker"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:touchEffects="clr-namespace:Maui.FreakyEffects.TouchEffects;assembly=Maui.FreakyEffects"
+    xmlns:viewmodel="clr-namespace:BarHub.ViewModel.Owner.Workers"
+    x:Name="this"
+    x:DataType="viewmodel:WorkerViewModel"
+    Background="{StaticResource Background}">
+    
+    <Grid
+        Padding="30,10"
+        touchEffects:TouchEffect.Color="{AppThemeBinding Light={StaticResource RippleDark},
+                                                         Dark={StaticResource RippleLight}}"
+        ColumnDefinitions="Auto,*,Auto"
+        ColumnSpacing="10"
+        HorizontalOptions="Fill">
+        <Image
+            Grid.Column="0"
+            HorizontalOptions="Center"
+            Source="{FontImageSource FontFamily=FASolid,
+                                     Glyph={x:Static fa:Solid.CircleUser},
+                                     Color={StaticResource Muted}}" WidthRequest="40"/>
+        <VerticalStackLayout Grid.Column="1">
+            <Label
+                x:Name="name"
+                Grid.Column="1"
+                FontAttributes="Bold" 
+                Text="{Binding Name}"
+                VerticalOptions="Center" />
+            <Label
+                Grid.Column="1"
+                Text="{Binding Username}"
+                VerticalOptions="Center" />
+        </VerticalStackLayout>
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+        </Grid.GestureRecognizers>
+    </Grid>
+</ContentView>

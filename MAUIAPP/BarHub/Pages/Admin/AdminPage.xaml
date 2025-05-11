@@ -46,7 +46,7 @@
                                 </SwipeView.RightItems>
 
 
-                                <adminComponents:CardRestaurant Background="{StaticResource Background}" Restaurant="{Binding .}" />
+                                <adminComponents:CardRestaurant Background="{StaticResource MainBackground}" Restaurant="{Binding .}" />
                             </SwipeView>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

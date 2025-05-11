@@ -5,12 +5,18 @@ using BarHub.Pages.Camarero;
 using BarHub.Pages.Login;
 using BarHub.Pages.Profile;
 using BarHub.Pages.Propietario;
+using BarHub.Pages.Propietario.Articles;
+using BarHub.Pages.Propietario.Workers;
+using BarHub.Pages.Waiter;
 using BarHub.Utils.UI.General;
 using BarHub.ViewModel;
 using BarHub.ViewModel.Admin;
 using BarHub.ViewModel.Interfaces;
 using BarHub.ViewModel.Login;
 using BarHub.ViewModel.Owner;
+using BarHub.ViewModel.Owner.Articles;
+using BarHub.ViewModel.Owner.Workers;
+using BarHub.ViewModel.Waiter;
 using CommunityToolkit.Maui;
 
 #if ANDROID
@@ -60,7 +66,8 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-
+        builder.Services.AddSingleton<IContext<WorkerViewModel>, Context<WorkerViewModel>>();
+        builder.Services.AddSingleton<IContext<ArticleViewModel>, Context<ArticleViewModel>>();
         builder.Services.AddSingleton<IContext<RestaurantViewModel>, Context<RestaurantViewModel>>();
         builder.Services.AddSingleton<IContext<SectionViewModel>, Context<SectionViewModel>>();
         builder.Services.AddTransient<FunctionsUI>();
@@ -79,11 +86,23 @@ public static class MauiProgram
         builder.Services.AddTransient<AdminPage>();
         builder.Services.AddTransient<ManageRestaurantViewModel>();
         builder.Services.AddTransient<ManageRestaurant>();
-        builder.Services.AddTransient<OwnerViewModel>();
+        builder.Services.AddTransient<SectionsPageViewModel>();
         builder.Services.AddTransient<OwnerPage>();
+        builder.Services.AddTransient<ArticlesPageViewModel>();
+        builder.Services.AddTransient<ArticlesPage>();
+        builder.Services.AddTransient<ManageArticleViewModel>();
+        builder.Services.AddTransient<ManageArticle>();
         builder.Services.AddTransient<ManageSectionViewModel>();
         builder.Services.AddTransient<ManageSection>();
+        builder.Services.AddTransient<WorkersPageViewModel>();
+        builder.Services.AddTransient<WorkerViewModel>();
+        builder.Services.AddTransient<ManageWorkerViewModel>();
+        builder.Services.AddTransient<ManageWorker>();
+        builder.Services.AddTransient<DetailsTableViewModel>();
+        builder.Services.AddTransient<TableDetails>();
+        builder.Services.AddTransient<WaiterViewModel>();
         builder.Services.AddTransient<WaiterPage>();
+
 
         return builder.Build();
 	}

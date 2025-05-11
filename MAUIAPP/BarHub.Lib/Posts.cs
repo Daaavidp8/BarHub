@@ -1,11 +1,6 @@
 ﻿using BarHub.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+using Section = BarHub.Models.Section;
 
 namespace BarHub.Lib
 {
@@ -83,6 +78,58 @@ namespace BarHub.Lib
 
         }
 
+        public async Task<Article?> CreateArticle(Article article, int? id)
+        {
+            try
+            {
+                var data = new
+                {
+                    article_name = article.Name,
+                    article_price = article.Price,
+                    article_img = article.Image
+                };
 
+                return await _methods.Post<object, Article>($"{ApiConstants.CREATE_ARTICLE}/{id}", data);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+                return null;
+            }
+        }
+
+        public async Task<User?> CreateWorker(User user, int? id)
+        {
+            try
+            {
+                var data = new
+                {
+                    worker_name = user.Name,
+                    worker_username = user.Username,
+                    worker_password = user.Password,
+                    worker_roles = user.Roles
+                };
+
+                return await _methods.Post<object, User>($"{ApiConstants.CREATE_WORKER}/{id}", data);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+                return null;
+            }
+        }
+
+        public async Task<Table> CreateTable(int restaurant)
+        {
+            try
+            {
+                return await _methods.Post<Table>($"{ApiConstants.ADD_TABLE}/{restaurant}");
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+                return null;
+            }
+        }
     }
 }

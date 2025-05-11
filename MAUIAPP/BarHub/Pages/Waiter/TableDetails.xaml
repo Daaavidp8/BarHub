@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pages:BarHubBaseContentPage
+    x:Class="BarHub.Pages.Waiter.TableDetails"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:globalComponents="clr-namespace:BarHub.Pages.GlobalComponents"
+    xmlns:models="clr-namespace:BarHub.Models;assembly=BarHub.Models"
+    xmlns:pages="clr-namespace:BarHub.Pages"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:touchEffects="clr-namespace:Maui.FreakyEffects.TouchEffects;assembly=Maui.FreakyEffects"
+    xmlns:translation="clr-namespace:BarHub.Utils.Translation"
+    xmlns:viewModels="clr-namespace:BarHub.ViewModel.Waiter"
+    x:Name="DetailsTablePageView"
+    x:DataType="viewModels:DetailsTableViewModel"
+    PageTitle="{Binding PageTitle}"
+    Shell.TabBarIsVisible="False">
+
+
+    <pages:BarHubBaseContentPage.Icon>
+        <globalComponents:GoBackComponent x:Name="goBackComponent">
+            <globalComponents:GoBackComponent.GestureRecognizers />
+        </globalComponents:GoBackComponent>
+    </pages:BarHubBaseContentPage.Icon>
+
+    <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
+        <Grid RowDefinitions="*,Auto" VerticalOptions="Fill">
+            <VerticalStackLayout
+                Grid.Row="0"
+                HorizontalOptions="Center"
+                Spacing="15">
+                <Image
+                    HorizontalOptions="Center"
+                    Source="{Binding QrImageSource}"
+                    WidthRequest="300" />
+                <Button
+                    BackgroundColor="{StaticResource Primary}"
+                    BorderWidth=".5"
+                    Command="{Binding GoToOrderCommand}"
+                    HorizontalOptions="Center"
+                    Text="Realizar Pedido"
+                    TextColor="{StaticResource White}">
+                    <Button.ImageSource>
+                        <FontImageSource
+                            FontFamily="FASolid"
+                            Glyph="{x:Static fa:Solid.ClipboardList}"
+                            Size="20"
+                            Color="{StaticResource White}" />
+                    </Button.ImageSource>
+                </Button>
+            </VerticalStackLayout>
+            <Button
+                Grid.Row="1"
+                Margin="0,0,0,50"
+                BackgroundColor="{StaticResource Error}"
+                BorderWidth=".5"
+                HorizontalOptions="Center"
+                Text="Sacar la cuenta"
+                TextColor="{StaticResource White}">
+                <Button.ImageSource>
+                    <FontImageSource
+                        FontFamily="FASolid"
+                        Glyph="{x:Static fa:Solid.Receipt}"
+                        Size="20"
+                        Color="{StaticResource White}" />
+                </Button.ImageSource>
+            </Button>
+        </Grid>
+    </ContentView>
+</pages:BarHubBaseContentPage>
