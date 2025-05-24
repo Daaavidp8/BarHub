@@ -16,5 +16,7 @@ namespace BarHub.Utils
         public static string Plus => "\u002b";
 
         public static string Workers => "\uf500";
+
+        public static string Orders => "\uf46d";
     }
 }

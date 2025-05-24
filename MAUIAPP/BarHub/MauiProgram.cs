@@ -3,6 +3,7 @@ using BarHub.Pages;
 using BarHub.Pages.Admin;
 using BarHub.Pages.Camarero;
 using BarHub.Pages.Login;
+using BarHub.Pages.Orders;
 using BarHub.Pages.Profile;
 using BarHub.Pages.Propietario;
 using BarHub.Pages.Propietario.Articles;
@@ -13,6 +14,7 @@ using BarHub.ViewModel;
 using BarHub.ViewModel.Admin;
 using BarHub.ViewModel.Interfaces;
 using BarHub.ViewModel.Login;
+using BarHub.ViewModel.Order;
 using BarHub.ViewModel.Owner;
 using BarHub.ViewModel.Owner.Articles;
 using BarHub.ViewModel.Owner.Workers;
@@ -34,17 +36,17 @@ namespace BarHub;
 
 public static class MauiProgram
 {
-	public static MauiApp CreateMauiApp()
-	{
-		var builder = MauiApp.CreateBuilder();
-		builder
-			.UseMauiApp<App>()
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
             .ConfigureMopups()
             .ConfigureFonts(fonts =>
-			{
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 fonts.AddMaterialSymbolsFonts();
                 fonts.AddFluentIconFonts();
                 fonts.AddFontAwesomeIconFonts();
@@ -60,12 +62,22 @@ public static class MauiProgram
 
             })
             .UseUraniumUI()
-		    .UseUraniumUIMaterial();
+            .UseUraniumUIMaterial();
 
         builder.Services.AddMopupsDialogs();
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
+        builder.ConfigureServices();
+
+
+
+        return builder.Build();
+    }
+
+    private static void ConfigureServices(this MauiAppBuilder builder)
+    {
+        builder.Services.AddSingleton<IContext<OrderLineViewModel>, Context<OrderLineViewModel>>();
         builder.Services.AddSingleton<IContext<WorkerViewModel>, Context<WorkerViewModel>>();
         builder.Services.AddSingleton<IContext<ArticleViewModel>, Context<ArticleViewModel>>();
         builder.Services.AddSingleton<IContext<RestaurantViewModel>, Context<RestaurantViewModel>>();
@@ -102,8 +114,7 @@ public static class MauiProgram
         builder.Services.AddTransient<TableDetails>();
         builder.Services.AddTransient<WaiterViewModel>();
         builder.Services.AddTransient<WaiterPage>();
-
-
-        return builder.Build();
-	}
+        builder.Services.AddTransient<OrderPageViewModel>();
+        builder.Services.AddTransient<OrdersPage>();
+    }
 }

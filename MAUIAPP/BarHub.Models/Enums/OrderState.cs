@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BarHub.Models.Enums
 {
-    public enum Enums
+    public enum OrderState
     {
         SERVIDO = 1,
         CANCELADO = 2,
@@ -17,6 +17,8 @@ namespace BarHub.Models.Enums
     {
         ADMIN = 1,
         PROPIETARIO = 2,
-        CAMARERO = 3
+        CAMARERO = 3,
+        ENCARGADOBARRA = 4,
+        COCINERO = 5,
     }
 }

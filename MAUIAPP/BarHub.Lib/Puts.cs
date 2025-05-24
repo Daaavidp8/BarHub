@@ -1,4 +1,5 @@
 ﻿using BarHub.Models;
+using BarHub.Models.Enums;
 using System.Diagnostics;
 using Section = BarHub.Models.Section;
 
@@ -87,6 +88,23 @@ namespace BarHub.Lib
                 };
 
                 await _methods.Put<object, User>($"{ApiConstants.UPDATE_WORKER}/{worker.Id}", data);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+            }
+        }
+
+        public async Task ModifyOrderLine(OrderLine orderLine, OrderState state)
+        {
+            try
+            {
+                var data = new
+                {
+                    id_state = state,
+                };
+
+                await _methods.Put<object, User>($"/set_state_orderLine/{orderLine.Id}", data);
             }
             catch (Exception e)
             {

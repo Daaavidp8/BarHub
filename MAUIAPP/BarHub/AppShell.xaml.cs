@@ -4,6 +4,7 @@ using BarHub.Models.Enums;
 using BarHub.Pages.Admin;
 using BarHub.Pages.Camarero;
 using BarHub.Pages.Login;
+using BarHub.Pages.Orders;
 using BarHub.Pages.Profile;
 using BarHub.Pages.Propietario;
 using BarHub.Pages.Propietario.Articles;
@@ -85,6 +86,23 @@ namespace BarHub
                             {
                                 FontFamily = "FASolid",
                                 Glyph = Icons.Chair,
+                                Size = 20,
+                            } : homeIcon
+                        });
+
+                        Routing.RegisterRoute(nameof(TableDetails), typeof(TableDetails));
+                    }
+
+                    if (user.Roles.Contains(Roles.ENCARGADOBARRA) || user.Roles.Contains(Roles.COCINERO) || user.Roles.Contains(Roles.PROPIETARIO))
+                    {
+                        tabbar.Items.Add(new ShellContent
+                        {
+                            Route = "OrderPage",
+                            Content = new OrdersPage(user, _services),
+                            Icon = user.Roles.Contains(Roles.PROPIETARIO) ? new FontImageSource
+                            {
+                                FontFamily = "FASolid",
+                                Glyph = Icons.Orders,
                                 Size = 20,
                             } : homeIcon
                         });

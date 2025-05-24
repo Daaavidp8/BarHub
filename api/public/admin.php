@@ -97,10 +97,10 @@ $app->post('/create_owner', function (Request $request, Response $response) {
         // Log received data safely
         error_log("CREATE_OWNER received data: " . ($data ? json_encode(array_keys($data)) : "No data received"));
         
-        $name = $data["owner_name"];
-        $cif = $data["owner_CIF"];
-        $email = $data["owner_contact_email"];
-        $phone = $data["owner_contact_phone"];
+        $name = filter_var($data["owner_name"], FILTER_SANITIZE_STRING);
+        $cif = filter_var($data["owner_CIF"], FILTER_SANITIZE_STRING);
+        $email = filter_var($data["owner_contact_email"], FILTER_SANITIZE_STRING);
+        $phone = filter_var($data["owner_contact_phone"], FILTER_SANITIZE_STRING);
         $logoBase64 = isset($data["owner_logo"]) ? $data["owner_logo"] : null;
         
         // Create owners directory if it doesn't exist

@@ -1,6 +1,8 @@
 ﻿
 
 using BarHub.Models;
+using BarHub.Models.Enums;
+using System.Diagnostics;
 
 namespace BarHub.Lib
 {
@@ -47,6 +49,21 @@ namespace BarHub.Lib
             var workers = await _methods.GetAsync<List<Table>>($"{ApiConstants.GET_TABLES}/{id}");
 
             return workers;
+        }
+
+        public async Task<List<Order>> GetOrder(User user, OrderState state)
+        {
+            try
+            {
+                var roles = string.Join(",", user.Roles.Select(r => ((int)r).ToString()));
+                string url = $"/get_pending_order_lines/{user.Restaurant}/{roles}/{(int)state}";
+                return await _methods.GetAsync<List<Order>>(url);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+                return null;
+            }
         }
     }
 }

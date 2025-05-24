@@ -54,6 +54,10 @@ namespace BarHub.Lib
         public const string DELETE_TABLE = "/delete_table";
 
 
+        // Orders
+        public const string GET_ORDERS = "/get_pending_order_lines";
+
+
 
 
     }
