@@ -9,7 +9,7 @@
     x:Name="this"
     x:DataType="viewmodel:WorkerViewModel"
     Background="{StaticResource Background}">
-    
+
     <Grid
         Padding="30,10"
         touchEffects:TouchEffect.Color="{AppThemeBinding Light={StaticResource RippleDark},
@@ -22,12 +22,13 @@
             HorizontalOptions="Center"
             Source="{FontImageSource FontFamily=FASolid,
                                      Glyph={x:Static fa:Solid.CircleUser},
-                                     Color={StaticResource Muted}}" WidthRequest="40"/>
+                                     Color={StaticResource Muted}}"
+            WidthRequest="40" />
         <VerticalStackLayout Grid.Column="1">
             <Label
                 x:Name="name"
                 Grid.Column="1"
-                FontAttributes="Bold" 
+                FontAttributes="Bold"
                 Text="{Binding Name}"
                 VerticalOptions="Center" />
             <Label

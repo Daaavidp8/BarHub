@@ -22,6 +22,9 @@ namespace BarHub.ViewModel.Order
         [ObservableProperty]
         private ObservableCollection<TableGroup> orders;
 
+        [ObservableProperty]
+        private string state;
+
 
         public OrderPageViewModel(IContext<OrderLineViewModel> articleContext, Gets gets,Puts puts, User user)
         {
@@ -32,8 +35,8 @@ namespace BarHub.ViewModel.Order
         private async Task GetOrders(Gets gets, User user)
         {
             var response = new ObservableCollection<OrderViewModel>(
-                (await gets.GetOrder(user, OrderState.PREPARACION))
-                .Select(o => new OrderViewModel(o)));
+             (await gets.GetOrder(user, OrderState.PREPARACION))
+             .Select(o => new OrderViewModel(o)));
 
             var allOrderLines = response
                 .SelectMany(order => order.OrderLines.Select(line => new
@@ -44,16 +47,45 @@ namespace BarHub.ViewModel.Order
                 }))
                 .ToList();
 
-            var groupedByTable = allOrderLines
-                .GroupBy(x => x.TableNumber)
-                .Select(tableGroup => new TableGroup(tableGroup.Key,
-                    tableGroup
-                    .GroupBy(x => x.SectionName)
-                    .Select(sectionGroup => new SectionGroup(sectionGroup.Key, sectionGroup.Select(x => x.OrderLineVM)))
-                ))
-                .ToList();
+            List<TableGroup> groupedByTable;
+
+            if (IsTablet())
+            {
+                groupedByTable = new List<TableGroup>();
+
+                var groupedByTableTemp = allOrderLines
+                    .GroupBy(x => x.TableNumber);
+
+                foreach (var tableGroup in groupedByTableTemp)
+                {
+                    foreach (var sectionGroup in tableGroup.GroupBy(x => x.SectionName))
+                    {
+                        var orderLines = sectionGroup.Select(x => x.OrderLineVM).ToList();
+
+                        for (int i = 0; i < orderLines.Count; i += 4)
+                        {
+                            var chunk = orderLines.Skip(i).Take(4);
+                            var newSectionGroup = new SectionGroup(sectionGroup.Key, chunk);
+                            groupedByTable.Add(new TableGroup(tableGroup.Key, new[] { newSectionGroup }));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                groupedByTable = allOrderLines
+                    .GroupBy(x => x.TableNumber)
+                    .Select(tableGroup => new TableGroup(tableGroup.Key,
+                        tableGroup
+                        .GroupBy(x => x.SectionName)
+                        .Select(sectionGroup => new SectionGroup(sectionGroup.Key, sectionGroup.Select(x => x.OrderLineVM)))
+                    ))
+                    .ToList();
+            }
 
             Orders = new ObservableCollection<TableGroup>(groupedByTable);
+
+
         }
 
 
@@ -97,6 +129,14 @@ namespace BarHub.ViewModel.Order
                     }
                 }
             }
+        }
+
+        public static bool IsTablet()
+        {
+            var width = DeviceDisplay.MainDisplayInfo.Width / DeviceDisplay.MainDisplayInfo.Density;
+
+            // Puedes ajustar este umbral (ej: 600 dp) según tu diseño
+            return width >= 600;
         }
 
     }

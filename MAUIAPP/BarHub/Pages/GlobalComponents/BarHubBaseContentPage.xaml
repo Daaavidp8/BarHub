@@ -1,25 +1,25 @@
-<uranium:UraniumContentPage 
+<uranium:UraniumContentPage
+    x:Class="BarHub.Pages.BarHubBaseContentPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    x:Class="BarHub.Pages.BarHubBaseContentPage"
-    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
     xmlns:components="clr-namespace:BarHub.Pages.GlobalComponents"
     xmlns:pages="clr-namespace:BarHub.Pages"
-    Shell.NavBarIsVisible="False"
-    x:Name="this">
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+    x:Name="this"
+    Shell.NavBarIsVisible="False">
 
     <uranium:UraniumContentPage.Resources>
         <ResourceDictionary>
             <ControlTemplate x:Key="HeaderControlTemplate">
                 <Grid RowDefinitions="Auto,*">
                     <pages:TopAppBar
-                    PageTitle="{Binding PageTitle,Source={x:Reference this}}"
-                    IconTemplate="{Binding Icon,Source={x:Reference this}}"
-                    Grid.Row="0" ZIndex="1" />
+                        Grid.Row="0"
+                        IconTemplate="{Binding Icon, Source={x:Reference this}}"
+                        PageTitle="{Binding PageTitle, Source={x:Reference this}}"
+                        ZIndex="1" />
 
-                    <ContentPresenter 
-                    Grid.Row="1" ZIndex="0"/>
+                    <ContentPresenter Grid.Row="1" ZIndex="0" />
                 </Grid>
             </ControlTemplate>
         </ResourceDictionary>
@@ -28,11 +28,9 @@
 
 
     <uranium:UraniumContentPage.Behaviors>
-        <toolkit:StatusBarBehavior 
-            StatusBarColor="{StaticResource Black}" 
-            StatusBarStyle="LightContent" />
+        <toolkit:StatusBarBehavior StatusBarColor="{StaticResource Black}" StatusBarStyle="LightContent" />
     </uranium:UraniumContentPage.Behaviors>
     <uranium:UraniumContentPage.Attachments>
-        <components:FloatingActionButton Ruta="{Binding FabRoute,Source={x:Reference this}}" IsVisible="False"/>
+        <components:FloatingActionButton IsVisible="False" Ruta="{Binding FabRoute, Source={x:Reference this}}" />
     </uranium:UraniumContentPage.Attachments>
 </uranium:UraniumContentPage>

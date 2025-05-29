@@ -3,18 +3,18 @@
     x:Class="BarHub.Pages.Propietario.Articles.ArticlesPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:components="clr-namespace:BarHub.Pages.Propietario.Articles"
+    xmlns:globalComponents="clr-namespace:BarHub.Pages.GlobalComponents"
     xmlns:pages="clr-namespace:BarHub.Pages"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:viewModel="clr-namespace:BarHub.ViewModel.Owner.Articles"
-    xmlns:components="clr-namespace:BarHub.Pages.Propietario.Articles"
-    xmlns:globalComponents="clr-namespace:BarHub.Pages.GlobalComponents"
     x:DataType="viewModel:ArticlesPageViewModel"
-    PageTitle="{Binding Section.Name}"
-    FabRoute="{Binding GoToManageArticleCommand}">
+    FabRoute="{Binding GoToManageArticleCommand}"
+    PageTitle="{Binding Section.Name}">
 
     <pages:BarHubBaseContentPage.Icon>
         <globalComponents:GoBackComponent x:Name="goBackComponent">
-            <globalComponents:GoBackComponent.GestureRecognizers/>
+            <globalComponents:GoBackComponent.GestureRecognizers />
         </globalComponents:GoBackComponent>
     </pages:BarHubBaseContentPage.Icon>
 
@@ -29,21 +29,21 @@
                                     <SwipeItems>
                                         <SwipeItemView>
                                             <VerticalStackLayout
-                                             Padding="350,0,0,0"
-                                             BackgroundColor="Red"
-                                             HorizontalOptions="Fill"
-                                             VerticalOptions="Center">
+                                                Padding="350,0,0,0"
+                                                BackgroundColor="Red"
+                                                HorizontalOptions="Fill"
+                                                VerticalOptions="Center">
                                                 <Image
-                                                 x:Name="iconTrash"
-                                                 Margin="0,0,30,0"
-                                                 Source="trash_icon"
-                                                 VerticalOptions="Center"
-                                                 WidthRequest="30" />
+                                                    x:Name="iconTrash"
+                                                    Margin="0,0,30,0"
+                                                    Source="trash_icon"
+                                                    VerticalOptions="Center"
+                                                    WidthRequest="30" />
                                             </VerticalStackLayout>
                                         </SwipeItemView>
                                     </SwipeItems>
                                 </SwipeView.RightItems>
-                                <components:CardArticle Article="{Binding .}"/>
+                                <components:CardArticle Article="{Binding .}" />
                             </SwipeView>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

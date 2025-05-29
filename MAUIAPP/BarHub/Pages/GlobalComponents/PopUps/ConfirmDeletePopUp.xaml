@@ -14,7 +14,8 @@
         StrokeThickness="2">
 
         <Grid RowDefinitions="*,*" RowSpacing="20">
-            <Label x:Name="title"
+            <Label
+                x:Name="title"
                 Grid.Row="0"
                 FontAttributes="Bold"
                 HorizontalOptions="Center"

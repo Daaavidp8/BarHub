@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="BarHub.Pages.Orders.OrderCard"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:viewModels="clr-namespace:BarHub.ViewModel.Order"
+    x:Name="this"
+    Padding="0"
+    x:DataType="viewModels:OrderLineViewModel"
+    HorizontalOptions="Fill"
+    VerticalOptions="Center">
+    <Grid
+        Padding="0"
+        ColumnDefinitions="Auto,Auto,*"
+        ColumnSpacing="5"
+        HorizontalOptions="Fill"
+        VerticalOptions="Center">
+        <Image
+            Grid.Column="0"
+            MaximumHeightRequest="30"
+            MaximumWidthRequest="30"
+            Source="{Binding OrderLine.ImageUrl, Source={x:Reference this}}" />
+        <Label
+            Grid.Column="1"
+            FontSize="14"
+            HorizontalOptions="Start"
+            Text="{Binding ArticleName}"
+            VerticalOptions="Center" />
+        <HorizontalStackLayout
+            Grid.Column="2"
+            HorizontalOptions="End"
+            Spacing="5"
+            VerticalOptions="Center">
+            <Button
+                BackgroundColor="Green"
+                Command="{Binding ReadyCommand, Source={x:Reference this}}"
+                CommandParameter="{Binding .}"
+                Style="{StaticResource button}">
+                <Button.ImageSource>
+                    <FontImageSource
+                        FontFamily="FASolid"
+                        Glyph="{x:Static fa:Solid.Check}"
+                        Size="15"
+                        Color="White" />
+                </Button.ImageSource>
+            </Button>
+            <Button
+                BackgroundColor="Red"
+                Command="{Binding CancelCommand, Source={x:Reference this}}"
+                CommandParameter="{Binding .}"
+                Style="{StaticResource button}">
+                <Button.ImageSource>
+                    <FontImageSource
+                        FontFamily="FASolid"
+                        Glyph="{x:Static fa:Solid.Xmark}"
+                        Size="15"
+                        Color="White" />
+                </Button.ImageSource>
+            </Button>
+        </HorizontalStackLayout>
+    </Grid>
+</ContentView>

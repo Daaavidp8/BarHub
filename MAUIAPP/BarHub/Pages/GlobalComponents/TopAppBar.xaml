@@ -11,7 +11,8 @@
             <ContentView
                 Grid.Column="0"
                 Content="{Binding IconTemplate, Source={x:Reference this}}"
-                HorizontalOptions="Start" VerticalOptions="Center" />
+                HorizontalOptions="Start"
+                VerticalOptions="Center" />
 
 
             <Label

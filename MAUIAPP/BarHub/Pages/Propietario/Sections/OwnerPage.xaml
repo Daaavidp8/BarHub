@@ -2,9 +2,9 @@
     x:Class="BarHub.Pages.Propietario.OwnerPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:ownerComponents="clr-namespace:BarHub.Pages.Propietario"
     xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
     xmlns:models="clr-namespace:BarHub.Models;assembly=BarHub.Models"
+    xmlns:ownerComponents="clr-namespace:BarHub.Pages.Propietario"
     xmlns:pages="clr-namespace:BarHub.Pages"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:translation="clr-namespace:BarHub.Utils.Translation"
@@ -44,7 +44,7 @@
                                     </SwipeItems>
                                 </SwipeView.RightItems>
 
-                                <ownerComponents:CardSection Section="{Binding .}"/>
+                                <ownerComponents:CardSection Section="{Binding .}" />
                             </SwipeView>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

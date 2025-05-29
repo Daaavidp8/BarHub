@@ -34,7 +34,13 @@
                 Text="{Binding User.RolesString}"
                 VerticalOptions="Center" />
 
-            <ImageButton Margin="0,10,0,0" Source="{FontImageSource FontFamily=FASolid, Glyph={x:Static fa:Solid.Gear}, Color={AppThemeBinding Light=Black, Dark=White}}"  WidthRequest="25"/>
+            <ImageButton
+                Margin="0,10,0,0"
+                Source="{FontImageSource FontFamily=FASolid,
+                                         Glyph={x:Static fa:Solid.Gear},
+                                         Color={AppThemeBinding Light=Black,
+                                                                Dark=White}}"
+                WidthRequest="25" />
         </VerticalStackLayout>
     </Grid>
 </ContentPage>

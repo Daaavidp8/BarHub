@@ -11,6 +11,10 @@ namespace BarHub.ViewModel.Order
         private OrderLine orderLine;
 
 
+        [ObservableProperty]
+        private int numberItems = 1;
+
+
         public OrderLineViewModel(OrderLine orderLine)
         {
             this.orderLine = orderLine;

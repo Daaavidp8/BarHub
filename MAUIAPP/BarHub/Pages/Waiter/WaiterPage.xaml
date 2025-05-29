@@ -24,18 +24,18 @@
             <Grid Grid.Row="0" toolkit:StateContainer.CurrentState="{Binding State}">
                 <toolkit:StateContainer.StateViews>
                     <CollectionView
-                    Grid.Row="0"
-                    toolkit:StateView.StateKey="Success"
-                    ItemsSource="{Binding Tables}">
+                        Grid.Row="0"
+                        toolkit:StateView.StateKey="Success"
+                        ItemsSource="{Binding Tables}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:Table">
                                 <Grid
-                                Padding="25,10"
-                                touchEffects:TouchEffect.Color="{AppThemeBinding Light={StaticResource RippleDark},
-                                                                                 Dark={StaticResource RippleLight}}"
-                                BackgroundColor="{StaticResource Background}"
-                                ColumnDefinitions="Auto,*"
-                                ColumnSpacing="15">
+                                    Padding="25,10"
+                                    touchEffects:TouchEffect.Color="{AppThemeBinding Light={StaticResource RippleDark},
+                                                                                     Dark={StaticResource RippleLight}}"
+                                    BackgroundColor="{StaticResource Background}"
+                                    ColumnDefinitions="Auto,*"
+                                    ColumnSpacing="15">
                                     <Image Grid.Column="0" HeightRequest="50">
                                         <Image.Source>
                                             <AppThemeBinding>
@@ -50,15 +50,13 @@
                                     </Image>
 
                                     <Label
-                                    Grid.Column="1"
-                                    FontAttributes="Bold"
-                                    FontSize="20"
-                                    Text="{Binding TableNumber, StringFormat='Mesa {0}'}"
-                                    VerticalOptions="Center" />
+                                        Grid.Column="1"
+                                        FontAttributes="Bold"
+                                        FontSize="20"
+                                        Text="{Binding TableNumber, StringFormat='Mesa {0}'}"
+                                        VerticalOptions="Center" />
                                     <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WaiterViewModel}}, Path=GoToTableDetailCommand}"
-                                        CommandParameter="{Binding .}" />
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:WaiterViewModel}}, Path=GoToTableDetailCommand}" CommandParameter="{Binding .}" />
                                     </Grid.GestureRecognizers>
                                 </Grid>
                             </DataTemplate>

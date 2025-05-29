@@ -88,6 +88,33 @@ namespace BarHub.Resources.Languages {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Nombre del Producto.
+        /// </summary>
+        internal static string ArticleNameText {
+            get {
+                return ResourceManager.GetString("ArticleNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Inserta el precio del producto.
+        /// </summary>
+        internal static string ArticlePricePlaceholder {
+            get {
+                return ResourceManager.GetString("ArticlePricePlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Precio del Producto.
+        /// </summary>
+        internal static string ArticlePriceText {
+            get {
+                return ResourceManager.GetString("ArticlePriceText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a CIF.
         /// </summary>
         internal static string CifRestaurantText {
@@ -147,6 +174,24 @@ namespace BarHub.Resources.Languages {
         internal static string CreateRestaurantText {
             get {
                 return ResourceManager.GetString("CreateRestaurantText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Imagen del producto.
+        /// </summary>
+        internal static string ImageArticle {
+            get {
+                return ResourceManager.GetString("ImageArticle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Insertar Imagen.
+        /// </summary>
+        internal static string InsertImageText {
+            get {
+                return ResourceManager.GetString("InsertImageText", resourceCulture);
             }
         }
         

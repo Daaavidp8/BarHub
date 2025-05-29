@@ -15,6 +15,21 @@ namespace BarHub
             InitializeComponent();
             _services = services;
             SetLanguage();
+
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                var ex = e.ExceptionObject as Exception;
+                Console.WriteLine("[UNHANDLED] " + ex?.Message);
+                Console.WriteLine(ex?.StackTrace);
+            };
+
+            TaskScheduler.UnobservedTaskException += (sender, e) =>
+            {
+                Console.WriteLine("[TASK ERROR] " + e.Exception.Message);
+                Console.WriteLine(e.Exception.StackTrace);
+                e.SetObserved();
+            };
+
         }
 
         private void SetLanguage()

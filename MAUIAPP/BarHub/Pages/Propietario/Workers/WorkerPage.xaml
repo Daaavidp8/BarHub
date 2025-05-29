@@ -5,15 +5,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
     xmlns:models="clr-namespace:BarHub.Models;assembly=BarHub.Models"
-    xmlns:workerComponents="clr-namespace:BarHub.Pages.Propietario.Workers"
     xmlns:pages="clr-namespace:BarHub.Pages"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:translation="clr-namespace:BarHub.Utils.Translation"
     xmlns:viewModels="clr-namespace:BarHub.ViewModel.Owner.Workers"
-    PageTitle="Administrador de Personal"
+    xmlns:workerComponents="clr-namespace:BarHub.Pages.Propietario.Workers"
     x:Name="AdminPageView"
     x:DataType="viewModels:WorkersPageViewModel"
-    FabRoute="{Binding GoToManageWorkerCommand}">
+    FabRoute="{Binding GoToManageWorkerCommand}"
+    PageTitle="Administrador de Personal">
 
 
     <pages:BarHubBaseContentPage.Icon>
@@ -23,7 +23,10 @@
     <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
         <Grid toolkit:StateContainer.CurrentState="{Binding State}">
             <toolkit:StateContainer.StateViews>
-                <CollectionView ItemsUpdatingScrollMode="KeepLastItemInView" toolkit:StateView.StateKey="Success" ItemsSource="{Binding Workers}">
+                <CollectionView
+                    toolkit:StateView.StateKey="Success"
+                    ItemsSource="{Binding Workers}"
+                    ItemsUpdatingScrollMode="KeepLastItemInView">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="viewModels:WorkerViewModel">
                             <SwipeView BackgroundColor="Red" SwipeEnded="SwipeView_SwipeEnded">
@@ -46,7 +49,7 @@
                                     </SwipeItems>
                                 </SwipeView.RightItems>
 
-                                <workerComponents:CardWorker Worker="{Binding .}"/>
+                                <workerComponents:CardWorker Worker="{Binding .}" />
                             </SwipeView>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

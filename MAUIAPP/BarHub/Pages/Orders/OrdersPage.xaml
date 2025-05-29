@@ -3,38 +3,38 @@
     x:Class="BarHub.Pages.Orders.OrdersPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:components="clr-namespace:BarHub.Pages.Orders"
     xmlns:fa="clr-namespace:UraniumUI.Icons.FontAwesome;assembly=UraniumUI.Icons.FontAwesome"
+    xmlns:flex="clr-namespace:Microsoft.Maui.Layouts;assembly=Microsoft.Maui"
     xmlns:models="clr-namespace:BarHub.Models;assembly=BarHub.Models"
     xmlns:pages="clr-namespace:BarHub.Pages"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:viewModels="clr-namespace:BarHub.ViewModel.Order"
     x:DataType="viewModels:OrderPageViewModel"
     PageTitle="Administración de pedidos">
+
     <pages:BarHubBaseContentPage.Icon>
         <Image Source="app_icon" WidthRequest="50" />
     </pages:BarHubBaseContentPage.Icon>
 
     <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
-        <ContentView.Resources>
-            <Style x:Key="button" TargetType="Button">
-                <Setter Property="BorderColor" Value="{AppThemeBinding Light=Black, Dark=White}" />
-                <Setter Property="BorderWidth" Value=".5" />
-                <!--<Setter Property="Command" Value="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OrderPageViewModel}}, Path=SetOrderCommand}"/>-->
-            </Style>
-        </ContentView.Resources>
-
-
-
         <ScrollView>
             <FlexLayout
                 AlignItems="Start"
                 Direction="Column"
                 JustifyContent="Start"
                 Wrap="NoWrap">
-                <CollectionView ItemsSource="{Binding Orders}">
+
+                <!--  Primer CollectionView: Orders (TableGroup)  -->
+                <CollectionView Margin="5" ItemsSource="{Binding Orders}">
+                    <CollectionView.ItemsLayout>
+                        <!--  3 columnas en tablet, 1 en móvil  -->
+                        <GridItemsLayout Orientation="Vertical" Span="{OnIdiom Phone=1, Tablet=3}" />
+                    </CollectionView.ItemsLayout>
+
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="viewModels:TableGroup">
-                            <toolkit:Expander IsExpanded="True">
+                            <toolkit:Expander Margin="5" IsExpanded="True">
                                 <toolkit:Expander.Header>
                                     <Label
                                         Padding="10"
@@ -46,14 +46,18 @@
                                 <toolkit:Expander.Content>
                                     <StackLayout Padding="10,0" Spacing="10">
 
+                                        <!--  Segundo CollectionView: SectionGroup (OrderLineViewModel)  -->
                                         <CollectionView ItemsSource="{Binding .}">
+                                            <CollectionView.ItemsLayout>
+                                                <!--  Siempre 1 columna, layout lineal vertical  -->
+                                                <LinearItemsLayout Orientation="Vertical" />
+                                            </CollectionView.ItemsLayout>
 
                                             <CollectionView.ItemTemplate>
                                                 <DataTemplate x:DataType="viewModels:SectionGroup">
-                                                    <toolkit:Expander IsExpanded="True">
+                                                    <toolkit:Expander Margin="2" IsExpanded="True">
                                                         <toolkit:Expander.Header>
                                                             <HorizontalStackLayout Background="{StaticResource Primary}" HorizontalOptions="Fill">
-
                                                                 <Label
                                                                     Margin="0,5"
                                                                     Padding="10"
@@ -63,56 +67,25 @@
                                                                     TextColor="White" />
                                                             </HorizontalStackLayout>
                                                         </toolkit:Expander.Header>
+
                                                         <toolkit:Expander.Content>
-                                                            <CollectionView ItemsSource="{Binding}">
+                                                            <CollectionView
+                                                                HorizontalOptions="Fill"
+                                                                ItemsSource="{Binding}">
+                                                                <CollectionView.ItemsLayout>
+                                                                    <!--  También 1 columna para OrderLineViewModel  -->
+                                                                    <LinearItemsLayout Orientation="Vertical" />
+                                                                </CollectionView.ItemsLayout>
+
                                                                 <CollectionView.ItemTemplate>
                                                                     <DataTemplate x:DataType="viewModels:OrderLineViewModel">
-                                                                        <Grid
-                                                                            Padding="10,2"
-                                                                            ColumnDefinitions="Auto,Auto,*"
-                                                                            ColumnSpacing="5">
-                                                                            <Image
-                                                                                Grid.Column="0"
-                                                                                MaximumHeightRequest="30"
-                                                                                MaximumWidthRequest="30"
-                                                                                Source="{Binding ImageUrl}" />
-                                                                            <Label
-                                                                                Grid.Column="1"
-                                                                                FontSize="14"
-                                                                                Text="{Binding ArticleName}"
-                                                                                VerticalOptions="Center" />
-                                                                            <HorizontalStackLayout
-                                                                                Grid.Column="2"
-                                                                                HorizontalOptions="End"
-                                                                                Spacing="5">
-                                                                                <Button
-                                                                                    BackgroundColor="Green"
-                                                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OrderPageViewModel}}, Path=SetOrderReadyCommand}"
-                                                                                    CommandParameter="{Binding .}"
-                                                                                    Style="{StaticResource button}">
-                                                                                    <Button.ImageSource>
-                                                                                        <FontImageSource
-                                                                                            FontFamily="FASolid"
-                                                                                            Glyph="{x:Static fa:Solid.Check}"
-                                                                                            Size="15"
-                                                                                            Color="White" />
-                                                                                    </Button.ImageSource>
-                                                                                </Button>
-                                                                                <Button
-                                                                                    BackgroundColor="Red"
-                                                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OrderPageViewModel}}, Path=SetOrderCancelledCommand}"
-                                                                                    CommandParameter="{Binding .}"
-                                                                                    Style="{StaticResource button}">
-                                                                                    <Button.ImageSource>
-                                                                                        <FontImageSource
-                                                                                            FontFamily="FASolid"
-                                                                                            Glyph="{x:Static fa:Solid.Xmark}"
-                                                                                            Size="15"
-                                                                                            Color="White" />
-                                                                                    </Button.ImageSource>
-                                                                                </Button>
-                                                                            </HorizontalStackLayout>
-                                                                        </Grid>
+                                                                        <components:OrderCard
+                                                                            Padding="0"
+                                                                            CancelCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OrderPageViewModel}}, Path=SetOrderCancelledCommand}"
+                                                                            HorizontalOptions="Fill"
+                                                                            OrderLine="{Binding}"
+                                                                            ReadyCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OrderPageViewModel}}, Path=SetOrderReadyCommand}"
+                                                                            VerticalOptions="Start" />
                                                                     </DataTemplate>
                                                                 </CollectionView.ItemTemplate>
                                                             </CollectionView>
@@ -131,7 +104,5 @@
 
             </FlexLayout>
         </ScrollView>
-
-
     </ContentView>
 </pages:BarHubBaseContentPage>

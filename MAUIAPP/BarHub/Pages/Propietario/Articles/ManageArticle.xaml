@@ -28,7 +28,7 @@
                     Grid.Column="0"
                     HorizontalOptions="Fill"
                     Spacing="10">
-                    <Label Text="{stringResource:Translate Name=RestaurantLogoText}" />
+                    <Label Text="{stringResource:Translate Name=ImageArticle}" />
                     <Button
                         Background="{DynamicResource Primary}"
                         BorderColor="{AppThemeBinding Light={StaticResource Black},
@@ -51,10 +51,10 @@
             </Grid>
 
             <VerticalStackLayout Spacing="5">
-                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=RestaurantNameText}" />
+                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=ArticleNameText}" />
                 <material:TextField
                     x:Name="name"
-                    Title="{stringResource:Translate Name=RestaurantNameText}"
+                    Title="{stringResource:Translate Name=ArticleNameText}"
                     Grid.Row="0"
                     AccentColor="Black"
                     BorderThickness="1"
@@ -65,10 +65,10 @@
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="5">
-                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=RestaurantNameText}" />
+                <Label FontAttributes="Bold" Text="{stringResource:Translate Name=ArticlePriceText}" />
                 <material:TextField
                     x:Name="price"
-                    Title="{stringResource:Translate Name=RestaurantNameText}"
+                    Title="{stringResource:Translate Name=ArticlePricePlaceholder}"
                     Grid.Row="0"
                     AccentColor="Black"
                     BorderThickness="1"

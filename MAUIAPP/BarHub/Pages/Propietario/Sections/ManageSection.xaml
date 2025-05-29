@@ -14,7 +14,7 @@
 
     <pages:BarHubBaseContentPage.Icon>
         <globalComponents:GoBackComponent x:Name="goBackComponent">
-            <globalComponents:GoBackComponent.GestureRecognizers/>
+            <globalComponents:GoBackComponent.GestureRecognizers />
         </globalComponents:GoBackComponent>
     </pages:BarHubBaseContentPage.Icon>
 

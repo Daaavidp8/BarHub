@@ -195,4 +195,19 @@
   <data name="SectionTitlePage" xml:space="preserve">
     <value>Administración de Secciones</value>
   </data>
+  <data name="InsertImageText" xml:space="preserve">
+    <value>Insertar Imagen</value>
+  </data>
+  <data name="ImageArticle" xml:space="preserve">
+    <value>Imagen del producto</value>
+  </data>
+  <data name="ArticleNameText" xml:space="preserve">
+    <value>Nombre del Producto</value>
+  </data>
+  <data name="ArticlePriceText" xml:space="preserve">
+    <value>Precio del Producto</value>
+  </data>
+  <data name="ArticlePricePlaceholder" xml:space="preserve">
+    <value>Inserta el precio del producto</value>
+  </data>
 </root>

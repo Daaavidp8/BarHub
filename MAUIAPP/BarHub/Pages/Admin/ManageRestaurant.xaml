@@ -17,7 +17,7 @@
 
     <pages:BarHubBaseContentPage.Icon>
         <globalComponents:GoBackComponent x:Name="goBackComponent">
-            <globalComponents:GoBackComponent.GestureRecognizers/>
+            <globalComponents:GoBackComponent.GestureRecognizers />
         </globalComponents:GoBackComponent>
     </pages:BarHubBaseContentPage.Icon>
 
@@ -112,9 +112,10 @@
                 BorderColor="{AppThemeBinding Light={StaticResource Black},
                                               Dark={StaticResource White}}"
                 BorderWidth=".5"
+                Command="{Binding ActionButtonPressedCommand}"
                 CornerRadius="5"
                 FontAttributes="Bold"
-                Text="{Binding ButtonText}" Command="{Binding ActionButtonPressedCommand}"/>
+                Text="{Binding ButtonText}" />
         </VerticalStackLayout>
 
     </ContentView>
