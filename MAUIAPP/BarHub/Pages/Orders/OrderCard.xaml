@@ -35,8 +35,7 @@
             <Button
                 BackgroundColor="Green"
                 Command="{Binding ReadyCommand, Source={x:Reference this}}"
-                CommandParameter="{Binding .}"
-                Style="{StaticResource button}">
+                CommandParameter="{Binding .}">
                 <Button.ImageSource>
                     <FontImageSource
                         FontFamily="FASolid"
@@ -48,8 +47,7 @@
             <Button
                 BackgroundColor="Red"
                 Command="{Binding CancelCommand, Source={x:Reference this}}"
-                CommandParameter="{Binding .}"
-                Style="{StaticResource button}">
+                CommandParameter="{Binding .}">
                 <Button.ImageSource>
                     <FontImageSource
                         FontFamily="FASolid"

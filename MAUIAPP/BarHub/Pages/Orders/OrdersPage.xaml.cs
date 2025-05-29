@@ -10,6 +10,7 @@ public partial class OrdersPage : BarHubBaseContentPage
 	public OrdersPage(User user, IServiceProvider services)
 	{
 		InitializeComponent();
+        Console.WriteLine("Aqui llegaaaaaa, OrdersPage initialized");
         var gets = services.GetService<Gets>();
         var deletes = services.GetService<Deletes>();
         var puts = services.GetService<Puts>();
@@ -19,5 +20,7 @@ public partial class OrdersPage : BarHubBaseContentPage
         var waiterViewModel = new OrderPageViewModel(orderLineContext,gets, puts, user);
 
         BindingContext = waiterViewModel;
+
+        Console.WriteLine("Aqui nooooooo llegaaaaaa, OrdersPage initialized BLABLALALBLALBLAL");
     }
 }
