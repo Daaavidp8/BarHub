@@ -38,7 +38,7 @@ $app->get('/get_tables/{id_owner}', function (Request $request, Response $respon
         $formattedTables = [];
         foreach ($tables as $table) {
             $codenumber = $table['codenumber'];
-            $url = 'http://172.17.0.2/' . $restaurantName . "/pedido/" . $codenumber;
+            $url = BASE_URL . $restaurantName . "/pedido/" . $codenumber;
             
             $qrCode = QrCode::create($url)
                 ->setSize(250)

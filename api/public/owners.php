@@ -35,10 +35,12 @@ $app->get('/get_sections/{id}', function (Request $request, Response $response) 
             $sectionName = $section['name'];
             
             // Get section image and encode it in base64
-            $imagePath = "./owners/{$restaurantName}/img/sections/{$sectionName}.png";
-            if (file_exists($imagePath)) {
-                $imageData = file_get_contents($imagePath);
-                $section['image'] = "data:image/png;base64," . base64_encode($imageData);
+            $imageRelativePath = "/owners/{$restaurantName}/img/sections/{$sectionName}.png";
+            $imageFullPath = "." . $imageRelativePath; // For file_exists check
+            
+            if (file_exists($imageFullPath)) {
+                // Use URL instead of base64
+                $section['image'] = BASE_URL . $imageRelativePath;
             } else {
                 $section['image'] = "";
             }
@@ -53,28 +55,15 @@ $app->get('/get_sections/{id}', function (Request $request, Response $response) 
             // Process each article to include its image
             foreach ($articles as &$article) {
                 $articleName = $article['name'];
-                $articleImagePath = "./owners/{$restaurantName}/img/articles/{$articleName}.png";
+                $articleRelativePath = "/owners/{$restaurantName}/img/articles/{$articleName}.png";
+                $articleFullPath = "." . $articleRelativePath; // For file_exists check
                 
-                if (file_exists($articleImagePath)) {
-                    try {
-                        $articleImageData = file_get_contents($articleImagePath);
-                        // Ensure valid base64 encoding by properly sanitizing the data
-                        $base64Data = base64_encode($articleImageData);
-                        // Validate the base64 string before adding it to the response
-                        if (base64_decode($base64Data, true) !== false) {
-                            $article['image'] = "data:image/png;base64," . $base64Data;
-                        } else {
-                            // If there's an issue with the base64 encoding, return empty string
-                            $article['image'] = "";
-                            error_log("Invalid base64 encoding for article image: {$articleName}");
-                        }
-                    } catch (Exception $e) {
-                        // Handle any exceptions during image processing
-                        $article['image'] = "";
-                        error_log("Error processing article image {$articleName}: " . $e->getMessage());
-                    }
+                if (file_exists($articleFullPath)) {
+                    // Use URL instead of base64
+                    $article['image'] = BASE_URL . $articleRelativePath;
                 } else {
                     $article['image'] = "";
+                    error_log("Article image not found: {$articleFullPath}");
                 }
             }
             

@@ -36,6 +36,8 @@ $app->add(new CorsMiddleware([
     "credentials" => true, // Si necesitas trabajar con cookies o tokens
 ]));
 
+define('BASE_URL', 'http://192.168.1.206:41063');
+
 include "./admin.php";
 include "./owners.php";
 include "./waiters.php";

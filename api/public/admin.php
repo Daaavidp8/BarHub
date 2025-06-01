@@ -5,6 +5,8 @@ global $app;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Models\DB;
+
+
 // Función que devuelve todos los restaurantes
 $app->get('/get_owners', function (Request $request, Response $response) {
     $sql = "SELECT * FROM Restaurants";
@@ -15,14 +17,14 @@ $app->get('/get_owners', function (Request $request, Response $response) {
         $owners = $stmt->fetchAll(PDO::FETCH_OBJ);
         $db = null;
         
-        // Add logo to each owner
+        // Add logo to each owner using URL instead of base64
         foreach ($owners as $owner) {
-            $logoPath = "./owners/" . $owner->name . "/img/logo.png";
-            if (file_exists($logoPath)) {
-                // Read the image file and convert to base64
-                $imageData = file_get_contents($logoPath);
-                $base64Image = base64_encode($imageData);
-                $owner->logo = "data:image/png;base64," . $base64Image;
+            $logoRelativePath = "/owners/" . $owner->name . "/img/logo.png";
+            $logoFullPath = "." . $logoRelativePath; // For file_exists check
+            
+            if (file_exists($logoFullPath)) {
+                // Use URL instead of base64
+                $owner->logo = BASE_URL . $logoRelativePath;
             } else {
                 $owner->logo = null;
             }
