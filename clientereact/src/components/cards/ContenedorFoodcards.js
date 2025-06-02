@@ -1,13 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "../../styles/cards/foodcards.css";
+import { DetailsButton } from "../buttons/Dinner/DetailsButton";
 
 export function ContenedorFoodcards(props) {
     const { table, sections, owner, codenumber } = props;
     
     return (
         <div className="foodCardsContainer">
-            <h2>Menú de {owner?.name || "Restaurante"}</h2>
+            <h2 style={{ color: 'white' }}>Menú de {owner?.name || "Restaurante"}</h2>
             
             {/* Display table information if available */}
             {table && (
@@ -46,12 +47,11 @@ export function ContenedorFoodcards(props) {
             </div>
             
             {/* Link to view current order */}
-            <Link 
-                to={`/${owner.name}/pedido/${codenumber || (table && table.codenumber)}/order`}
-                className="viewOrderButton"
-            >
-                Ver Pedido Actual
-            </Link>
+            <DetailsButton 
+                text="Ver Pedido Actual"
+                idOwner={owner}
+                table={table ? table.table_number : null}
+            />
         </div>
     );
 }

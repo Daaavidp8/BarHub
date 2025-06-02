@@ -5,9 +5,7 @@ import { ReactComponent as Flecha } from '../../../images/arrow-sm-left-svgrepo-
 import { ReactComponent as Resumen } from '../../../images/resumen.svg';
 import { BackButton } from "../../buttons/BackButton";
 import "../../../styles/main/dinner/articleSection.css";
-import { ArticleCard } from "../../cards/ArticleCard";
-import { DetailsButton } from "../../buttons/Dinner/DetailsButton";
-import { ENDPOINTS } from '../../../utils/constants'; // Importing ENDPOINTS from constants
+import { ENDPOINTS } from '../../../utils/constants'; 
 import axiosInstance from '../../../utils/axiosConfig';
 
 export function ArticlesSection(props) {

@@ -25,17 +25,22 @@ export function SecondScreen(props) {
 
     return (
         <>
+                {sections && sections.length > 0 ? (
             <div className="containerCodeScreen">
-                <ContenedorFoodcards 
-                    table={props.table} 
-                    sections={sections}
-                    owner={props.owner}
-                    codenumber={codenumber}
-                />
+                        <ContenedorFoodcards 
+                        table={props.table} 
+                        sections={sections}
+                        owner={props.owner}
+                        codenumber={codenumber}
+                    />
+                    
             </div>
+                    )
+                 : (
+                    <p>No hay secciones disponibles</p>
+                )}
 
-            {/* Display sections with base64 images */}
-            <div className="sectionsContainer">
+            {/* <div className="sectionsContainer">
                 {sections && sections.length > 0 ? (
                     sections.map((section) => (
                         <div key={section.id_section} className="sectionCard">
@@ -52,7 +57,7 @@ export function SecondScreen(props) {
                 ) : (
                     <p>No hay secciones disponibles</p>
                 )}
-            </div>
+            </div> */}
 
             {showConfirmMessage && (
                 <div className={"message " + (message == 2 ? "confirmMessage" : "errorMessage")}>

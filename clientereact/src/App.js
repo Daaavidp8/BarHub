@@ -233,11 +233,18 @@ function App() {
                                                     element={<ArticlesSection owner={owner} table={codigo.table_number}/>}
                                                 />
                                                 {allsections && allsections[index] && allsections[index].length > 0 && allsections[index].map((section) => (
-                                                    <Route
-                                                        key={`${owner.id_restaurant}_${codigo.table_number}_${codigo.codenumber}_${section.name}_AñadirProducto`}
-                                                        path={`/${owner.name}/pedido/${codigo.codenumber}/${section.name}`}
-                                                        element={<ArticlesSection section={section} owner={owner} table={codigo.table_number}/>}
-                                                    />
+                                                    <React.Fragment key={`section-fragment-${section.id_section}`}>
+                                                        <Route
+                                                            key={`${owner.id_restaurant}_${codigo.table_number}_${codigo.codenumber}_resumeOrder`}
+                                                            path={`/${owner.name}/pedido/${codigo.codenumber}/order`}
+                                                            element={<ArticlesSection articles={section.articles} table={codigo.table_number}/>}
+                                                        />
+                                                        <Route
+                                                            key={`${owner.id_restaurant}_${codigo.table_number}_${codigo.codenumber}_${section.name}_AñadirProducto`}
+                                                            path={`/${owner.name}/pedido/${codigo.codenumber}/${section.name}`}
+                                                            element={<ArticlesSection section={section} owner={owner} table={codigo.table_number}/>}
+                                                        />
+                                                    </React.Fragment>
                                                 ))}
                                             </React.Fragment>
                                         ))}
@@ -310,17 +317,19 @@ function App() {
                                                     path={`/${owner.name}/pedido/${codigo.codenumber}`}
                                                     element={<SecondScreen table={codigo} />}
                                                 />
-                                                <Route
-                                                    key={`${owner.id_restaurant}_${codigo.table_number}_${codigo.codenumber}_resumeOrder`}
-                                                    path={`/${owner.name}/pedido/${codigo.codenumber}/order`}
-                                                    element={<ArticlesSection owner={owner} table={codigo.table_number}/>}
-                                                />
-                                                {allsections && allsections[index] && allsections[index].length > 0 && allsections[index].map((section) => (
-                                                    <Route
-                                                        key={`${owner.id_restaurant}_${codigo.table_number}_${codigo.codenumber}_${section.name}_AñadirProducto`}
-                                                        path={`/${owner.name}/pedido/${codigo.codenumber}/${section.name}`}
-                                                        element={<ArticlesSection section={section} owner={owner} table={codigo.table_number}/>}
-                                                    />
+                                               {allsections && allsections[index] && allsections[index].length > 0 && allsections[index].map((section) => (
+                                                    <React.Fragment key={`section-fragment-${section.id_section}`}>
+                                                        <Route
+                                                            key={`${owner.id_restaurant}_${codigo.table_number}_${codigo.codenumber}_resumeOrder`}
+                                                            path={`/${owner.name}/pedido/${codigo.codenumber}/order`}
+                                                            element={<ArticlesSection articles={section.articles} table={codigo.table_number}/>}
+                                                        />
+                                                        <Route
+                                                            key={`${owner.id_restaurant}_${codigo.table_number}_${codigo.codenumber}_${section.name}_AñadirProducto`}
+                                                            path={`/${owner.name}/pedido/${codigo.codenumber}/${section.name}`}
+                                                            element={<ArticlesSection section={section} owner={owner} table={codigo.table_number}/>}
+                                                        />
+                                                    </React.Fragment>
                                                 ))}
                                             </React.Fragment>
                                         ))}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../../styles/buttons/dinner/detailsButton.css";
 import axios from "axios";
-import { ENDPOINTS } from '../../../utils/constants'; // Importing ENDPOINTS from constants
+import { ENDPOINTS,API_CONFIG } from '../../../utils/constants'; // Importing ENDPOINTS from constants
 
 export function DetailsButton(props) {
     const navigate = useNavigate();
@@ -49,7 +49,7 @@ export function DetailsButton(props) {
             <div className="detailsButton" onClick={props.table ? order : goPath}>
                 <p className="textButton">{props.text}</p>
                 <div className="containerImageDinner">
-                    <img src={`/images/owners/${owner}/img/logo.png`} alt={`Logo de ${owner}`} />
+                    <img src={`${API_CONFIG.BASE_URL}/owners/${owner}/img/logo.png`} alt={`Logo de ${owner}`} />
                 </div>
             </div>
         </>

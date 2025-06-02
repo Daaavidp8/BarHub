@@ -49,7 +49,7 @@ export function ArticleCard(props) {
                         <div className="containerImageAndText">
                             <div className="containerImgArticle">
                                 <img
-                                    src={`/images/owners/${props.owner.name}/img/articles/${article.name}.png`}
+                                    src={article.image}
                                     alt={`Imagen de ${article.name}`}
                                     className="articleImage"
                                 />
