@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ENDPOINTS } from '../../utils/constants'; // Importing ENDPOINTS from constants
+import { ENDPOINTS,API_CONFIG } from '../../utils/constants'; // Importing ENDPOINTS from constants
 import axiosInstance from '../../utils/axiosConfig';
 
 // Componente que contiene los articulos, se utiliza para el resumen del pedido y para mostrar los articulos de una sección
@@ -49,7 +49,11 @@ export function ArticleCard(props) {
                         <div className="containerImageAndText">
                             <div className="containerImgArticle">
                                 <img
-                                    src={article.image}
+                                    src={
+                                        article.image
+                                          ? article.image
+                                          : `${API_CONFIG.BASE_URL}/owners/${props.owner.name}/img/articles/${article.name}.png`
+                                      }
                                     alt={`Imagen de ${article.name}`}
                                     className="articleImage"
                                 />
@@ -69,7 +73,7 @@ export function ArticleCard(props) {
                                         console.error('Error al eliminar el producto de la lista:', error);
                                     });
                                 }}>-</div>
-                                <div className="quantityButton" id={index}>{props.numberArticles[index]}</div>
+                                <div className="quantityButton" id={index}>{article.quantity}</div>
                                 <div className="plusButton" onClick={() => {
                                     addArticleBasket(article.id_article).then(() => {
                                         const element = document.getElementById(index);

@@ -53,50 +53,61 @@ $app->get('/resumeOrder/{idRestaurante}/{numeroMesa}', function (Request $reques
         $db = new DB();
         $conn = $db->connect();
 
-        // Obtener los ids de los artículos de la cesta de compras
-        $sql = "SELECT id_article FROM ShoppingBasket WHERE id_restaurant = :idRestaurant AND table_number = :tableNumber";
+        // Obtener id_article y cantidad agrupada por artículo
+        $sql = "SELECT id_article, COUNT(*) AS quantity 
+                FROM OrderLines 
+                WHERE id_state = 6 
+                AND id_order IN (
+                    SELECT id_order FROM Orders WHERE id_restaurant = :idRestaurant AND table_number = :tableNumber
+                )
+                GROUP BY id_article";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':idRestaurant', $idRestaurant, PDO::PARAM_INT);
         $stmt->bindParam(':tableNumber', $numeroMesa, PDO::PARAM_INT);
         $stmt->execute();
-        $articles = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+        $articlesWithQty = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (count($articles) > 0) {
-            $placeholders = rtrim(str_repeat('?,', count($articles)), ',');
+        if (count($articlesWithQty) > 0) {
+            // Extraer sólo los ids para la consulta de detalles
+            $articleIds = array_column($articlesWithQty, 'id_article');
+            $placeholders = rtrim(str_repeat('?,', count($articleIds)), ',');
             $sql = "SELECT * FROM Articles WHERE id_article IN ($placeholders)";
             $stmt = $conn->prepare($sql);
-            foreach ($articles as $index => $article) {
-                $stmt->bindValue(($index + 1), $article, PDO::PARAM_INT);
+            foreach ($articleIds as $index => $idArticle) {
+                $stmt->bindValue(($index + 1), $idArticle, PDO::PARAM_INT);
             }
             $stmt->execute();
             $articlesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Transformar el array de artículos en un objeto con nombres de columnas como claves
-            $articlesOrder = [];
+            // Combinar datos de artículos con cantidad
+            $result = [];
             foreach ($articlesData as $article) {
-                $articlesOrder[] = $article;
+                foreach ($articlesWithQty as $articleQty) {
+                    if ($article['id_article'] == $articleQty['id_article']) {
+                        $article['quantity'] = (int)$articleQty['quantity'];
+                        $result[] = $article;
+                        break;
+                    }
+                }
             }
         } else {
-            $articlesOrder = [];
+            $result = [];
         }
 
         $db = null;
 
-        $response->getBody()->write(json_encode($articlesOrder));
+        $response->getBody()->write(json_encode($result));
         return $response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (PDOException $e) {
-        $error = array(
-            "message" => $e->getMessage()
-        );
-
+        $error = ["message" => $e->getMessage()];
         $response->getBody()->write(json_encode($error));
-        return $response
-            ->withHeader('content-type', 'application/json')
-            ->withStatus(500);
+        return $response->withHeader('content-type', 'application/json')->withStatus(500);
     }
 });
+
+
 
 
 // Añade un articulo al pedido
