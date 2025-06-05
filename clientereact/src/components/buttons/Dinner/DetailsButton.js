@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../../../styles/buttons/dinner/detailsButton.css";
 import axios from "axios";
 import { ENDPOINTS,API_CONFIG } from '../../../utils/constants'; // Importing ENDPOINTS from constants
+import axiosInstance from '../../../utils/axiosConfig';
 
 export function DetailsButton(props) {
     const navigate = useNavigate();
@@ -18,27 +19,10 @@ export function DetailsButton(props) {
 
     const order = async () => {
         try {
-            const resumeOrderResponse = await axios.get(`${ENDPOINTS.RESUME_ORDER}/${props.idOwner.id_restaurant}/${props.table}`);
-
-            if (resumeOrderResponse.data.length > 0) {
-                await Promise.all(resumeOrderResponse.data.map(async (article, index) => {
-                    const numberArticlesResponse = await axios.get(`${ENDPOINTS.GET_NUMBER_ARTICLES}/${props.idOwner.id_restaurant}/${props.table}/${article.id_article}`);
-                    await axios.post(`${ENDPOINTS.ORDER_LOG}`, {
-                        owner_name: props.idOwner.name,
-                        article: article.name,
-                        price: article.price,
-                        number_table: props.table,
-                        codetable: codeNumber,
-                        quantity: numberArticlesResponse.data
-                    });
-                }));
-                await axios.delete(`${ENDPOINTS.DELETE_BASKET}/${props.idOwner.id_restaurant}/${props.table}`);
-                navigate(`/${owner}/pedido/${codeNumber}`);
-                localStorage.setItem('pedido', '2');
-            } else {
-                navigate(`/${owner}/pedido/${codeNumber}`);
-                localStorage.setItem('pedido', '3');
-            }
+            console.log(props.isOrderSummary)
+            console.log(props.idOrder)
+            await axiosInstance.put(`${ENDPOINTS.ORDER}/${props.idOrder}`);
+            navigate(`/${owner}/pedido/${codeNumber}`);
         } catch (e) {
             console.error("Error al realizar el pedido: " + e);
         }
@@ -46,7 +30,7 @@ export function DetailsButton(props) {
 
     return (
         <>
-            <div className="detailsButton" onClick={props.table ? order : goPath}>
+            <div className="detailsButton" onClick={props.isOrderSummary ? order : goPath}>
                 <p className="textButton">{props.text}</p>
                 <div className="containerImageDinner">
                     <img src={`${API_CONFIG.BASE_URL}/owners/${owner}/img/logo.png`} alt={`Logo de ${owner}`} />

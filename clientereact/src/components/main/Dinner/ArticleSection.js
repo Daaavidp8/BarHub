@@ -21,37 +21,65 @@ export function ArticlesSection(props) {
     const [articles, setArticles] = useState([]);
     const [selectedArticles, setSelectedArticles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [order, setOrder] = useState(true);
 
     useEffect(() => {
         const fetchOrderSummary = async () => {
             try {
-                setLoading(true);
-                const res = await axios.get(
+                const response = await axios.get(
                     `${API_CONFIG.BASE_URL}${ENDPOINTS.RESUME_ORDER}/${props.owner.id_restaurant}/${props.table}`,
                     { headers: API_CONFIG.HEADERS }
                 );
-                setArticles(res.data || []);
+                console.log(response.data);
+                return response.data;
             } catch (err) {
-                setArticles([]);
-            } finally {
-                setLoading(false);
+                console.error(err);
+                return []; // Fallback in case of error
             }
         };
-
-        if (isOrderSummary) {
-            fetchOrderSummary();
-        } else if (props.section && props.section.articles && props.section.articles.length > 0) {
-            if (sectionName) {
-                const sectionArticles = props.section.articles.filter(article => {
-                    return article.section_name === sectionName;
-                });
-                setArticles(sectionArticles);
-            } else {
-                setArticles(props.section.articles);
+    
+        const loadArticles = async () => {
+            const data = await fetchOrderSummary();
+            console.log(data);
+            if (data.length != 0) {
+                console.log("Id Order = " + data[0].id_order);
+                setOrder(data[0].id_order);
             }
+        
+            if (isOrderSummary) {
+                setArticles(data);
+            } else if (props.section && props.section.articles && props.section.articles.length > 0) {
+                // Creamos un mapa con los id_article y sus quantities desde data
+                const quantityMap = new Map(
+                    data.map(article => [article.id_article, article.quantity])
+                );
+        
+                // Añadimos quantity a los artículos de props.section.articles
+                const enrichedArticles = props.section.articles.map(article => ({
+                    ...article,
+                    quantity: quantityMap.get(article.id_article) || 0,
+                }));
+        
+                if (sectionName) {
+                    const sectionArticles = enrichedArticles.filter(
+                        article => article.section_name === sectionName
+                    );
+                    setArticles(sectionArticles);
+                    console.log(sectionArticles);
+                } else {
+                    setArticles(enrichedArticles);
+                    console.log(enrichedArticles);
+                }
+        
+            }
+            
             setLoading(false);
-        }
+        };
+        
+    
+        loadArticles();
     }, [isOrderSummary, props.section, sectionName, props.owner, props.table]);
+    
 
     // Cantidad actual de cada artículo
     const numberArticles = articles.map(article => {
@@ -86,7 +114,7 @@ export function ArticlesSection(props) {
                    fontWeight: 500,       // equiv. a font-medium
                  }}
                >
-                 <ClipLoader color="#4B5563" size={40} />
+                 <ClipLoader color="#FFFFFF" size={40} />
                  <div style={{ marginTop: '1rem', animation: 'pulse 2s infinite' }}>
                    Cargando artículos...
                  </div>
@@ -100,6 +128,7 @@ export function ArticlesSection(props) {
                         table={props.table}
                         articles={articles}
                         numberArticles={numberArticles}
+                        order={order}
                     />
                 </>
             ) : (
@@ -123,9 +152,11 @@ export function ArticlesSection(props) {
             )}
 
             <DetailsButton 
-                text="Ver Pedido Actual"
+                text={isOrderSummary? "Finalizar pedido" : "Ver pedido"}
                 idOwner={props.owner}
                 table={props.table ? props.table.table_number : null}
+                isOrderSummary={isOrderSummary}
+                idOrder={order}
             />
         </div>
     );

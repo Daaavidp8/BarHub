@@ -2,15 +2,14 @@
     border-radius: 5px;
     position: sticky;
     bottom: 0;
-    width: 100%;
     height: 50px;
     color: black;
     background-color: orange;
-    margin: 0 auto;
     display: flex;
     align-items: center;
     font-weight: bold;
     justify-content: center;
+    margin: 0 10px;
 }
 
 .containerImageDinner{

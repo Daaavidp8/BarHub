@@ -53,14 +53,14 @@ $app->get('/resumeOrder/{idRestaurante}/{numeroMesa}', function (Request $reques
         $db = new DB();
         $conn = $db->connect();
 
-        // Obtener id_article y cantidad agrupada por artículo
-        $sql = "SELECT id_article, COUNT(*) AS quantity 
+        // Agrupar por id_article e id_order, contar cuántas filas hay para cada combinación
+        $sql = "SELECT id_article, id_order, MAX(id_order_line) as id_order_line, COUNT(*) AS quantity 
                 FROM OrderLines 
                 WHERE id_state = 6 
                 AND id_order IN (
                     SELECT id_order FROM Orders WHERE id_restaurant = :idRestaurant AND table_number = :tableNumber
                 )
-                GROUP BY id_article";
+                GROUP BY id_article, id_order";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':idRestaurant', $idRestaurant, PDO::PARAM_INT);
         $stmt->bindParam(':tableNumber', $numeroMesa, PDO::PARAM_INT);
@@ -79,13 +79,16 @@ $app->get('/resumeOrder/{idRestaurante}/{numeroMesa}', function (Request $reques
             $stmt->execute();
             $articlesData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Combinar datos de artículos con cantidad
+            // Combinar datos de artículos con cantidad, id_order_line e id_order
             $result = [];
-            foreach ($articlesData as $article) {
-                foreach ($articlesWithQty as $articleQty) {
+            foreach ($articlesWithQty as $articleQty) {
+                foreach ($articlesData as $article) {
                     if ($article['id_article'] == $articleQty['id_article']) {
-                        $article['quantity'] = (int)$articleQty['quantity'];
-                        $result[] = $article;
+                        $articleWithLine = $article;
+                        $articleWithLine['quantity'] = (int)$articleQty['quantity'];
+                        $articleWithLine['id_order_line'] = $articleQty['id_order_line'];
+                        $articleWithLine['id_order'] = $articleQty['id_order'];
+                        $result[] = $articleWithLine;
                         break;
                     }
                 }
@@ -111,24 +114,57 @@ $app->get('/resumeOrder/{idRestaurante}/{numeroMesa}', function (Request $reques
 
 
 // Añade un articulo al pedido
-$app->post('/create_row_basket/{id_owner}', function (Request $request, Response $response) {
-    $ownerid = $request->getAttribute('id_owner');
+$app->post('/create_row_basket/{id_owner}', function (Request $request, Response $response, $args) {
+    $ownerid = $args['id_owner'];
     $data = $request->getParsedBody();
     $article = $data["id_article"];
     $numberTable = $data["number_table"];
-
-    
 
     try {
         $db = new DB();
         $conn = $db->connect();
 
-        $sql = "INSERT INTO ShoppingBasket (`id_restaurant`, `table_number`, `id_article`) VALUES (:ownerid, :number_table, :idArticle)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':ownerid', $ownerid);
-        $stmt->bindParam(':idArticle', $article);
-        $stmt->bindParam(':number_table', $numberTable);
-        $stmt->execute();
+        // Buscar la última Order asociada a esa mesa y restaurante
+        $sqlOrder = "SELECT id_order FROM Orders WHERE id_restaurant = :ownerid AND table_number = :number_table ORDER BY id_order DESC LIMIT 1";
+        $stmtOrder = $conn->prepare($sqlOrder);
+        $stmtOrder->bindParam(':ownerid', $ownerid, PDO::PARAM_INT);
+        $stmtOrder->bindParam(':number_table', $numberTable, PDO::PARAM_INT);
+        $stmtOrder->execute();
+        $orderRow = $stmtOrder->fetch(PDO::FETCH_ASSOC);
+
+        if (!$orderRow || !isset($orderRow['id_order'])) {
+            $db = null;
+            $response->getBody()->write(json_encode(['message' => 'No se encontró una orden activa para esa mesa']));
+            return $response->withHeader('content-type', 'application/json')->withStatus(400);
+        }
+
+        $idOrder = $orderRow['id_order'];
+
+        // Obtener article_name y article_price desde la tabla Articles
+        $sqlArticle = "SELECT name, price FROM Articles WHERE id_article = :id_article LIMIT 1";
+        $stmtArticle = $conn->prepare($sqlArticle);
+        $stmtArticle->bindParam(':id_article', $article, PDO::PARAM_INT);
+        $stmtArticle->execute();
+        $articleData = $stmtArticle->fetch(PDO::FETCH_ASSOC);
+
+        if (!$articleData) {
+            $db = null;
+            $response->getBody()->write(json_encode(['message' => 'No se encontró el artículo']));
+            return $response->withHeader('content-type', 'application/json')->withStatus(400);
+        }
+
+        $articleName = $articleData['name'];
+        $articlePrice = $articleData['price'];
+
+        // Insertar la línea en OrderLines
+        $sqlInsert = "INSERT INTO OrderLines (id_article, article_name, article_price, id_state, id_order) 
+                      VALUES (:id_article, :article_name, :article_price, 6, :id_order)";
+        $stmtInsert = $conn->prepare($sqlInsert);
+        $stmtInsert->bindParam(':id_article', $article, PDO::PARAM_INT);
+        $stmtInsert->bindParam(':article_name', $articleName);
+        $stmtInsert->bindParam(':article_price', $articlePrice);
+        $stmtInsert->bindParam(':id_order', $idOrder, PDO::PARAM_INT);
+        $stmtInsert->execute();
 
         $db = null;
 
@@ -136,7 +172,39 @@ $app->post('/create_row_basket/{id_owner}', function (Request $request, Response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (PDOException $e) {
+        $error = array(
+            "message" => $e->getMessage()
+        );
 
+        $response->getBody()->write(json_encode($error));
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(500);
+    }
+});
+
+
+
+// Añade un articulo al pedido
+$app->put('/set_order_to_prep/{id_order}', function (Request $request, Response $response, $args) {
+    $idOrder = $args['id_order'];
+
+    try {
+        $db = new DB();
+        $conn = $db->connect();
+
+        // Cambiar el estado de todas las order_lines con ese id_order y id_state = 6 a id_state = 5
+        $sqlUpdate = "UPDATE OrderLines SET id_state = 5 WHERE id_order = :id_order AND id_state = 6";
+        $stmtUpdate = $conn->prepare($sqlUpdate);
+        $stmtUpdate->bindParam(':id_order', $idOrder, PDO::PARAM_INT);
+        $stmtUpdate->execute();
+
+        $db = null;
+
+        return $response
+            ->withHeader('content-type', 'application/json')
+            ->withStatus(200);
+    } catch (PDOException $e) {
         $error = array(
             "message" => $e->getMessage()
         );
@@ -229,30 +297,44 @@ $app->delete('/delete_article_basket/{idRestaurante}/{numeroMesa}/{idArticulo}',
 });
 
 // Borra todos los articulos del pedido de una mesa
-$app->delete('/delete_basket/{idRestaurante}/{numeroMesa}', function (Request $request, Response $response, $args) {
-    $idRestaurant = $args['idRestaurante'];
-    $numeroMesa = $args['numeroMesa'];
+// Borra la última fila de OrderLines con ese id_order, id_article y id_state = 6
+$app->delete('/delete_article_basket/{idOrder}/{idArticle}', function (Request $request, Response $response, $args) {
+    $idOrder = $args['idOrder'];
+    $idArticle = $args['idArticle'];
 
-    $sql = "DELETE FROM ShoppingBasket WHERE id_restaurant = :idRestaurant AND table_number = :tableNumber";
+    // Buscar la última fila que cumpla las condiciones
+    $sqlSelect = "SELECT id_order_line FROM OrderLines WHERE id_order = :idOrder AND id_article = :idArticle AND id_state = 6 ORDER BY id_order_line DESC LIMIT 1";
 
     try {
         $db = new DB();
         $conn = $db->connect();
-        $conn->beginTransaction();
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':idRestaurant', $idRestaurant, PDO::PARAM_INT);
-        $stmt->bindParam(':tableNumber', $numeroMesa, PDO::PARAM_INT);
-        $stmt->execute();
-        $conn->commit();
-        $db = null;
-        $response->getBody()->write(json_encode(['message' => 'Cesta eliminada exitosamente']));
-        return $response
-            ->withHeader('content-type', 'application/json')
-            ->withStatus(200);
-    } catch (PDOException $e) {
-        if ($conn->inTransaction()) {
-            $conn->rollBack();
+
+        $stmtSelect = $conn->prepare($sqlSelect);
+        $stmtSelect->bindParam(':idOrder', $idOrder, PDO::PARAM_INT);
+        $stmtSelect->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+        $stmtSelect->execute();
+        $row = $stmtSelect->fetch(PDO::FETCH_ASSOC);
+
+        if ($row && isset($row['id_order_line'])) {
+            $idOrderLine = $row['id_order_line'];
+            $sqlDelete = "DELETE FROM OrderLines WHERE id_order_line = :idOrderLine";
+            $stmtDelete = $conn->prepare($sqlDelete);
+            $stmtDelete->bindParam(':idOrderLine', $idOrderLine, PDO::PARAM_INT);
+            $stmtDelete->execute();
+
+            $db = null;
+            $response->getBody()->write(json_encode(['message' => 'Artículo eliminado exitosamente']));
+            return $response
+                ->withHeader('content-type', 'application/json')
+                ->withStatus(200);
+        } else {
+            $db = null;
+            $response->getBody()->write(json_encode(['message' => 'No se encontró la fila a eliminar']));
+            return $response
+                ->withHeader('content-type', 'application/json')
+                ->withStatus(404);
         }
+    } catch (PDOException $e) {
         $error = ['message' => $e->getMessage()];
         $response->getBody()->write(json_encode($error));
         return $response

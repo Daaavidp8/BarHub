@@ -1,10 +1,13 @@
 import axios from "axios";
 import { ENDPOINTS,API_CONFIG } from '../../utils/constants'; // Importing ENDPOINTS from constants
 import axiosInstance from '../../utils/axiosConfig';
+import { useEffect } from "react";
 
 // Componente que contiene los articulos, se utiliza para el resumen del pedido y para mostrar los articulos de una sección
 
 export function ArticleCard(props) {
+
+
 
     const addArticleBasket = async (idArticle) => {
         try {
@@ -17,7 +20,7 @@ export function ArticleCard(props) {
             // Make sure we're sending the data in the correct format
             const response = await axiosInstance.post(`${ENDPOINTS.CREATE_ROW_BASKET}/${props.owner.id_restaurant}`, {
                 id_article: idArticle,
-                number_table: props.table,
+                number_table: props.table
             }, {
                 headers: {
                      'Content-Type': 'multipart/form-data'
@@ -35,7 +38,7 @@ export function ArticleCard(props) {
 
     const deleteArticleBasket = async (idArticle) => {
         try {
-            await axiosInstance.delete(`${ENDPOINTS.DELETE_ARTICLE}/${props.owner.id_restaurant}/${props.table}/${idArticle}`);
+            await axiosInstance.delete(`${ENDPOINTS.DELETE_ARTICLE}/${props.order}/${idArticle}`);
         } catch (e) {
             console.error("Error al eliminar el articulo de la lista: " + e)
         }

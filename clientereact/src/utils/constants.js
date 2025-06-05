@@ -32,6 +32,7 @@ export const ENDPOINTS = {
     GET_SECTION: '/get_section',
     CREATE_SECTION: '/create_section',
     CREATE_ARTICLE: '/create_article',
+    ORDER: "/set_order_to_prep"
 };
 
 // Local Storage Keys
