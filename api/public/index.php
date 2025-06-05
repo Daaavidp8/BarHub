@@ -29,7 +29,7 @@ $app->options('/{routes:.+}', function (Request $request, Response $response) {
 });
 
 $app->add(new CorsMiddleware([
-    "origin" => ["http://localhost:41064"], // Permite solicitudes desde este origen
+    "origin" => ["http://192.168.1.206:41064"], // Permite solicitudes desde este origen
     "methods" => ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Métodos permitidos
     "headers.allow" => ["Content-Type", "Authorization"], // Encabezados permitidos
     "headers.expose" => ["Authorization"], // Si necesitas exponer algún encabezado

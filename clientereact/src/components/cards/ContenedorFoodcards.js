@@ -47,11 +47,11 @@ export function ContenedorFoodcards(props) {
             </div>
             
             {/* Link to view current order */}
-            <DetailsButton 
+            {/* <DetailsButton 
                 text="Ver Pedido Actual"
                 idOwner={owner}
                 table={table ? table.table_number : null}
-            />
+            /> */}
         </div>
     );
 }

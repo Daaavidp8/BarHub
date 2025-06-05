@@ -22,6 +22,7 @@ export function DetailsButton(props) {
             console.log(props.isOrderSummary)
             console.log(props.idOrder)
             await axiosInstance.put(`${ENDPOINTS.ORDER}/${props.idOrder}`);
+            localStorage.setItem('pedido', 'true');
             navigate(`/${owner}/pedido/${codeNumber}`);
         } catch (e) {
             console.error("Error al realizar el pedido: " + e);
