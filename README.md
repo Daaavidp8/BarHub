@@ -12,7 +12,7 @@ BarHub es una aplicación web diseñada para gestionar bares y restaurantes. Per
 - **Seguridad:** Ofrece funciones de autenticación y control de acceso para proteger la información sensible.
 
 ## Tecnologías Utilizadas
-- **Frontend:** React.js, HTML, CSS
+- **Frontend:** .NET MAUI, React.js, HTML, CSS
 - **Backend:** PHP, Slim4
 
 
