@@ -11,7 +11,7 @@
     HorizontalOptions="Fill"
     VerticalOptions="Center">
     <Grid
-        Padding="0"
+        Padding="0,5,0,0"
         ColumnDefinitions="Auto,Auto,*"
         ColumnSpacing="5"
         HorizontalOptions="Fill"
@@ -23,6 +23,7 @@
             Source="{Binding OrderLine.ImageUrl, Source={x:Reference this}}" />
         <Label
             Grid.Column="1"
+            Margin="10,0,0,0"
             FontSize="14"
             HorizontalOptions="Start"
             Text="{Binding ArticleName}"

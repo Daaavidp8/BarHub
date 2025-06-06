@@ -124,8 +124,17 @@ $app->post('/create_row_basket/{id_owner}', function (Request $request, Response
         $db = new DB();
         $conn = $db->connect();
 
-        // Buscar la última Order asociada a esa mesa y restaurante
-        $sqlOrder = "SELECT id_order FROM Orders WHERE id_restaurant = :ownerid AND table_number = :number_table ORDER BY id_order DESC LIMIT 1";
+        // Buscar la última orden con líneas activas (id_state 5 o 6)
+        $sqlOrder = "
+            SELECT DISTINCT o.id_order
+            FROM Orders o
+            JOIN OrderLines ol ON ol.id_order = o.id_order
+            WHERE o.id_restaurant = :ownerid
+            AND o.table_number = :number_table
+            AND ol.id_state IN (5,6)
+            ORDER BY o.id_order DESC
+            LIMIT 1
+        ";
         $stmtOrder = $conn->prepare($sqlOrder);
         $stmtOrder->bindParam(':ownerid', $ownerid, PDO::PARAM_INT);
         $stmtOrder->bindParam(':number_table', $numberTable, PDO::PARAM_INT);
@@ -133,14 +142,18 @@ $app->post('/create_row_basket/{id_owner}', function (Request $request, Response
         $orderRow = $stmtOrder->fetch(PDO::FETCH_ASSOC);
 
         if (!$orderRow || !isset($orderRow['id_order'])) {
-            $db = null;
-            $response->getBody()->write(json_encode(['message' => 'No se encontró una orden activa para esa mesa']));
-            return $response->withHeader('content-type', 'application/json')->withStatus(400);
+            // No existe orden activa, crear nueva
+            $sqlInsertOrder = "INSERT INTO Orders (id_restaurant, restaurant_name, order_date, client_ipaddress, table_number, total) VALUES (:ownerid, '', NOW(), '', :number_table, 0)";
+            $stmtInsertOrder = $conn->prepare($sqlInsertOrder);
+            $stmtInsertOrder->bindParam(':ownerid', $ownerid, PDO::PARAM_INT);
+            $stmtInsertOrder->bindParam(':number_table', $numberTable, PDO::PARAM_INT);
+            $stmtInsertOrder->execute();
+            $idOrder = $conn->lastInsertId();
+        } else {
+            $idOrder = $orderRow['id_order'];
         }
 
-        $idOrder = $orderRow['id_order'];
-
-        // Obtener article_name y article_price desde la tabla Articles
+        // Obtener article_name y article_price desde Articles
         $sqlArticle = "SELECT name, price FROM Articles WHERE id_article = :id_article LIMIT 1";
         $stmtArticle = $conn->prepare($sqlArticle);
         $stmtArticle->bindParam(':id_article', $article, PDO::PARAM_INT);
@@ -156,7 +169,7 @@ $app->post('/create_row_basket/{id_owner}', function (Request $request, Response
         $articleName = $articleData['name'];
         $articlePrice = $articleData['price'];
 
-        // Insertar la línea en OrderLines
+        // Insertar línea en OrderLines
         $sqlInsert = "INSERT INTO OrderLines (id_article, article_name, article_price, id_state, id_order) 
                       VALUES (:id_article, :article_name, :article_price, 6, :id_order)";
         $stmtInsert = $conn->prepare($sqlInsert);
@@ -172,9 +185,7 @@ $app->post('/create_row_basket/{id_owner}', function (Request $request, Response
             ->withHeader('content-type', 'application/json')
             ->withStatus(200);
     } catch (PDOException $e) {
-        $error = array(
-            "message" => $e->getMessage()
-        );
+        $error = array("message" => $e->getMessage());
 
         $response->getBody()->write(json_encode($error));
         return $response
@@ -182,6 +193,7 @@ $app->post('/create_row_basket/{id_owner}', function (Request $request, Response
             ->withStatus(500);
     }
 });
+
 
 
 

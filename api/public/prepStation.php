@@ -408,7 +408,7 @@ $app->get('/get_pending_order_lines/{idRestaurante}/{idRoles}/{idState}', functi
                     // Generate image path based on restaurant and article names
                     $restaurantName = $restaurant['name'] ?? '';
                     $articleName = $article['name'] ?? '';
-                    $imagePath = "http://192.168.1.146:41063/owners/{$restaurantName}/img/articles/{$articleName}.png";
+                    $imagePath = BASE_URL . "/owners/{$restaurantName}/img/articles/{$articleName}.png";
                     
                     $restructuredArticle = [
                         'id_article' => $article['id_article'],

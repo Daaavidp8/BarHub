@@ -18,91 +18,107 @@
     </pages:BarHubBaseContentPage.Icon>
 
     <ContentView x:Name="template" ControlTemplate="{StaticResource HeaderControlTemplate}">
-        <ScrollView>
-            <FlexLayout
-                AlignItems="Start"
-                Direction="Column"
-                JustifyContent="Start"
-                Wrap="NoWrap">
 
-                <!--  Primer CollectionView: Orders (TableGroup)  -->
-                <CollectionView Margin="5" ItemsSource="{Binding Orders}">
-                    <CollectionView.ItemsLayout>
-                        <!--  3 columnas en tablet, 1 en móvil  -->
-                        <GridItemsLayout Orientation="Vertical" Span="{OnIdiom Phone=1, Tablet=3}" />
-                    </CollectionView.ItemsLayout>
+        <Grid
+            toolkit:StateContainer.CurrentState="{Binding State}"
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill">
+            <!--  Estado: FULL (Pedidos disponibles)  -->
+            <toolkit:StateContainer.StateViews>
+                <!--  FULL  -->
+                <Grid toolkit:StateView.StateKey="Full">
+                    <ScrollView>
+                        <FlexLayout
+                            AlignItems="Start"
+                            Direction="Column"
+                            JustifyContent="Start"
+                            Wrap="NoWrap">
 
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="viewModels:TableGroup">
-                            <toolkit:Expander Margin="5" IsExpanded="True">
-                                <toolkit:Expander.Header>
-                                    <Label
-                                        Padding="10"
-                                        FontAttributes="Bold"
-                                        FontSize="20"
-                                        Text="{Binding TableNumber, StringFormat='Mesa {0}'}" />
-                                </toolkit:Expander.Header>
+                            <CollectionView Margin="5" ItemsSource="{Binding Orders}">
+                                <CollectionView.ItemsLayout>
+                                    <GridItemsLayout Orientation="Vertical" Span="{OnIdiom Phone=1, Tablet=3}" />
+                                </CollectionView.ItemsLayout>
 
-                                <toolkit:Expander.Content>
-                                    <StackLayout Padding="10,0" Spacing="10">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="viewModels:TableGroup">
+                                        <toolkit:Expander Margin="5" IsExpanded="True">
+                                            <toolkit:Expander.Header>
+                                                <Label
+                                                    Padding="10"
+                                                    FontAttributes="Bold"
+                                                    FontSize="20"
+                                                    Text="{Binding TableNumber, StringFormat='Mesa {0}'}" />
+                                            </toolkit:Expander.Header>
 
-                                        <!--  Segundo CollectionView: SectionGroup (OrderLineViewModel)  -->
-                                        <CollectionView ItemsSource="{Binding .}">
-                                            <CollectionView.ItemsLayout>
-                                                <!--  Siempre 1 columna, layout lineal vertical  -->
-                                                <LinearItemsLayout Orientation="Vertical" />
-                                            </CollectionView.ItemsLayout>
+                                            <toolkit:Expander.Content>
+                                                <StackLayout Padding="10,0" Spacing="10">
+                                                    <CollectionView ItemsSource="{Binding .}">
+                                                        <CollectionView.ItemsLayout>
+                                                            <LinearItemsLayout Orientation="Vertical" />
+                                                        </CollectionView.ItemsLayout>
 
-                                            <CollectionView.ItemTemplate>
-                                                <DataTemplate x:DataType="viewModels:SectionGroup">
-                                                    <toolkit:Expander Margin="2" IsExpanded="True">
-                                                        <toolkit:Expander.Header>
-                                                            <HorizontalStackLayout Background="{StaticResource Primary}" HorizontalOptions="Fill">
-                                                                <Label
-                                                                    Margin="0,5"
-                                                                    Padding="10"
-                                                                    Background="{StaticResource Primary}"
-                                                                    FontSize="16"
-                                                                    Text="{Binding SectionName}"
-                                                                    TextColor="White" />
-                                                            </HorizontalStackLayout>
-                                                        </toolkit:Expander.Header>
+                                                        <CollectionView.ItemTemplate>
+                                                            <DataTemplate x:DataType="viewModels:SectionGroup">
+                                                                <toolkit:Expander Margin="2" IsExpanded="True">
+                                                                    <toolkit:Expander.Header>
+                                                                        <HorizontalStackLayout Background="{StaticResource Primary}" HorizontalOptions="Fill">
+                                                                            <Label
+                                                                                Margin="0,5"
+                                                                                Padding="10"
+                                                                                Background="{StaticResource Primary}"
+                                                                                FontSize="16"
+                                                                                Text="{Binding SectionName}"
+                                                                                TextColor="White" />
+                                                                        </HorizontalStackLayout>
+                                                                    </toolkit:Expander.Header>
 
-                                                        <toolkit:Expander.Content>
-                                                            <CollectionView
-                                                                HorizontalOptions="Fill"
-                                                                ItemsSource="{Binding}">
-                                                                <CollectionView.ItemsLayout>
-                                                                    <!--  También 1 columna para OrderLineViewModel  -->
-                                                                    <LinearItemsLayout Orientation="Vertical" />
-                                                                </CollectionView.ItemsLayout>
+                                                                    <toolkit:Expander.Content>
+                                                                        <CollectionView HorizontalOptions="Fill" ItemsSource="{Binding}">
+                                                                            <CollectionView.ItemsLayout>
+                                                                                <LinearItemsLayout Orientation="Vertical" />
+                                                                            </CollectionView.ItemsLayout>
 
-                                                                <CollectionView.ItemTemplate>
-                                                                    <DataTemplate x:DataType="viewModels:OrderLineViewModel">
-                                                                        <components:OrderCard
-                                                                            Padding="0"
-                                                                            CancelCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OrderPageViewModel}}, Path=SetOrderCancelledCommand}"
-                                                                            HorizontalOptions="Fill"
-                                                                            OrderLine="{Binding}"
-                                                                            ReadyCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OrderPageViewModel}}, Path=SetOrderReadyCommand}"
-                                                                            VerticalOptions="Start" />
-                                                                    </DataTemplate>
-                                                                </CollectionView.ItemTemplate>
-                                                            </CollectionView>
-                                                        </toolkit:Expander.Content>
-                                                    </toolkit:Expander>
-                                                </DataTemplate>
-                                            </CollectionView.ItemTemplate>
-                                        </CollectionView>
+                                                                            <CollectionView.ItemTemplate>
+                                                                                <DataTemplate x:DataType="viewModels:OrderLineViewModel">
+                                                                                    <components:OrderCard
+                                                                                        Padding="0"
+                                                                                        CancelCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OrderPageViewModel}}, Path=SetOrderCancelledCommand}"
+                                                                                        HorizontalOptions="Fill"
+                                                                                        OrderLine="{Binding}"
+                                                                                        ReadyCommand="{Binding Source={RelativeSource AncestorType={x:Type viewModels:OrderPageViewModel}}, Path=SetOrderReadyCommand}"
+                                                                                        VerticalOptions="Start" />
+                                                                                </DataTemplate>
+                                                                            </CollectionView.ItemTemplate>
+                                                                        </CollectionView>
+                                                                    </toolkit:Expander.Content>
+                                                                </toolkit:Expander>
+                                                            </DataTemplate>
+                                                        </CollectionView.ItemTemplate>
+                                                    </CollectionView>
+                                                </StackLayout>
+                                            </toolkit:Expander.Content>
+                                        </toolkit:Expander>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </FlexLayout>
+                    </ScrollView>
+                </Grid>
 
-                                    </StackLayout>
-                                </toolkit:Expander.Content>
-                            </toolkit:Expander>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-
-            </FlexLayout>
-        </ScrollView>
+                <!--  EMPTY  -->
+                <Grid
+                    toolkit:StateView.StateKey="Empty"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+                    <!--  Aquí colocas tu imagen personalizada  -->
+                    <Image
+                        HeightRequest="200"
+                        Source="your_placeholder_image.png"
+                        WidthRequest="200" />
+                    <Label Text="No hay imagenes jijijiji" />
+                </Grid>
+            </toolkit:StateContainer.StateViews>
+        </Grid>
     </ContentView>
+
 </pages:BarHubBaseContentPage>

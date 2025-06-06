@@ -61,6 +61,7 @@ namespace BarHub.Lib
             }
             catch (Exception e)
             {
+                
                 Trace.WriteLine(e.Message);
                 return null;
             }

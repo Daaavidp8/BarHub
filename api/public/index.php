@@ -29,14 +29,14 @@ $app->options('/{routes:.+}', function (Request $request, Response $response) {
 });
 
 $app->add(new CorsMiddleware([
-    "origin" => ["http://192.168.1.206:41064"], // Permite solicitudes desde este origen
+    "origin" => ["http://localhost:41064"], // Permite solicitudes desde este origen
     "methods" => ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Métodos permitidos
     "headers.allow" => ["Content-Type", "Authorization"], // Encabezados permitidos
     "headers.expose" => ["Authorization"], // Si necesitas exponer algún encabezado
     "credentials" => true, // Si necesitas trabajar con cookies o tokens
 ]));
 
-define('BASE_URL', 'http://192.168.1.206:41063');
+define('BASE_URL', 'http://192.168.1.131:41063');
 
 include "./admin.php";
 include "./owners.php";
@@ -45,55 +45,62 @@ include "./dinners.php";
 include "./prepStation.php";
 include "./JWT.php";
 
-// $authMiddleware = function ($request, $handler) {
-//     $response = new \Slim\Psr7\Response();
+$authMiddleware = function ($request, $handler) {
+    $response = new \Slim\Psr7\Response();
     
-//     $header = $request->getHeaderLine('Authorization');
-//     if (empty($header)) {
-//         $response->getBody()->write(json_encode(['error' => 'Token no proporcionado']));
-//         return $response
-//             ->withStatus(401)
-//             ->withHeader('Content-Type', 'application/json');
-//     }
+    $header = $request->getHeaderLine('Authorization');
+    if (empty($header)) {
+        $response->getBody()->write(json_encode(['error' => 'Token no proporcionado']));
+        return $response
+            ->withStatus(401)
+            ->withHeader('Content-Type', 'application/json');
+    }
 
-//     try {
-//         $token = str_replace('Bearer ', '', $header);
-//         $decoded = JWT::decode($token, new Key(JWT_SECRET, 'HS256'));
+    try {
+        $token = str_replace('Bearer ', '', $header);
+        $decoded = JWT::decode($token, new Key(JWT_SECRET, 'HS256'));
         
-//         $request = $request->withAttribute('user', $decoded);
-//         return $handler->handle($request);
-//     } catch (Exception $e) {
-//         $response->getBody()->write(json_encode(['error' => 'Token inválido']));
-//         return $response
-//             ->withStatus(401)
-//             ->withHeader('Content-Type', 'application/json');
-//     }
-// };
+        $request = $request->withAttribute('user', $decoded);
+        return $handler->handle($request);
+    } catch (Exception $e) {
+        $response->getBody()->write(json_encode(['error' => 'Token inválido']));
+        return $response
+            ->withStatus(401)
+            ->withHeader('Content-Type', 'application/json');
+    }
+};
 
-// $app->add(function ($request, $handler) use ($authMiddleware) {
-//     $route = $request->getUri()->getPath();
-//     $method = $request->getMethod();
+$app->add(function ($request, $handler) use ($authMiddleware) {
+    $route = $request->getUri()->getPath();
+    $method = $request->getMethod();
 
-//     if ($method === 'OPTIONS') {
-//         $response = new \Slim\Psr7\Response();
-//         $origin = $request->getHeaderLine('Origin');
-//         if (!empty($origin)) {
-//             $response = $response
-//                 ->withHeader('Access-Control-Allow-Origin', $origin)
-//                 ->withHeader('Access-Control-Allow-Credentials', 'true')
-//                 ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-//                 ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-//                 ->withStatus(200);
-//         }
-//         return $response;
-//     }
+    if ($method === 'OPTIONS') {
+        $response = new \Slim\Psr7\Response();
+        $origin = $request->getHeaderLine('Origin');
+        if (!empty($origin)) {
+            $response = $response
+                ->withHeader('Access-Control-Allow-Origin', $origin)
+                ->withHeader('Access-Control-Allow-Credentials', 'true')
+                ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+                ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+                ->withStatus(200);
+        }
+        return $response;
+    }
 
-//     if ($route === '/get_sesion') {
-//         return $handler->handle($request);
-//     }
+    $routes = ['/get_sesion','/get_owners','/get_waiters','/get_dinners','/get_prep_station','/get_sections','/get_tables','/create_row_basket','/resumeOrder','/set_order_to_prep'];
 
-//     return $authMiddleware($request, $handler);
-// });
+        foreach ($routes as $allowed) {
+            if (strpos($route, $allowed) === 0) {
+                return $handler->handle($request);
+            }
+        }
+        return $handler->handle($request);
+
+
+
+    return $authMiddleware($request, $handler);
+});
 
 $app->post('/get_sesion', function (Request $request, Response $response) {
     try {

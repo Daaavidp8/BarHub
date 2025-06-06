@@ -126,14 +126,8 @@ export function ArticlesSection(props) {
                         {articles.length > 0 ? (
                             <ArticleCard articles={articles} owner={props.owner} numberArticles={numberArticles}
                                          table={props.table}/>
-                        ) : (
-                            <div className="container-error-message">
-                                <div className="error-message">
-                                    {props.section ? "Ups! Parece que al propietario se le ha olvidado añadir artículos a esta sección." :
-                                        "Vaya! Aun no hay articulos añadidos a tu pedido."}
-                                </div>
-                            </div>
-                        )}
+                        ): null}
+
 
                         <div className="containerDetailsButton" style={props.section ? null : ({height: "100px"})}>
                             <div>
